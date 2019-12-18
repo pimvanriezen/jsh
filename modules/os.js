@@ -179,6 +179,14 @@ ls = function(path) {
     }
 }
 
+stat = function(path) {
+    sys.stat (""+path);
+}
+
+exists = function(path) {
+    return ($(path).count() != 0);
+}
+
 load = function(name) {
     var nm = ""+name;
     if (sys.stat(nm)) {
