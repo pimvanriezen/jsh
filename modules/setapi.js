@@ -64,6 +64,26 @@ setapi = function(defarr) {
         return console.log (cmd, argv);
     }
     obj.help = function() {
+        var maxlen=function(str) {
+            if (! this.max) this.max = 0;
+            if (str) {
+                var len = (""+str).length;
+                if (len>this.max) this.max = len;
+            }
+            return this.max;
+        }
+        maxlen("123456");
+        for (var k in defarr) {
+            var o = defarr[k];
+            var kk;
+            if (o.arg) maxlen (o.arg);
+            else if (o.opt) {
+                for (kk in o.opt) maxlen(kk);
+            }
+            else if (o.flag) {
+                for (kk in o.flag) maxlen(kk); 
+            }
+        }
         var cmd = "command";
         for (var ii in defarr) {
             if (defarr[ii].name) {
@@ -93,7 +113,7 @@ setapi = function(defarr) {
             if (def.arg) {
                 print (printhdr);
                 printhdr = "           ";
-                print ((""+def.arg).padEnd(20));
+                print ((""+def.arg).padEnd(maxlen()+2));
                 if (def.helptext) echo (def.helptext);
                 else print ("Mandatory\n");
             }
@@ -108,7 +128,7 @@ setapi = function(defarr) {
                 for (var oi in def.opt) {
                     print (printhdr);
                     printhdr = "           ";
-                    print ((""+oi).padEnd(20));
+                    print ((""+oi).padEnd(maxlen()+2));
                     if (def.helptext) echo (def.helptext);
                     else print ("Option\n");
                 }
@@ -117,7 +137,7 @@ setapi = function(defarr) {
                 for (var fi in def.flag) {
                     print (printhdr);
                     printhdr = "           ";
-                    print ((""+fi).padEnd(20));
+                    print ((""+fi).padEnd(maxlen()+2));
                     if (def.helptext) echo ("Flag: " + def.helptext);
                     else print ("Flag\n");
                 }

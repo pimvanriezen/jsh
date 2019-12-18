@@ -32,8 +32,12 @@ dir = function(path) {
             objects = sys.dir (path);
         }
     }
+    
+    objects.sort();
+    
     for (var idx in objects) {
         var objpath = objects[idx];
+        if (objpath[0] == '.') continue;
         if (path) objpath = path + "/" + objpath;
         dir[objects[idx]] = sys.stat (objpath);
     }
@@ -43,6 +47,15 @@ dir = function(path) {
 dir.help = function() { echo ("Usage: dir ([path or glob])"); }
 
 ls = function(path) {
+    function maxlen(str) {
+        if (! this.max) this.max = 0;
+        if (str) {
+            var len = (""+str).length;
+            if (len>this.max) this.max = len;
+        }
+        return this.max;
+    }
+
     function dtformat (date) {
         if (date.getDate === undefined) return ("?? ??? ????");
         var months = ["Jan","Feb","Mar","Apr","May","Jun",
@@ -52,13 +65,23 @@ ls = function(path) {
     }
     
     var objs = dir (path);
+    maxlen("1234");
+    for (var k in objs) { maxlen(objs[k].user);}
+    var ulen = maxlen();
+    console.log ("ulen",ulen);
+    maxlen.max = 4;
+    for (var k in objs) { maxlen(objs[k].group); }
+    var glen = maxlen();
+    maxlen.max = 2;
+    for (var k in objs) { maxlen(""+objs[k].size); }
+    
     for (var name in objs) {
         var o = objs[name];
         if (o) {
-            outstr = o.modeString + " " + dtformat(o.mtime) + " " +
-                     o.user.padEnd(9) +
-                     o.group.padEnd(9) +
-                     (""+o.size).padStart(9) + " " +
+            outstr = o.modeString + " [" + dtformat(o.mtime).padStart(11)+"] "+
+                     o.user.padEnd(ulen) + "/ " +
+                     o.group.padEnd(glen+1) +
+                     (""+o.size).padStart(maxlen()+1) + " " +
                      name;
             console.log (outstr);
         }
@@ -66,7 +89,6 @@ ls = function(path) {
 }
 
 ls.help = function() { echo ("Usage: ls ([path or glob])"); }
-
 
 stat = function(path) {
     return sys.stat (""+path);
