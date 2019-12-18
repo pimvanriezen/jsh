@@ -306,6 +306,25 @@ duk_ret_t sys_stat (duk_context *ctx) {
     duk_put_prop_string (ctx, obj_idx, "group");
     duk_push_int (ctx, st.st_size);
     duk_put_prop_string (ctx, obj_idx, "size");
+    
+    double atime = st.st_atime;
+    duk_eval_string(ctx, "Date");
+    duk_push_number (ctx, 1000.0 * atime);
+    duk_pnew (ctx,1);
+    duk_put_prop_string (ctx, obj_idx, "atime");
+    
+    double mtime = st.st_mtime;
+    duk_eval_string(ctx, "Date");
+    duk_push_number (ctx, 1000.0 * mtime);
+    duk_pnew (ctx,1);
+    duk_put_prop_string (ctx, obj_idx, "mtime");
+
+    double ctime = st.st_ctime;
+    duk_eval_string(ctx, "Date");
+    duk_push_number (ctx, 1000.0 * ctime);
+    duk_pnew (ctx,1);
+    duk_put_prop_string (ctx, obj_idx, "ctime");
+
     duk_push_boolean (ctx, S_ISDIR(st.st_mode)?1:0);
     duk_put_prop_string (ctx, obj_idx, "isDir");
     if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {

@@ -145,7 +145,6 @@ setapi = function(defarr) {
 dir = function(path) {
     var dir = {};
     var objects = [];
-    
     if (! path) objects = sys.dir();
     else {
         if ((path.indexOf('*')>=0)||(path.indexOf('?')>=0)) {
@@ -165,11 +164,19 @@ dir = function(path) {
 }
 
 ls = function(path) {
+    function dtformat (date) {
+        if (date.getDate === undefined) return ("?? ??? ????");
+        var months = ["Jan","Feb","Mar","Apr","May","Jun",
+                      "Jul","Aug","Sep","Oct","Nov","Dec"];
+        return date.getDate() + " " + months[date.getMonth()] + " " + 
+               date.getFullYear();
+    }
+    
     var objs = dir (path);
     for (var name in objs) {
         var o = objs[name];
         if (o) {
-            outstr = o.modeString + " " +
+            outstr = o.modeString + " " + dtformat(o.mtime) + " " +
                      o.user.padEnd(9) +
                      o.group.padEnd(9) +
                      (""+o.size).padStart(9) + " " +
@@ -180,7 +187,7 @@ ls = function(path) {
 }
 
 stat = function(path) {
-    sys.stat (""+path);
+    return sys.stat (""+path);
 }
 
 exists = function(path) {
