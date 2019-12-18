@@ -11,12 +11,21 @@
 #include <strings.h>
 #include <grp.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/errno.h>
 #include "duktape.h"
+
+char *mystrdup (const char *orig) {
+    size_t len = strlen (orig);
+    char *res = (char *) malloc (len+1);
+    strcpy (res, orig);
+    return res;
+}
 
 duk_ret_t sys_cd (duk_context *ctx) {
     const char *path;
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
-    path = duk_get_string (ctx, 0);
+    path = duk_to_string (ctx, 0);
     if (path) {
         if (chdir (path) == 0) {
             duk_push_boolean (ctx, 1);
@@ -49,7 +58,7 @@ duk_ret_t sys_dir (duk_context *ctx) {
         path = ".";
     }
     else {
-        path = duk_get_string (ctx, 0);
+        path = duk_to_string (ctx, 0);
     }
     
     arr_idx = duk_push_array (ctx);
@@ -67,7 +76,7 @@ duk_ret_t sys_dir (duk_context *ctx) {
 duk_ret_t sys_glob (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     int i = 0;
-    const char *match = duk_get_string (ctx, 0);
+    const char *match = duk_to_string (ctx, 0);
     duk_idx_t arr_idx = duk_push_array (ctx);
     glob_t *g = (glob_t *) calloc (sizeof (glob_t), 1);
     if (glob (match, 0, NULL, g) == 0) {
@@ -83,8 +92,8 @@ duk_ret_t sys_glob (duk_context *ctx) {
 
 duk_ret_t sys_setenv (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
-    const char *key = duk_get_string (ctx, 0);
-    const char *value = duk_get_string (ctx, 1);
+    const char *key = duk_to_string (ctx, 0);
+    const char *value = duk_to_string (ctx, 1);
     
     setenv (key, value, 1);
     return 0;
@@ -92,7 +101,7 @@ duk_ret_t sys_setenv (duk_context *ctx) {
 
 duk_ret_t sys_getenv (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
-    const char *key = duk_get_string (ctx, 0);
+    const char *key = duk_to_string (ctx, 0);
     const char *v = getenv (key);
     if (v) {
         duk_push_string (ctx, v);
@@ -109,7 +118,7 @@ duk_ret_t sys_read (duk_context *ctx) {
     size_t rdsz = 0;
     size_t ressz = 0;
     char *buffer;
-    const char *path = duk_get_string (ctx, 0);
+    const char *path = duk_to_string (ctx, 0);
     if (duk_get_top (ctx) > 1) {
         maxsz = duk_get_int (ctx, 1);
     }
@@ -150,8 +159,8 @@ duk_ret_t sys_read (duk_context *ctx) {
 
 duk_ret_t sys_write (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
-    const char *data = duk_get_string (ctx, 0);
-    const char *fname = duk_get_string (ctx, 1);
+    const char *data = duk_to_string (ctx, 0);
+    const char *fname = duk_to_string (ctx, 1);
     char *tmpname = (char *) malloc (strlen(fname)+64);
     strcpy (tmpname, fname);
     strcat (tmpname, ".new-XXXXXXXXXX");
@@ -194,7 +203,7 @@ duk_ret_t sys_write (duk_context *ctx) {
 
 duk_ret_t sys_print (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
-    const char *data = duk_get_string (ctx, 0);
+    const char *data = duk_to_string (ctx, 0);
     write (1, data, strlen(data));
     return 0;
 }
@@ -286,7 +295,7 @@ void modestring (char *into, mode_t mode) {
 duk_ret_t sys_stat (duk_context *ctx) {
     char modestr[16];
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
-    const char *path = duk_get_string (ctx, 0);
+    const char *path = duk_to_string (ctx, 0);
     struct stat st;
     duk_idx_t obj_idx = duk_push_object (ctx);
     
@@ -359,11 +368,88 @@ duk_ret_t sys_stat (duk_context *ctx) {
     return 1;
 }
 
+duk_ret_t sys_mkdir (duk_context *ctx) {
+    int mode = 0755;
+    if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
+    const char *path = duk_to_string (ctx, 0);
+    if (duk_get_top (ctx) > 1) {
+        mode = duk_get_int (ctx, 1);
+    }
+    if (mkdir (path, mode) == 0) {
+        duk_push_boolean (ctx, 1);
+    }
+    else {
+        duk_push_boolean (ctx, 0);
+    }
+    return 1;
+}
+
+duk_ret_t sys_chmod (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    const char *path = duk_to_string (ctx, 0);
+    int mode = duk_get_int (ctx, 1);
+    if (chmod (path, mode) == 0) {
+        duk_push_boolean (ctx, 1);
+    }
+    else {
+        duk_push_boolean (ctx, 0);
+    }
+    return 1;
+}
+
+duk_ret_t sys_chown (duk_context *ctx) {
+    if (duk_get_top (ctx) < 3) return DUK_RET_TYPE_ERROR;
+    const char *path = duk_to_string (ctx, 0);
+    int uid = duk_get_int (ctx, 1);
+    int gid = duk_get_int (ctx, 2);
+    if (chown (path, (uid_t) uid, (gid_t) gid) == 0) {
+        duk_push_boolean (ctx, 1);
+    }
+    else {
+        duk_push_boolean (ctx, 0);
+    }
+    return 1;
+}
+
+void pushpasswd (duk_context *ctx, struct passwd *pw) {
+    duk_idx_t obj_idx = duk_push_object (ctx);
+    duk_push_string (ctx, pw->pw_name);
+    duk_put_prop_string (ctx, obj_idx, "name");
+    duk_push_int (ctx, (int) pw->pw_uid);
+    duk_put_prop_string (ctx, obj_idx, "uid");
+    duk_push_int (ctx, (int) pw->pw_gid);
+    duk_put_prop_string (ctx, obj_idx, "gid");
+    duk_push_string (ctx, pw->pw_gecos);
+    duk_put_prop_string (ctx, obj_idx, "gecos");
+    duk_push_string (ctx, pw->pw_dir);
+    duk_put_prop_string (ctx, obj_idx, "home");
+    duk_push_string (ctx, pw->pw_shell);
+    duk_put_prop_string (ctx, obj_idx, "shell");
+}
+
+duk_ret_t sys_getpwnam (duk_context *ctx) {
+    if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
+    const char *username = duk_to_string (ctx, 0);
+    struct passwd *pw = getpwnam (username);
+    if (! pw) return 0;
+    pushpasswd (ctx, pw);
+    return 1;
+}
+
+duk_ret_t sys_getpwuid (duk_context *ctx) {
+    if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
+    uid_t uid = (uid_t) duk_get_int (ctx, 0);
+    struct passwd *pw = getpwuid (uid);
+    if (! pw) return 0;
+    pushpasswd (ctx, pw);
+    return 1;
+}
+
 duk_ret_t sys_modsearch (duk_context *ctx) {
     struct stat st;
     int filno;
     char *buffer;
-    const char *id = duk_get_string (ctx, 0);
+    const char *id = duk_to_string (ctx, 0);
     const char *path = getenv("JSH_MODULE_PATH");
     if (! path) path = "./modules";
     char *full = (char *) malloc ((size_t) (strlen(path)+strlen(id)+16));
@@ -397,6 +483,132 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     duk_push_string (ctx, buffer);
     free (buffer);
     return 1;
+}
+
+duk_ret_t sys_run (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    int tocmdpipe[2];
+    int fromcmdpipe[2];
+    int i;
+    pid_t pid;
+    int fdin;
+    int fdout;
+    int numarg = 0;
+    char **args = NULL;
+    const char *command = duk_to_string (ctx, 0);
+    const char *senddata = NULL;
+    duk_get_prop_string(ctx,1,"length");
+    numarg = duk_get_int(ctx,-1);
+    duk_pop(ctx);
+    
+    args = (char **) calloc (sizeof(char*),numarg+2);
+    args[0] = mystrdup (command);
+    for (i=0; i<numarg; ++i) {
+        duk_get_prop_index(ctx,1,i);
+        args[i+1] = mystrdup(duk_to_string(ctx,-1));
+        duk_pop(ctx);
+    }
+    args[i+1] = NULL;
+    
+    if (duk_get_top (ctx) > 2) senddata = duk_to_string (ctx, 2);
+    
+    pipe (tocmdpipe);
+    pipe (fromcmdpipe);
+    
+    switch (pid = fork()) {
+        case -1:
+            close (tocmdpipe[0]);
+            close (tocmdpipe[1]);
+            close (fromcmdpipe[0]);
+            close (fromcmdpipe[1]);
+            for (i=0; i<(numarg+1);++i) free (args[i]);
+            free (args);
+            return 0;
+            
+        case 0:
+            close (0);
+            close (1);
+            close (2);
+            dup2 (tocmdpipe[0], 0);
+            dup2 (fromcmdpipe[1], 1);
+            dup2 (fromcmdpipe[1], 2);
+            for (i=3; i<255;++i) close (i);
+            execvp (command, args);
+            printf ("Exec failed: %s", strerror (errno));
+            exit (0);
+    }
+    
+    close (fromcmdpipe[1]);
+    close (tocmdpipe[0]);
+    
+    fdout = tocmdpipe[1];
+    fdin = fromcmdpipe[0];
+    
+    if (senddata) {
+        if (write (fdout, senddata, strlen(senddata)) != strlen(senddata)) {
+            close (fdout);
+            close (fdin);
+            for (i=0; i<(numarg+1);++i) free (args[i]);
+            free (args);
+            duk_push_boolean (ctx, 0);
+            return 1;
+        }
+    }
+    
+    for (i=0; i<(numarg+1);++i) free (args[i]);
+    free (args);
+    int retstatus;
+    size_t rdsz;
+    size_t bufsz = 1024;
+    size_t bufpos = 0;
+    char *buf = (char *) malloc (1024);
+    
+    while (1) {
+        if (bufpos+256 >= bufsz) {
+            bufsz = 2* bufsz;
+            buf = (char *) realloc (buf, bufsz);
+            if (! buf) break;
+        }
+        if (waitpid (pid, &retstatus, WNOHANG)) break;
+        rdsz = read (fdin, buf+bufpos, 256);
+        if (rdsz<1) break;
+        bufpos += rdsz;
+        buf[bufpos] = 0;
+    }
+    close (fdin);
+    close (fdout);
+    waitpid (pid, &retstatus, 0);
+
+    if (WEXITSTATUS(retstatus) != 0) {
+        duk_push_boolean (ctx, 0);
+    }
+    else {
+        if (*buf) {
+            duk_push_string (ctx, buf);
+        }
+        else {
+            duk_push_boolean (ctx, 1);
+        }
+    }
+    free (buf);
+    return 1;
+}
+
+duk_ret_t sys_hostname (duk_context *ctx) {
+    char nm[256];
+    if (duk_get_top (ctx) == 0) {
+        nm[0] = nm[255] = 0;
+        gethostname (nm, 255);
+        duk_push_string (ctx, nm);
+        return 1;
+    }
+    const char *newnm = duk_to_string (ctx, 0);
+    if (sethostname (newnm, strlen(newnm)) == 0) {
+        duk_push_boolean (ctx, 1);
+    }
+    else {
+        duk_push_boolean (ctx, 0);
+    }
 }
 
 void sys_init (duk_context *ctx) {
@@ -451,6 +663,34 @@ void sys_init (duk_context *ctx) {
     
     duk_push_string (ctx, "write");
     duk_push_c_function (ctx, sys_write, 2);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "run");
+    duk_push_c_function (ctx, sys_run, DUK_VARARGS);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "mkdir");
+    duk_push_c_function (ctx, sys_mkdir, DUK_VARARGS);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "chmod");
+    duk_push_c_function (ctx, sys_chmod, 2);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "chown");
+    duk_push_c_function (ctx, sys_chown, 3);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "getpwnam");
+    duk_push_c_function (ctx, sys_getpwnam, 1);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "getpwuid");
+    duk_push_c_function (ctx, sys_getpwuid, 1);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "hostname");
+    duk_push_c_function (ctx, sys_hostname, DUK_VARARGS);
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     
     duk_push_string (ctx, "stat");

@@ -10,10 +10,13 @@ which = function(cmd) {
 }
 
 which.help = function() {
-    echo ("Usage: which (unix command)");
+    echo ("Usage:     which (unix command)");
     echo ("");
     echo ("Resolves a unix command to its path on the filesystem through "+
-          "chasing the env.PATH variable.");
+          "chasing the");
+    echo ("env.PATH variable. Returns the absolute path for the command, "+
+          "if it can ");
+    echo ("be resolved.");
 }
 
 // ============================================================================
@@ -44,7 +47,15 @@ dir = function(path) {
     return dir;
 }
 
-dir.help = function() { echo ("Usage: dir ([path or glob])"); }
+dir.help = function() {
+    echo ("Usage: dir ([path or glob])");
+    echo ("Usage:     dir (path)");
+    echo ("");
+    echo ("Arguments: path   Path of the directory, or a glob matchstring.");
+    echo ("");
+    echo ("Gets directory information. Returns An object with stat data,");
+    echo ("indexed by file name.");
+}
 
 ls = function(path) {
     function maxlen(str) {
@@ -55,6 +66,8 @@ ls = function(path) {
         }
         return this.max;
     }
+    
+    if (maxlen.max) maxlen.max = 0;
 
     function dtformat (date) {
         if (date.getDate === undefined) return ("?? ??? ????");
@@ -100,7 +113,12 @@ exists = function(path) {
     return ($(path).count() != 0);
 }
 
-exists.help = function() { echo ("Usage: exists (path)"); }
+exists.help = function() {
+    echo ("Usage:     exists (path)");
+    echo ("Arguments: path   Location of the file to check.");
+    echo ("");
+    echo ("Checks the location of a file. Returns true if the file exists.");
+}
 
 load = function(name) {
     var nm = ""+name;
@@ -116,7 +134,13 @@ load = function(name) {
     }
 }
 
-load.help = function() { echo ("Usage: load (path)"); }
+load.help = function() {
+    echo ("Usage:     load (path)");
+    echo ("Arguments: path   Location of the file to load.");
+    echo ("");
+    echo ("Loads data from the filesystem. Returns the loaded data as "+
+          "a string or\nparsed object.");
+}
 
 save = function(value,name) {
     var nm = "" + name;

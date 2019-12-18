@@ -2,7 +2,30 @@
 // API for interacting with unix tools
 // ============================================================================
 
+$apidb = {};
+
+help = function() {
+    echo ("Available commands:");
+    var list = [];
+    for (var k in $apidb) list.push(k);
+    list.sort();
+    for (var k in list) {
+        echo ("    " + list[k]);
+    }
+}
+
 setapi = function(defarr) {
+    for (var k in defarr) {
+        if (defarr[k].name) {
+            $apidb[defarr[k].name] = true;
+            break;
+        }
+        if (defarr[k].literal) {
+            $apidb[defarr[k].literal] = true;
+            break;
+        }
+    }
+
     var obj = function() {
         var argp = 0;
         var args = {};
@@ -61,7 +84,7 @@ setapi = function(defarr) {
         var cmd = argv.splice (0,1);
         if (cmd) cmd = cmd[0];
         if (cmd) cmd = which(cmd);
-        return console.log (cmd, argv);
+        return sys.run (cmd, argv);
     }
     obj.help = function() {
         var maxlen=function(str) {

@@ -32,6 +32,10 @@ $fquery.prototype.each = function(f) {
     }
 }
 
+$fquery.prototype.line = function (i) {
+    return this.cat().split('\n')[0];
+}
+
 $fquery.prototype.cat = function() {
     var res = "";
     var matches = sys.glob (this.query);

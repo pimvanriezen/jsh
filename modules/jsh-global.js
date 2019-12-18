@@ -33,12 +33,16 @@ $envproxy.has = function (target, key) {
     return true;
 }
 $envproxy.get = function (target, key) {
-    return sys.getenv (key);
+    if (key == "_defaults") return target.defaults;
+    var v = sys.getenv (key);
+    if (v === undefined) return target.defaults[key];
+    return v;
 }
 $envproxy.set = function (target, key, value) {
+    if (key == "_defaults") return;
     sys.setenv (key, ""+value);
 }
-env = new Proxy ({}, $envproxy);
+env = new Proxy ({defaults:{}}, $envproxy);
 
 setenv = function(def) {
     for (var k in def) {
@@ -48,17 +52,34 @@ setenv = function(def) {
 
 defaults = function(def) {
     for (var k in def) {
-        if (! env[k]) env[k] = def[k];
+        env._defaults[k] = def[k];
     }
 }
 
-defaults({JSH_MODULE_PATH:"./modules"});
+$userdbproxy = {}
+$userdbproxy.get = function (target, key) {
+    if ((key=="0")||(parseInt(key))) {
+        return sys.getpwuid(parseInt(key));
+    }
+    return sys.getpwnam(key);
+}
+$userdbproxy.set = function () {
+    throw ("Cannot change userdb");
+}
+
+userdb = new Proxy ({}, $userdbproxy);
 
 // ============================================================================
 // Load in modules and globals
 // ============================================================================
+defaults({
+    JSH_MODULE_PATH:"./modules",
+    PATH:"/sbin:/usr/sbin:/bin:/usr/sbin"
+});
+
 $ = require("fquery");
 setapi = require("setapi");
+
 include (env.JSH_MODULE_PATH + "/global.d/*.js");
 
 // ============================================================================
