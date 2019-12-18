@@ -33,7 +33,7 @@ $fquery.prototype.each = function(f) {
 }
 
 $fquery.prototype.line = function (i) {
-    return this.cat().split('\n')[0];
+    return this.cat().split('\n')[i];
 }
 
 $fquery.prototype.cat = function() {

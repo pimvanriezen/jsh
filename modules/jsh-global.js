@@ -23,6 +23,20 @@ print = function(x) {
 
 echo = console.log;
 
+run = function() {
+    var args = [];
+    if (arguments.length == 1) {
+        var arg = ""+arguments[0];
+        if (arg.indexOf (' ') < 0) return sys.run (arg, []);
+        args = arg.split(' ');
+        var cmd = args.splice(0,1)[0];
+        return sys.run (cmd, args);
+    }
+    var cmd = arguments[0];
+    for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
+    return sys.run (cmd, args);
+}
+
 // ============================================================================
 // Environment
 // ============================================================================

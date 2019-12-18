@@ -5,25 +5,31 @@
 $apidb = {};
 
 help = function() {
+    echo ("Invoke the .help() method on a command to check for its syntax.");
     echo ("Available commands:");
-    var list = [];
+    var list = ["ls","defaults","setenv","stat","exists",
+                "load","save","cd","cwd"];
+    var row = 0;
     for (var k in $apidb) list.push(k);
     list.sort();
     for (var k in list) {
-        echo ("    " + list[k]);
+        print (("    "+list[k]).padEnd(40));
+        if (row & 1) print ("\n");
+        row++;
     }
+    if (row&1) print ("\n");
 }
 
 setapi = function(defarr) {
+    var apitype="unix";
+    var f = null;
+    var processf = null;
     for (var k in defarr) {
         if (defarr[k].name) {
             $apidb[defarr[k].name] = true;
-            break;
         }
-        if (defarr[k].literal) {
-            $apidb[defarr[k].literal] = true;
-            break;
-        }
+        if (defarr[k].process) processf = defarr[k].process;
+        if (defarr[k].f) f=defarr[k].f;
     }
 
     var obj = function() {
@@ -66,8 +72,11 @@ setapi = function(defarr) {
             }
             if (def.arg) {
                 if (args[def.arg] == undefined) {
-                    printerr ("Missing argument: "+def.arg);
-                    return null;
+                    if (def.def) args[def.arg] = def.def;
+                    else {
+                        printerr ("Missing argument: "+def.arg);
+                        return null;
+                    }
                 }
                 argv.push (""+args[def.arg]);
                 continue;
@@ -80,11 +89,19 @@ setapi = function(defarr) {
                 }
             }
         }
-        
-        var cmd = argv.splice (0,1);
-        if (cmd) cmd = cmd[0];
-        if (cmd) cmd = which(cmd);
-        return sys.run (cmd, argv);
+
+        var res;
+        if (f) {
+            res = f(args);
+        }
+        else {
+            var cmd = argv.splice (0,1);
+            if (cmd) cmd = cmd[0];
+            if (cmd) cmd = which(cmd);
+            res = sys.run (cmd, argv);
+        }
+        if (processf) res = processf (res);
+        return res;
     }
     obj.help = function() {
         var maxlen=function(str) {

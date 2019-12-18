@@ -555,6 +555,8 @@ duk_ret_t sys_run (duk_context *ctx) {
         }
     }
     
+    close (fdout);
+    
     for (i=0; i<(numarg+1);++i) free (args[i]);
     free (args);
     int retstatus;
@@ -576,7 +578,6 @@ duk_ret_t sys_run (duk_context *ctx) {
         buf[bufpos] = 0;
     }
     close (fdin);
-    close (fdout);
     waitpid (pid, &retstatus, 0);
 
     if (WEXITSTATUS(retstatus) != 0) {

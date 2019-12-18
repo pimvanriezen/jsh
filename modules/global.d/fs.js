@@ -81,7 +81,6 @@ ls = function(path) {
     maxlen("1234");
     for (var k in objs) { maxlen(objs[k].user);}
     var ulen = maxlen();
-    console.log ("ulen",ulen);
     maxlen.max = 4;
     for (var k in objs) { maxlen(objs[k].group); }
     var glen = maxlen();
