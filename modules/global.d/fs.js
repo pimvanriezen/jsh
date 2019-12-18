@@ -48,7 +48,6 @@ dir = function(path) {
 }
 
 dir.help = function() {
-    echo ("Usage: dir ([path or glob])");
     echo ("Usage:     dir (path)");
     echo ("");
     echo ("Arguments: path   Path of the directory, or a glob matchstring.");
@@ -100,7 +99,14 @@ ls = function(path) {
     }
 }
 
-ls.help = function() { echo ("Usage: ls ([path or glob])"); }
+ls.help = function() {
+    echo ("Usage:     ls ([path])");
+    echo ("");
+    echo ("Arguments: path   Path of the directory, or a glob matchstring. If left");
+    echo ("                  empty, use current working directory.");
+    echo ("");
+    echo ("Prints contents of a directory in human-readable form to the console.");
+}
 
 stat = function(path) {
     return sys.stat (""+path);
@@ -149,7 +155,13 @@ save = function(value,name) {
     return sys.write (""+value, nm);
 }
 
-save.help = function() { echo ("Usage: save (value,path)"); }
+save.help = function() {
+    echo ("Usage:     save (value,path)");
+    echo ("Arguments: value  The value to save (string, or object)");
+    echo ("           path   Location to write to.");
+    echo ("");
+    echo ("Saves (object) data to the filesystem.");
+}
 
 // ============================================================================
 // Working directory tools
