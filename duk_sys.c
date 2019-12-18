@@ -338,6 +338,24 @@ duk_ret_t sys_stat (duk_context *ctx) {
     duk_put_prop_string (ctx, obj_idx, "isLink");
     duk_push_boolean (ctx, S_ISSOCK(st.st_mode)?1:0);
     duk_put_prop_string (ctx, obj_idx, "isSocket");
+    uid_t myuid = geteuid();
+    gid_t mygid = getegid();
+    if (S_ISDIR(st.st_mode)) {
+        duk_push_boolean (ctx, 0);
+    }
+    else if ((st.st_mode & 0100) && st.st_uid == myuid) {
+        duk_push_boolean (ctx, 1);
+    }
+    else if ((st.st_mode & 0010) && st.st_gid == mygid) {
+        duk_push_boolean (ctx, 1);
+    }
+    else if (st.st_mode & 0001) {
+        duk_push_boolean (ctx, 1);
+    }
+    else {
+        duk_push_boolean (ctx, 0);
+    }
+    duk_put_prop_string (ctx, obj_idx, "isExecutable");
     return 1;
 }
 
@@ -447,7 +465,7 @@ void sys_init (duk_context *ctx) {
     duk_pop (ctx);
     
     osglobal = getenv("JSH_GLOBAL");
-    if (! osglobal) osglobal = "./modules/os.js";
+    if (! osglobal) osglobal = "./modules/jsh-global.js";
     if (stat (osglobal, &st) == 0) {
         buffer = (char *) calloc (st.st_size+1,1);
         filno = open (osglobal, O_RDONLY);
