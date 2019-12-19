@@ -58,16 +58,27 @@ echo.help = function() {
 // ============================================================================
 run = function() {
     var args = [];
+    var res;
     if (arguments.length == 1) {
         var arg = ""+arguments[0];
-        if (arg.indexOf (' ') < 0) return sys.run (arg, []);
-        args = arg.split(' ');
-        var cmd = args.splice(0,1)[0];
-        return sys.run (cmd, args);
+        if (arg.indexOf (' ') < 0) res = sys.run (arg, []);
+        else {
+            args = arg.split(' ');
+            var cmd = args.splice(0,1)[0];
+            res = sys.run (cmd, args);
+        }
+        if (typeof(res) == "string" && res.indexOf('\n') == res.length-1) {
+            res = res.substr (0,res.length-1);
+        }
+        return res;
     }
     var cmd = arguments[0];
     for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
-    return sys.run (cmd, args);
+    res = sys.run (cmd, args);
+    if (typeof(res) == "string" && res.indexOf('\n') == res.length-1) {
+        res = res.substr (0,res.length-1);
+    }
+    return res;
 }
 
 run.help = function() {

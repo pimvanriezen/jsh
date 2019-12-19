@@ -122,6 +122,9 @@ var setapi = function(arg1,arg2) {
             else {
                 res = sys.run (cmd, argv);
             }
+            if (typeof(res) == "string" && res.indexOf('\n') == res.length-1) {
+                res = res.substr (0,res.length-1);
+            }
         }
         if (processf) res = processf (res);
         return res;

@@ -225,8 +225,7 @@ md5sum = setapi ([
     {process:function(dat) {
         dat = dat.replace('\n','');
         if (md5cmd == "md5sum") return dat.split(' ')[0];
-        var tmp = dat.split(' ');
-        return tmp[tmp.length-1];
+        return dat;
     }},
     {helptext:"Get md5 checksum for a file"}
 ]);
