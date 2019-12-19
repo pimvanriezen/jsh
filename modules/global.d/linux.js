@@ -1,6 +1,8 @@
 // ============================================================================
 // Unix command wrappers
 // ============================================================================
+
+// ----------------------------------------------------------------------------
 iptables = {
     help:function(){echo ("Usage: iptables.add | iptables.remove | "+
                           "iptables.create");},
@@ -51,6 +53,7 @@ iptables = {
     ])
 };
 
+// ----------------------------------------------------------------------------
 hwclock = setapi([
     {name:"hwclock"},
     {literal:"hwclock"},
@@ -72,6 +75,7 @@ hwclock.save = setapi([
     {helptext:"Saves system clock into hardware clock"}
 ]);
 
+// ----------------------------------------------------------------------------
 mount = setapi ([
     {name:"mount"},
     {literal:"mount"},
@@ -80,16 +84,19 @@ mount = setapi ([
     {opt:{"type":"-t"},helptext:"Filesystem type"},
     {opt:{"options":"-o"},helptext:"Mount options (fs-specific)"},
     {arg:"device",helptext:"Device name"},
-    {arg:"at",helptext:"Mount point"}
+    {arg:"at",helptext:"Mount point"},
+    {helptext:"Mount a filesystem"}
 ]);
 
 mount.all = setapi ([
     {name:"mount.all"},
     {literal:"mount"},
     {opt:{"type":"-t"},helptext:"Filesystem type"},
-    {literal:"-a"}
+    {literal:"-a"},
+    {helptext:"Mount all filesystems set up in /etc/fstab"}
 ]);
 
+// ----------------------------------------------------------------------------
 cp = setapi ([
     {setarg:"from"},
     {setarg:"to"},
@@ -100,6 +107,7 @@ cp = setapi ([
     {helptext:"Copies a file"}
 ]);
 
+// ----------------------------------------------------------------------------
 mv = setapi ([
     {setarg:"from"},
     {setarg:"to"},
@@ -109,6 +117,7 @@ mv = setapi ([
     {helptext:"Moves/renames a filesystem object"}
 ]);
 
+// ----------------------------------------------------------------------------
 ln = {
     help:function(){echo ("Usage: ln.soft | ln.hard");},
     soft:setapi([
@@ -132,7 +141,8 @@ ln = {
     ])
 };
 
-$signal_mkapi = function(type) {
+// ----------------------------------------------------------------------------
+var $signal_mkapi = function(type) {
     return setapi([
         {name:"signal."+type.toLowerCase()},
         {setarg:"pid"},
@@ -154,6 +164,7 @@ signal = {
     usr1:$signal_mkapi("USR1")
 };
 
+// ----------------------------------------------------------------------------
 rm = setapi ([
     {setarg:"target"},
     {literal:"rm"},
@@ -163,6 +174,7 @@ rm = setapi ([
     {helptext:"Deletes filesystem object(s)."}
 ]);
 
+// ----------------------------------------------------------------------------
 chmod = setapi ([
     {name:"chmod"},
     {setarg:"path"},
@@ -201,6 +213,7 @@ chmod = setapi ([
               "mode\nor a relative specification, e.g. [u|g|o|a][+|-][r|w|x|s]"}
 ]);
 
+// ----------------------------------------------------------------------------
 var md5cmd = "md5sum"
 if (! which("md5sum")) md5cmd = "md5";
 
@@ -218,6 +231,7 @@ md5sum = setapi ([
     {helptext:"Get md5 checksum for a file"}
 ]);
 
+// ----------------------------------------------------------------------------
 chown = setapi ([
     {name:"chown"},
     {setarg:"path"},
@@ -234,6 +248,7 @@ chown = setapi ([
     {helptext:"Change owner of filesystem object"}
 ]);
 
+// ----------------------------------------------------------------------------
 hostname = function(nm) {
     if (nm) return sys.hostname (nm);
     else return sys.hostname();
@@ -247,11 +262,12 @@ hostname.help = function() {
           "name");
 }
 
+// ----------------------------------------------------------------------------
 mkdir = setapi ([
     {name:"mkdir"},
     {setarg:"path"},
     {arg:"path",helptext:"Path of directory to create"},
-    {arg:"mode",def:0755,helptext:"Permissions (number or change string)"},
+    {arg:"mode",def:0755,helptext:"Permissions (number)"},
     {f:function(args) {
         if (typeof (args.mode) != "number") {
             printerr ("Illegal mode, expecting number");
