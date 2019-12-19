@@ -49,6 +49,8 @@ int duk_cmdline_stack_check(void);
  */
 
 static void print_greet_line(void) {
+    printf ("Entering interactive shell.\n"
+            "Type help() for a list of commands.\n");
 }
 
 static void set_resource_limits(rlim_t mem_limit_value) {

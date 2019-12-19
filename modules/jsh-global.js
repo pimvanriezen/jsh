@@ -6,7 +6,7 @@ include = function(name) {
             eval(script);
         }
         catch (e) {
-            sys.print ("% Error importing '"+scripts[i]+"': "+e);
+            sys.print ("% "+scripts[i]+": "+e+'\n');
         }
     }
 }
