@@ -1,18 +1,18 @@
 // ============================================================================
 // Filesystem query implementation
 // ============================================================================
-function $fquery(q) {
+var fquery = function(q) {
     this.query = q;
 }
 
-$fquery.prototype.write = function(data) {
+fquery.prototype.write = function(data) {
     var matches = sys.glob (this.query);
     for (var k in matches) {
         sys.write (data, matches[k]);
     }
 }
 
-$fquery.prototype.run = function() {
+fquery.prototype.run = function() {
     var matches = sys.glob (this.query);
     var res = true;
     for (var k in matches) {
@@ -20,23 +20,23 @@ $fquery.prototype.run = function() {
     } 
 }
 
-$fquery.prototype.count = function() {
+fquery.prototype.count = function() {
     var matches = sys.glob (this.query);
     return matches.length;
 }
 
-$fquery.prototype.each = function(f) {
+fquery.prototype.each = function(f) {
     var matches = sys.glob (this.query);
     for (var i=0; i<matches.length; ++i) {
         f (matches[i]);
     }
 }
 
-$fquery.prototype.line = function (i) {
+fquery.prototype.line = function (i) {
     return this.cat().split('\n')[i];
 }
 
-$fquery.prototype.cat = function() {
+fquery.prototype.cat = function() {
     var res = "";
     var matches = sys.glob (this.query);
     for (var i=0; i<matches.length; ++i) {
@@ -47,5 +47,5 @@ $fquery.prototype.cat = function() {
 }
 
 module.exports = function(match) {
-    return new $fquery(match);
+    return new fquery(match);
 }

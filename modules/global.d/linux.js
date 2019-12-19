@@ -94,8 +94,9 @@ cp = setapi ([
     {setarg:"from"},
     {setarg:"to"},
     {literal:"cp"},
-    {arg:"from"},
-    {arg:"to"},
+    {flag:{"preserve":"-p"},helptext:"Preserve permissions"},
+    {arg:"from",helptext:"Source file"},
+    {arg:"to",helptext:"Destination path"},
     {helptext:"Copies a file"}
 ]);
 
@@ -199,6 +200,19 @@ chmod = setapi ([
     {helptext:"Changes file permissions. Accepts either an integer for the new "+
               "mode\nor a relative specification, e.g. [u|g|o|a][+|-][r|w|x|s]"}
 ]);
+
+hostname = function(nm) {
+    if (nm) return sys.hostname (nm);
+    else return sys.hostname();
+}
+
+hostname.help = function() {
+    echo ("Usage:     hostname ([name])");
+    echo ("Arguments: name  New hostname");
+    echo ("");
+    echo ("Gets or sets the hostname. If no argument is provided, returns the "+
+          "name");
+}
 
 mkdir = setapi ([
     {name:"mkdir"},

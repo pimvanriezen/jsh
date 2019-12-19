@@ -4,11 +4,12 @@
 
 $apidb = {};
 
-help = function() {
+help = function(helpfor) {
+    if (helpfor && helpfor.help) return helpfor.help();
     echo ("Invoke the .help() method on a command to check for its syntax.");
     echo ("Available commands:");
     var list = ["ls","defaults","setenv","stat","exists",
-                "load","save","cd","cwd"];
+                "load","save","cd","cwd","hostname"];
     var row = 0;
     for (var k in $apidb) list.push(k);
     list.sort();
@@ -20,7 +21,7 @@ help = function() {
     if (row&1) print ("\n");
 }
 
-setapi = function(defarr) {
+var setapi = function(defarr) {
     var apitype="unix";
     var f = null;
     var processf = null;
@@ -33,6 +34,7 @@ setapi = function(defarr) {
     }
 
     var obj = function() {
+        var stdin = null;
         var argp = 0;
         var args = {};
         var lastp = arguments.length;
@@ -78,7 +80,17 @@ setapi = function(defarr) {
                         return null;
                     }
                 }
-                argv.push (""+args[def.arg]);
+                if (def.tostdin) {
+                    var a = args[def.arg];
+                    if (typeof (a) == "object") {
+                        stdin = JSON.stringify (a);
+                    }
+                    else {
+                        stdin = a;
+                        if (def.addnewline) stdin += '\n';
+                    }
+                }
+                else argv.push (""+args[def.arg]);
                 continue;
             }
             if (def.flag) {
@@ -98,7 +110,12 @@ setapi = function(defarr) {
             var cmd = argv.splice (0,1);
             if (cmd) cmd = cmd[0];
             if (cmd) cmd = which(cmd);
-            res = sys.run (cmd, argv);
+            if (stdin) {
+                res = sys.run (cmd, argv, stdin);
+            }
+            else {
+                res = sys.run (cmd, argv);
+            }
         }
         if (processf) res = processf (res);
         return res;

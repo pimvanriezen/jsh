@@ -684,9 +684,7 @@ static duk_context *create_duktape_heap(int alloc_provider,
 
 	/* Register require() (removed in Duktape 2.x). */
 	duk_module_duktape_init(ctx);
-
     sys_init (ctx);
-    
 
 	/* Stash a formatting function for evaluation results. */
 	duk_push_global_stash(ctx);

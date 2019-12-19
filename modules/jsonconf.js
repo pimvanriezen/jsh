@@ -1,4 +1,3 @@
-var subProxy = {};
 var cProxy = {};
 cProxy.has = function (target, key) {
     if (! target.loaded) {
