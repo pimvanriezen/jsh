@@ -201,6 +201,39 @@ chmod = setapi ([
               "mode\nor a relative specification, e.g. [u|g|o|a][+|-][r|w|x|s]"}
 ]);
 
+var md5cmd = "md5sum"
+if (! which("md5sum")) md5cmd = "md5";
+
+md5sum = setapi ([
+    {name:"md5sum"},
+    {setarg:"path"},
+    {literal:md5cmd},
+    {arg:"path",helptext:"File to checksum"},
+    {process:function(dat) {
+        dat = dat.replace('\n','');
+        if (md5cmd == "md5sum") return dat.split(' ')[0];
+        var tmp = dat.split(' ');
+        return tmp[tmp.length-1];
+    }},
+    {helptext:"Get md5 checksum for a file"}
+]);
+
+chown = setapi ([
+    {name:"chown"},
+    {setarg:"path"},
+    {setarg:"owner"},
+    {arg:"path",helptext:"Object to change"},
+    {arg:"owner",helptext:"New owner (username or userid)"},
+    {f:function(args) {
+        if (! exists (args.path)) return false;
+        if (! userdb[args.owner]) return false;
+        var uid = userdb[args.owner].uid;
+        var gid = stat(args.path).gid;
+        sys.chown (path, uid, gid);
+    }},
+    {helptext:"Change owner of filesystem object"}
+]);
+
 hostname = function(nm) {
     if (nm) return sys.hostname (nm);
     else return sys.hostname();

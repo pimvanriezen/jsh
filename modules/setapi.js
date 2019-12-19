@@ -2,14 +2,13 @@
 // API for interacting with unix tools
 // ============================================================================
 
-$apidb = {};
+var $apidb = {};
 
 help = function(helpfor) {
     if (helpfor && helpfor.help) return helpfor.help();
     echo ("Invoke the .help() method on a command to check for its syntax.");
     echo ("Available commands:");
-    var list = ["ls","defaults","setenv","stat","exists",
-                "load","save","cd","cwd","hostname"];
+    var list = [];
     var row = 0;
     for (var k in $apidb) list.push(k);
     list.sort();
@@ -21,7 +20,14 @@ help = function(helpfor) {
     if (row&1) print ("\n");
 }
 
-var setapi = function(defarr) {
+var setapi = function(arg1,arg2) {
+    if (typeof (arg1) == "function") {
+        if (typeof (arg1.help) == "function") {
+            $apidb[arg2] = true;
+            return;
+        }
+    }
+    var defarr = arg1;
     var apitype="unix";
     var f = null;
     var processf = null;

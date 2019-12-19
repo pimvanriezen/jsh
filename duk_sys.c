@@ -313,7 +313,7 @@ duk_ret_t sys_stat (duk_context *ctx) {
     duk_put_prop_string (ctx, obj_idx, "gid");
     duk_push_string (ctx, cgetgid (st.st_gid));
     duk_put_prop_string (ctx, obj_idx, "group");
-    duk_push_int (ctx, st.st_size);
+    duk_push_number (ctx, (double) st.st_size);
     duk_put_prop_string (ctx, obj_idx, "size");
     
     double atime = st.st_atime;

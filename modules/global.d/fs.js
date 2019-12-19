@@ -108,6 +108,8 @@ ls.help = function() {
     echo ("Prints contents of a directory in human-readable form to the console.");
 }
 
+setapi (ls, "ls");
+
 stat = function(path) {
     return sys.stat (""+path);
 }
@@ -167,5 +169,24 @@ save.help = function() {
 // Working directory tools
 // ============================================================================
 cd = sys.cd;
-cwd = sys.cwd;
+cd.help = function() {
+    echo ("Usage:     cd (path)");
+    echo ("");
+    echo ("Change current working directory");
+}
 
+cwd = sys.cwd;
+cwd.help = function() {
+    echo ("Usage:     cwd()");
+    echo ("");
+    echo ("Returns current working directory");
+}
+
+setapi (which, "which");
+setapi (dir, "dir");
+setapi (ls, "ls");
+setapi (exists, "exists");
+setapi (load, "load");
+setapi (save, "save");
+setapi (cd, "cd");
+setapi (cwd, "cwd");

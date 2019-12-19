@@ -11,8 +11,20 @@ include = function(name) {
     }
 }
 
+include.help = function() {
+    echo ("Usage:     include (glob)");
+    echo ("");
+    echo ("Includes one or more javascript matching the glob in global scope.");
+}
+
 printerr = function(e) {
     console.log ("% " + e);
+}
+
+printerr.help = function() {
+    echo ("Usage:     include (errorstr)");
+    echo ("");
+    echo ("Outputs error to console");
 }
 
 print = function(x) {
@@ -35,6 +47,20 @@ run = function() {
     var cmd = arguments[0];
     for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
     return sys.run (cmd, args);
+}
+
+run.help = function() {
+    echo ("Usage:     run (cmd, <args>)");
+    echo ("");
+    echo ("Executes a program and returns its output. Arguments can be provided");
+    echo ("in three ways:");
+    echo ("");
+    echo ("  1. run ('command','arg1','arg2')");
+    echo ("  2. run ('command arg1 arg2')");
+    echo ("  3. run ('command',[arg1,arg2])");
+    echo ("");
+    echo ("If execution fails, a boolean is returned with the value set to "+
+          "false.");
 }
 
 // ============================================================================
@@ -64,10 +90,24 @@ setenv = function(def) {
     }
 }
 
+setenv.help = function() {
+    echo ("Usage:     setenv ({key:val,key:val})");
+    echo ("");
+    echo ("Set multiple environment variables");
+}
+
 defaults = function(def) {
     for (var k in def) {
         env._defaults[k] = def[k];
     }
+}
+
+defaults.help = function() {
+    echo ("Usage:     defaults ({key:val,key:val})");
+    echo ("");
+    echo ("Set multiple defaults environment variables. If the key is accessed"+
+          "\nthrough env.KEY, and KEY is not in the environment, the default"+
+          " will be\nobtained.");
 }
 
 $userdbproxy = {}
@@ -93,6 +133,11 @@ defaults({
 
 $ = require("fquery");
 setapi = require("setapi");
+
+setapi (setenv, "setenv");
+setapi (defaults, "defaults");
+setapi (run, "run");
+setapi (include, "include");
 
 include (env.JSH_MODULE_PATH + "/global.d/*.js");
 
