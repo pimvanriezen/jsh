@@ -33,7 +33,19 @@ print = function(x) {
     sys.print ("" + x);
 }
 
+print.help = function() {
+    echo ("Usage:     print (data)");
+    echo ("");
+    echo ("Prints out the data, raw without a newline");
+}
+
 echo = console.log;
+
+echo.help = function() {
+    echo ("Usage:     echo (data)");
+    echo ("");
+    echo ("Prints data to the console, adding a newline");
+}
 
 run = function() {
     var args = [];
@@ -138,6 +150,9 @@ setapi (setenv, "setenv");
 setapi (defaults, "defaults");
 setapi (run, "run");
 setapi (include, "include");
+setapi (printerr, "printerr");
+setapi (print, "print");
+setapi (echo, "echo");
 
 include (env.JSH_MODULE_PATH + "/global.d/*.js");
 
