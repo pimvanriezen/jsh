@@ -1,3 +1,6 @@
+// ============================================================================
+// Global include
+// ============================================================================
 include = function(name) {
     var scripts = sys.glob (name);
     for (var i in scripts) {
@@ -17,6 +20,9 @@ include.help = function() {
     echo ("Includes one or more javascript matching the glob in global scope.");
 }
 
+// ============================================================================
+// Printing
+// ============================================================================
 printerr = function(e) {
     console.log ("% " + e);
 }
@@ -47,6 +53,9 @@ echo.help = function() {
     echo ("Prints data to the console, adding a newline");
 }
 
+// ============================================================================
+// Unix execution
+// ============================================================================
 run = function() {
     var args = [];
     if (arguments.length == 1) {
