@@ -225,7 +225,7 @@ md5sum = setapi ([
     {process:function(dat) {
         dat = dat.replace('\n','');
         if (md5cmd == "md5sum") return dat.split(' ')[0];
-        return dat;
+        return dat.replace (/^.* /,"");
     }},
     {helptext:"Get md5 checksum for a file"}
 ]);
@@ -275,4 +275,16 @@ mkdir = setapi ([
         return sys.mkdir (args.path, args.mode);
     }},
     {helptext:"Creates a directory."}
+]);
+
+// ----------------------------------------------------------------------------
+stty = setapi ([
+    {name:"stty"},
+    {setarg:"device"},
+    {setarg:"speed"},
+    {literal:"stty"},
+    {literal:"-F"},
+    {arg:"device",helptext:"Path of the tty device"},
+    {arg:"speed",helptext:"Speed in bits/sec"},
+    {helptext:"Set serial device speed"}
 ]);

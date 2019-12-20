@@ -164,7 +164,6 @@ duk_ret_t sys_write (duk_context *ctx) {
     char *tmpname = (char *) malloc (strlen(fname)+64);
     strcpy (tmpname, fname);
     strcat (tmpname, ".new-XXXXXXXXXX");
-    mktemp (tmpname);
     
     int mode = 0644;
     if (duk_get_top (ctx) > 2) {
@@ -172,7 +171,7 @@ duk_ret_t sys_write (duk_context *ctx) {
     }
     int filno;
     
-    filno = open (tmpname, O_WRONLY|O_CREAT|O_TRUNC);
+    filno = mkostemp (tmpname, O_WRONLY|O_CREAT|O_TRUNC);
     if (filno < 0) {
         duk_push_boolean (ctx, 0);
         return 1;
@@ -610,6 +609,7 @@ duk_ret_t sys_hostname (duk_context *ctx) {
     else {
         duk_push_boolean (ctx, 0);
     }
+    return 1;
 }
 
 void sys_init (duk_context *ctx) {
