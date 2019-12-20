@@ -56,19 +56,48 @@ dir.help = function() {
     echo ("indexed by file name.");
 }
 
-ls = function(path) {
-    function maxlen(str) {
-        if (! this.max) this.max = 0;
-        if (str) {
-            var len = (""+str).length;
-            if (len>this.max) this.max = len;
-        }
-        return this.max;
+ls = function (path) {
+    var ansi = {
+        dir:"\033[34m",
+        exe:"\033[97m",
+        dev:"\033[31m",
+        sock:"\033[33m",
+        link:"\033[36m",
+        file:"",
+        end:"\033[0m"
+    }
+    var suffx = {
+        dir:"/",
+        exe:"",
+        sock:"$",
+        link:">",
+        dev:""
+    }
+    if (env.TERM == "vt100") {
+        ansi = {};
+        suffx.exe = "*";
+        suffx.dev = "@";
     }
     
-    if (maxlen.max) maxlen.max = 0;
+    var maxlen = function (str) {
+        if (! this.max) this.max = 0;
+        var res = this.max;
+        if (typeof (str) == "number") {
+            this.max = str;
+            res = str;
+        }
+        else if (str) {
+            var len = (""+str).length;
+            if (len>this.max) this.max = len;
+            res = len;
+        }
+        else this.max = 0;
+        return res;
+    }
+    
+    maxlen();
 
-    function dtformat (date) {
+    var dtformat = function (date) {
         if (date.getDate === undefined) return ("?? ??? ????");
         var months = ["Jan","Feb","Mar","Apr","May","Jun",
                       "Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -77,24 +106,53 @@ ls = function(path) {
     }
     
     var objs = dir (path);
-    maxlen("1234");
+    maxlen(4);
     for (var k in objs) { maxlen(objs[k].user);}
     var ulen = maxlen();
-    maxlen.max = 4;
+    maxlen(4);
     for (var k in objs) { maxlen(objs[k].group); }
     var glen = maxlen();
-    maxlen.max = 2;
+    maxlen(2);
     for (var k in objs) { maxlen(""+objs[k].size); }
+    var szlen = maxlen();
     
     for (var name in objs) {
         var o = objs[name];
         if (o) {
-            outstr = o.modeString + " [" + dtformat(o.mtime).padStart(11)+"] "+
+            var fnstart="";
+            var fnend="";
+            var suffix="";
+            if (o.isDir && ansi.dir) {
+                fnstart = ansi.dir;
+                fnend = ansi.end;
+                suffix = suffx.dir;
+            }
+            if (o.isExecutable && ansi.exe) {
+                fnstart = ansi.exe;
+                fnend = ansi.end;
+                suffix = suffx.exe;
+            }
+            if (o.isDevice && ansi.dev) {
+                fnstart = ansi.dev;
+                fnend = ansi.end;
+                suffix = suffx.dev;
+            }
+            if (o.isSocket && ansi.sock) {
+                fnstart = ansi.sock;
+                fnend = ansi.end;
+                suffix = suffx.sock;
+            }
+            if (o.isLink && ansi.link) {
+                fnstart = ansi.link;
+                fnend = ansi.end;
+                suffix = suffx.link;
+            }
+            outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+" : "+
                      o.user.padEnd(ulen) + "/ " +
                      o.group.padEnd(glen+1) +
-                     (""+o.size).padStart(maxlen()+1) + " " +
-                     name;
-            console.log (outstr);
+                     (""+o.size).padStart(szlen+1) + " " +
+                     fnstart + name + fnend + suffix + '\n';
+            sys.print (outstr);
         }
     }
 }
