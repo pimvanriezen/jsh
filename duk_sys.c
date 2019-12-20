@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <time.h>
 #include <pwd.h>
 #include <glob.h>
@@ -12,6 +11,7 @@
 #include <grp.h>
 #include <stdlib.h>
 #define _XOPEN_SOURCE 700
+#include <sys/stat.h>
 #include <string.h>
 #undef _XOPEN_SOURCE
 #include <sys/errno.h>
