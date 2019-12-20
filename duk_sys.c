@@ -15,6 +15,7 @@
 #include <string.h>
 #undef _XOPEN_SOURCE
 #include <sys/errno.h>
+#include <sys/wait.h>
 #include "duktape.h"
 
 char *mystrdup (const char *orig) {
