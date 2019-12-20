@@ -1,4 +1,3 @@
-#define _XOPEN_SOURCE 700
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -6,17 +5,15 @@
 #include <pwd.h>
 #include <glob.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <dirent.h>
 #include <strings.h>
 #include <grp.h>
 #include <sys/stat.h>
-#include <string.h>
-#undef _XOPEN_SOURCE
-#define _GNU_SOURCE 1
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/errno.h>
 #include <sys/wait.h>
+#include <strings.h>
 #include "duktape.h"
 
 char *mystrdup (const char *orig) {
