@@ -28,8 +28,6 @@
 #include "duk_module_duktape.h"
 #include "duktape.h"
 
-#include "duk_cmdline.h"
-
 extern void sys_init (duk_context *);
 
 #define  MEM_LIMIT_NORMAL   (128*1024*1024)   /* 128 MB */
