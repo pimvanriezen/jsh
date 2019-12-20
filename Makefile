@@ -9,8 +9,8 @@ CMDLINE_SOURCES = \
 	duktape/duk_cmdline.c duk_sys.c
 
 CC = gcc
-CCOPTS = -pedantic -Wall
-CCOPTS += -I./duktape   # duktape.h and duk_config.h must be in include path
+CCOPTS = -std=c99 -Wall
+CCOPTS += -D_C99_SOURCE -I./duktape   # duktape.h and duk_config.h must be in include path
 CCLIBS = -lm
 
 # Enable console object (console.log() etc) for command line.
