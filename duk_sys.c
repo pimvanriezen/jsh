@@ -11,7 +11,9 @@
 #include <strings.h>
 #include <grp.h>
 #include <stdlib.h>
+#define _XOPEN_SOURCE 700
 #include <string.h>
+#undef _XOPEN_SOURCE
 #include <sys/errno.h>
 #include "duktape.h"
 
