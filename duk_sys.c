@@ -1,3 +1,4 @@
+#define _XOPEN_SOURCE 700
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -9,11 +10,11 @@
 #include <dirent.h>
 #include <strings.h>
 #include <grp.h>
-#include <stdlib.h>
-#define _XOPEN_SOURCE 700
 #include <sys/stat.h>
 #include <string.h>
 #undef _XOPEN_SOURCE
+#define _GNU_SOURCE 1
+#include <stdlib.h>
 #include <sys/errno.h>
 #include <sys/wait.h>
 #include "duktape.h"
@@ -166,7 +167,7 @@ duk_ret_t sys_write (duk_context *ctx) {
     const char *fname = duk_to_string (ctx, 1);
     char *tmpname = (char *) malloc (strlen(fname)+64);
     strcpy (tmpname, fname);
-    strcat (tmpname, ".new-XXXXXXXXXX");
+    strcat (tmpname, ".new-XXXXXX");
     
     int mode = 0644;
     if (duk_get_top (ctx) > 2) {
@@ -174,7 +175,7 @@ duk_ret_t sys_write (duk_context *ctx) {
     }
     int filno;
     
-    filno = mkostemp (tmpname, O_WRONLY|O_CREAT|O_TRUNC);
+    filno = mkstemp (tmpname);
     if (filno < 0) {
         duk_push_boolean (ctx, 0);
         return 1;
