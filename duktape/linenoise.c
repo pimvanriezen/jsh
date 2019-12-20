@@ -169,6 +169,8 @@ enum KEY_ACTION{
 	ENTER = 13,         /* Enter */
 	CTRL_N = 14,        /* Ctrl-n */
 	CTRL_P = 16,        /* Ctrl-p */
+	CTRL_Q = 17,        /* Ctrl-q */
+	CTRL_S = 19,        /* Ctrl-s */
 	CTRL_T = 20,        /* Ctrl-t */
 	CTRL_U = 21,        /* Ctrl+u */
 	CTRL_W = 23,        /* Ctrl+w */
@@ -923,6 +925,10 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
                     break;
                 }
             }
+            break;
+        case CTRL_Q:
+            break;
+        case CTRL_S:
             break;
         default:
             if (linenoiseEditInsert(&l,c)) return -1;
