@@ -14,6 +14,7 @@
 #include <sys/errno.h>
 #include <sys/wait.h>
 #include <strings.h>
+#include <sys/ioctl.h>
 #include "duktape.h"
 
 char *mystrdup (const char *orig) {
@@ -156,6 +157,17 @@ duk_ret_t sys_read (duk_context *ctx) {
     close (filno);
     duk_push_string (ctx, buffer);
     free (buffer);
+    return 1;
+}
+
+duk_ret_t sys_winsize (duk_context *ctx) {
+    struct winsize ws;
+    if (ioctl (0, TIOCGWINSZ, &ws) == 0) {
+        duk_push_int (ctx, ws.ws_col);
+    }
+    else {
+        duk_push_int (ctx, 80);
+    }
     return 1;
 }
 
@@ -696,6 +708,10 @@ void sys_init (duk_context *ctx) {
     duk_push_c_function (ctx, sys_hostname, DUK_VARARGS);
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     
+    duk_push_string (ctx, "winsize");
+    duk_push_c_function (ctx, sys_winsize, 0);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+
     duk_push_string (ctx, "stat");
     duk_push_c_function (ctx, sys_stat, 1);
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
