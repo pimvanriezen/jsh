@@ -118,7 +118,7 @@ duk_ret_t sys_read (duk_context *ctx) {
     int filno;
     size_t rdsz = 0;
     size_t ressz = 0;
-    char *buffer;
+    char *buffer = NULL;
     const char *path = duk_to_string (ctx, 0);
     if (duk_get_top (ctx) > 1) {
         maxsz = duk_get_int (ctx, 1);
@@ -128,6 +128,7 @@ duk_ret_t sys_read (duk_context *ctx) {
     }
     
     if (stat (path, &st)) return 0;
+    if (st.st_size == 0) st.st_size = 10240;
     if (st.st_size > maxsz) {
         buffer = (char *) calloc (maxsz+2, 1);
     }
