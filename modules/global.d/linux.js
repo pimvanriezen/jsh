@@ -210,7 +210,7 @@ chmod = setapi ([
         return sys.chmod (args.path, mode);
     }},
     {helptext:"Changes file permissions. Accepts either an integer for the new "+
-              "mode\nor a relative specification, e.g. [u|g|o|a][+|-][r|w|x|s]"}
+              "mode or a relative specification, e.g. [u|g|o|a][+|-][r|w|x|s]"}
 ]);
 
 // ----------------------------------------------------------------------------

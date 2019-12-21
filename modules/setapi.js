@@ -131,6 +131,7 @@ var setapi = function(arg1,arg2) {
     }
     obj.help = function() {
         var t = new texttable(4);
+        var argi = {}
         t.boldcolumn = 2;
         var cmd = "command";
         for (var ii in defarr) {
@@ -145,11 +146,13 @@ var setapi = function(arg1,arg2) {
         }
         
         var arglist = [];
+        var argc = 0;
         var optcount = 0;
         for (var ai in defarr) {
             var def = defarr[ai];
             if (def.setarg) {
                 arglist.push (def.setarg);
+                argi[def.setarg] = argc++;
             }
             else if (def.opt || def.flag) {
                 optcount++;
@@ -158,14 +161,22 @@ var setapi = function(arg1,arg2) {
         if (optcount) arglist.push ("{..options..}");
         t.addRow ("Usage:","",cmd,'('+arglist.join(', ')+')');
         
-        var argc = 0;
         var printhdr = "Arguments:";
         for (ai in defarr) {
             def = defarr[ai];
             if (def.arg) {
                 var txt = def.helptext;
                 if (! txt) txt = "Mandatory argument";
-                t.addRow (printhdr, '['+argc+']', def.arg, txt);
+                if (def.def) {
+                    txt = '[default: '+def.def+'] '+txt;
+                }
+                argc = argi[def.arg];
+                if (argc !== undefined) {
+                    t.addRow (printhdr, '['+argc+']', def.arg, txt);
+                }
+                else {
+                    t.addRow (printhdr, "", def.arg, txt);
+                }
                 printhdr = " ";
                 argc++;
             }
