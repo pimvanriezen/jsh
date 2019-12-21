@@ -130,26 +130,8 @@ var setapi = function(arg1,arg2) {
         return res;
     }
     obj.help = function() {
-        var maxlen=function(str) {
-            if (! this.max) this.max = 0;
-            if (str) {
-                var len = (""+str).length;
-                if (len>this.max) this.max = len;
-            }
-            return this.max;
-        }
-        maxlen("123456");
-        for (var k in defarr) {
-            var o = defarr[k];
-            var kk;
-            if (o.arg) maxlen (o.arg);
-            else if (o.opt) {
-                for (kk in o.opt) maxlen(kk);
-            }
-            else if (o.flag) {
-                for (kk in o.flag) maxlen(kk); 
-            }
-        }
+        var t = new texttable(4);
+        t.boldcolumn = 2;
         var cmd = "command";
         for (var ii in defarr) {
             if (defarr[ii].name) {
@@ -161,59 +143,89 @@ var setapi = function(arg1,arg2) {
                 break;
             }
         }
-        print ("Usage:     "+cmd+" (");
-        var needcomma = false;
+        
+        var arglist = [];
+        var optcount = 0;
         for (var ai in defarr) {
             var def = defarr[ai];
             if (def.setarg) {
-                if (needcomma) print (",");
-                print (def.setarg);
-                needcomma = true;
+                arglist.push (def.setarg);
+            }
+            else if (def.opt || def.flag) {
+                optcount++;
             }
         }
-        if (needcomma) print (",");
-        print ("<options>)\n");
-        var printhdr = "Arguments: ";
+        if (optcount) arglist.push ("{..options..}");
+        t.addRow ("Usage:","",cmd,'('+arglist.join(', ')+')');
+        
+        var argc = 0;
+        var printhdr = "Arguments:";
         for (ai in defarr) {
             def = defarr[ai];
             if (def.arg) {
-                print (printhdr);
-                printhdr = "           ";
-                print ((""+def.arg).padEnd(maxlen()+2));
-                if (def.helptext) echo (def.helptext);
-                else print ("Mandatory\n");
+                var txt = def.helptext;
+                if (! txt) txt = "Mandatory argument";
+                t.addRow (printhdr, '['+argc+']', def.arg, txt);
+                printhdr = " ";
+                argc++;
             }
         }
-        printhdr = "Arguments: ";
-        printhdr = "Options:   ";
+        printhdr = "Options:";
         for (ai in defarr) {
             def = defarr[ai];
             if (def.arg) {
             }
             else if (def.opt) {
                 for (var oi in def.opt) {
-                    print (printhdr);
-                    printhdr = "           ";
-                    print ((""+oi).padEnd(maxlen()+2));
-                    if (def.helptext) echo (def.helptext);
-                    else print ("Option\n");
+                    var txt = def.helptext;
+                    if (!txt) txt = "Option";
+                    t.addRow (printhdr,"",oi,txt);
+                    printhdr = "";
                 }
             }
             else if (def.flag) {
                 for (var fi in def.flag) {
-                    print (printhdr);
-                    printhdr = "           ";
-                    print ((""+fi).padEnd(maxlen()+2));
-                    if (def.helptext) echo ("Flag: " + def.helptext);
-                    else print ("Flag\n");
+                    var txt = def.helptext;
+                    if (!txt) txt = "Flag";
+                    else txt = "Flag: " + txt;
+                    t.addRow (printhdr, "", fi, txt);
+                    printhdr = "";
                 }
             }
             else if (def.helptext) {
-                print ("\n"+def.helptext+"\n");
+                print (t.format());
+                echo ("\n"+def.helptext.wrap(sys.winsize()).join('\n'));
             }
         }
     }
     return obj;
+}
+
+setapi.helptext = function(def) {
+    var t = new texttable(4);
+    t.boldcolumn = 2;
+    var arglist = [];
+    for (var ai in def.args) arglist.push (def.args[ai].name);
+    if (def.opts && def.opts.length) arglist.push ("{..options..}");
+    t.addRow ("Usage:","",def.name,'('+arglist.join(', ')+')');
+    if (def.args && def.args.length) {
+        for (var ai in def.args) {
+            var ttxt = (ai==0) ? "Arguments:" : "";
+            t.addRow (ttxt, '['+ai+']', def.args[ai].name, def.args[ai].text);
+        }
+    }
+    if (def.opts && def.opts.length) {
+        for (var oi in def.opts) {
+            var ttxt = (oi==0) ? "Options:" : "";
+            t.addRow (ttxt, oi, def.opts[ai].name, def.opts[oi].text);
+        }
+    }
+    print (t.format());
+    if (def.text) {
+        echo ("");
+        var txt = def.text.wrap (sys.winsize());
+        for (var ln in txt) echo (txt[ln]);
+    }
 }
 
 module.exports = setapi;

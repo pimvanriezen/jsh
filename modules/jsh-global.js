@@ -15,9 +15,15 @@ include = function(name) {
 }
 
 include.help = function() {
-    echo ("Usage:     include (glob)");
-    echo ("");
-    echo ("Includes one or more javascript matching the glob in global scope.");
+    setapi.helptext ({
+        name:"include",
+        args:[
+            {name:"glob",text:"File or wildcard match"}
+        ],
+        opts:[],
+        text:"Includes one or more javascript matching the glob in the "+
+             "global scope."
+    });
 }
 
 // ============================================================================
@@ -28,9 +34,13 @@ printerr = function(e) {
 }
 
 printerr.help = function() {
-    echo ("Usage:     include (errorstr)");
-    echo ("");
-    echo ("Outputs error to console");
+    setapi.helptext ({
+        name:"printerr",
+        args:[
+            {name:"error",text:"The error text"}
+        ],
+        text:"Outputs error to the console"
+    });
 }
 
 print = function(x) {
@@ -40,17 +50,25 @@ print = function(x) {
 }
 
 print.help = function() {
-    echo ("Usage:     print (data)");
-    echo ("");
-    echo ("Prints out the data, raw without a newline");
+    setapi.helptext ({
+        name:"print",
+        args:[
+            {name:"data",text:"String to print"}
+        ],
+        text:"Prints out the data, raw without a newline"
+    });
 }
 
 echo = console.log;
 
 echo.help = function() {
-    echo ("Usage:     echo (data)");
-    echo ("");
-    echo ("Prints data to the console, adding a newline");
+    setapi.helptext ({
+        name:"echo",
+        args:[
+            {name:"data",text:"String to print"}
+        ],
+        text:"Prints data to the console, adding a newline"
+    });
 }
 
 // ============================================================================
@@ -123,9 +141,14 @@ setenv = function(def) {
 }
 
 setenv.help = function() {
-    echo ("Usage:     setenv ({key:val,key:val})");
-    echo ("");
-    echo ("Set multiple environment variables");
+    setapi.helptext ({
+        name:"setenv",
+        args:[
+            {name:"data",text:"Object with a key/value dictionary "+
+                              "of the environment variables to be set."}
+        ],
+        text:"Sets multiple environment variables"
+    });
 }
 
 defaults = function(def) {
@@ -135,11 +158,16 @@ defaults = function(def) {
 }
 
 defaults.help = function() {
-    echo ("Usage:     defaults ({key:val,key:val})");
-    echo ("");
-    echo ("Set multiple defaults environment variables. If the key is accessed"+
-          "\nthrough env.KEY, and KEY is not in the environment, the default"+
-          " will be\nobtained.");
+    setapi.helptext ({
+        name:"defaults",
+        args:[
+            {name:"data",text:"Object with a key/value dictionary of "+
+                              "the environment variables to be defaulted."}
+        ],
+        text:"Set multiple defaults environment variables. If the key is "+
+          "accessed through env.KEY, and KEY is not in the environment, the "+
+          "default will be obtained."
+    });
 }
 
 $userdbproxy = {}
@@ -179,15 +207,19 @@ include (env.JSH_MODULE_PATH + "/global.d/*.js");
 // ============================================================================
 // Augmentations for the string class
 // ============================================================================
-String.prototype.padStart = function(len) {
+String.prototype.padStart = function(len,c) {
+    if (c === undefined) c = " ";
     var res = this.slice(0,len);
-    while (res.length < len) res = " "+res;
+    if (res.length > len) res.splice (len, res.length-len);
+    while (res.length < len) res = c+res;
     return res;
 }
 
-String.prototype.padEnd = function(len) {
+String.prototype.padEnd = function(len,c) {
+    if (c === undefined) c = " ";
     var res = this.slice(0,len);
-    while (res.length < len) res = res+" ";
+    if (res.length > len) res.splice (len, res.length-len);
+    while (res.length < len) res = res+c;
     return res;
 }
 

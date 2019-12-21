@@ -10,13 +10,15 @@ which = function(cmd) {
 }
 
 which.help = function() {
-    echo ("Usage:     which (unix command)");
-    echo ("");
-    echo ("Resolves a unix command to its path on the filesystem through "+
-          "chasing the");
-    echo ("env.PATH variable. Returns the absolute path for the command, "+
-          "if it can ");
-    echo ("be resolved.");
+    setapi.helptext ({
+        name:"which",
+        args:[
+            {name:"cmd",text:"The unix command"}
+        ],
+        text:"Resolves a unix command to its path on the filesystem "+
+             "through chasing the env.PATH variable. Returns the absolute "+
+             "path for the command, if it can be resolved."
+    });
 }
 
 // ============================================================================
@@ -48,12 +50,14 @@ dir = function(path) {
 }
 
 dir.help = function() {
-    echo ("Usage:     dir (path)");
-    echo ("");
-    echo ("Arguments: path   Path of the directory, or a glob matchstring.");
-    echo ("");
-    echo ("Gets directory information. Returns An object with stat data,");
-    echo ("indexed by file name.");
+    setapi.helptext({
+        name:"dir",
+        args:[
+            {name:"path",text:"Path of the directory, or a glob matchstring"}
+        ],
+        text:"Gets directory information. Returns An object with stat "+
+             "data, indexed by file name."
+    });
 }
 
 ls = function (path) {
@@ -122,6 +126,7 @@ ls = function (path) {
             var fnstart="";
             var fnend="";
             var suffix="";
+            
             if (o.isDir && ansi.dir) {
                 fnstart = ansi.dir;
                 fnend = ansi.end;
@@ -147,6 +152,7 @@ ls = function (path) {
                 fnend = ansi.end;
                 suffix = suffx.link;
             }
+            
             outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+" : "+
                      o.user.padEnd(ulen) + "/ " +
                      o.group.padEnd(glen+1) +
@@ -158,12 +164,16 @@ ls = function (path) {
 }
 
 ls.help = function() {
-    echo ("Usage:     ls ([path])");
-    echo ("");
-    echo ("Arguments: path   Path of the directory, or a glob matchstring. If left");
-    echo ("                  empty, use current working directory.");
-    echo ("");
-    echo ("Prints contents of a directory in human-readable form to the console.");
+    setapi.helptext({
+        name:"ls",
+        args:[
+            {name:"path",text:"Path of the directory, or a glob "+
+                              "matchstring. If left empty, uses "+
+                              "the current working directory."}
+        ],
+        text:"Prints contents of a directory in human-readable form to "+
+             "the console."
+    });
 }
 
 setapi (ls, "ls");
@@ -179,10 +189,13 @@ exists = function(path) {
 }
 
 exists.help = function() {
-    echo ("Usage:     exists (path)");
-    echo ("Arguments: path   Location of the file to check.");
-    echo ("");
-    echo ("Checks the location of a file. Returns true if the file exists.");
+    setapi.helptext({
+        name:"exists",
+        args:[
+            {name:"path",text:"Location of the file to check."}
+        ],
+        text:"Checks the location of a file. Returns true if the file exists."
+    });
 }
 
 load = function(name) {
@@ -200,11 +213,14 @@ load = function(name) {
 }
 
 load.help = function() {
-    echo ("Usage:     load (path)");
-    echo ("Arguments: path   Location of the file to load.");
-    echo ("");
-    echo ("Loads data from the filesystem. Returns the loaded data as "+
-          "a string or\nparsed object.");
+    setapi.helptext({
+        name:"load",
+        args:[
+            {name:"path",text:"Location of the file to load."}
+        ],
+        text:"Loads data from the filesystem. Returns the loaded data as "+
+             "a string or parsed JSON object."
+    });
 }
 
 save = function(value,name) {
@@ -216,11 +232,14 @@ save = function(value,name) {
 }
 
 save.help = function() {
-    echo ("Usage:     save (value,path)");
-    echo ("Arguments: value  The value to save (string, or object)");
-    echo ("           path   Location to write to.");
-    echo ("");
-    echo ("Saves (object) data to the filesystem.");
+    setapi.helptext ({
+        name:"save",
+        args:[
+            {name:"value",text:"String or object to save."},
+            {name:"path",text:"File name and path to write to."}
+        ],
+        text:"Saves (object) data to the filesystem."
+    });
 }
 
 // ============================================================================
@@ -228,16 +247,21 @@ save.help = function() {
 // ============================================================================
 cd = sys.cd;
 cd.help = function() {
-    echo ("Usage:     cd (path)");
-    echo ("");
-    echo ("Change current working directory");
+    setapi.helptext ({
+        name:"cd",
+        args:[
+            {name:"path",text:"Relative or absolute path of new directory."}
+        ],
+        text:"Change current working directory"
+    });
 }
 
 cwd = sys.cwd;
 cwd.help = function() {
-    echo ("Usage:     cwd()");
-    echo ("");
-    echo ("Returns current working directory");
+    setapi.helptext ({
+        name:"cwd",
+        text:"Returns the current working directory"
+    });
 }
 
 setapi (which, "which");

@@ -254,11 +254,14 @@ hostname = function(nm) {
 }
 
 hostname.help = function() {
-    echo ("Usage:     hostname ([name])");
-    echo ("Arguments: name  New hostname");
-    echo ("");
-    echo ("Gets or sets the hostname. If no argument is provided, returns the "+
-          "name");
+    setapi.helptext ({
+        name:"hostname",
+        args:[
+            {name:"newname",text:"New hostname, leave empty to obtain the "+
+                                 "currently configured name."}
+        ],
+        text:"Gets or sets the hostname."
+    });
 }
 
 // ----------------------------------------------------------------------------
