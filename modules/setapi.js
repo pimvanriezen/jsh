@@ -134,6 +134,12 @@ var setapi = function(arg1,arg2) {
         if (processf) res = processf (res);
         return res;
     }
+    obj.unixcmd = function() {
+        for (var ii in defarr) {
+            if (defarr[ii].literal) return defarr[ii].literal;
+        }
+        return null;
+    }
     obj.help = function() {
         var t = new texttable(4);
         var argi = {}
@@ -239,8 +245,7 @@ setapi.helptext = function(def) {
     print (t.format());
     if (def.text) {
         echo ("");
-        var txt = def.text.wrap (sys.winsize());
-        for (var ln in txt) echo (txt[ln]);
+        print (def.text.rewrap (sys.winsize()));
     }
 }
 

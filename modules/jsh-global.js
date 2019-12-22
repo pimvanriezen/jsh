@@ -18,11 +18,13 @@ include.help = function() {
     setapi.helptext ({
         name:"include",
         args:[
-            {name:"glob",text:"File or wildcard match"}
+            {name:"pathspec",text:"File or wildcard match"}
         ],
         opts:[],
-        text:"Includes one or more javascript matching the glob in the "+
-             "global scope."
+        text:<<<
+            Includes one or more javascript files, parsing them into the
+            global scope.
+        >>>
     });
 }
 
@@ -164,9 +166,11 @@ defaults.help = function() {
             {name:"data",text:"Object with a key/value dictionary of "+
                               "the environment variables to be defaulted."}
         ],
-        text:"Set multiple defaults environment variables. If the key is "+
-          "accessed through env.KEY, and KEY is not in the environment, the "+
-          "default will be obtained."
+        text:<<<
+            Set multiple defaults environment variables. If the key is
+            accessed through env.KEY, and KEY is not in the environment, the 
+            default will be obtained.
+        >>>
     });
 }
 
