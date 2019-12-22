@@ -3,20 +3,28 @@
 // ============================================================================
 
 var $apidb = {};
+$colorize = function(x) {
+    var matches = {
+        "@function":1,
+        "(\\b(true|false))":36,
+        "(\\b(null))":31
+    }
+    for (var k in matches) {
+        x = x.colorMatch (k, matches[k]);
+    }
+    return x;    
+}
 
 help = function(helpfor) {
     if (helpfor && helpfor.help) return helpfor.help();
     
-    var boldf = function(match) { return '\033[1m'+match+'\033[0m'; }
-    var fre = new RegExp ("[.a-zA-Z_]+\\([._a-zA-Z]*\\)","g");
-    
-    print (<<<
+    print ($colorize(<<<
         Call help(command) with a function of this list to check for its
         syntax. Document your own global functions by defining a
         help() property and calling setapi() on it.
         
         Available commands:
-    >>>.rewrap(80).replace (fre, boldf));
+    >>>.rewrap(80)));
         
     var list = [];
     var row = 0;
@@ -221,7 +229,9 @@ var setapi = function(arg1,arg2) {
             }
             else if (def.helptext) {
                 echo (t.format());
-                print (def.helptext.rewrap(sys.winsize()));
+                print ($colorize(
+                    def.helptext.rewrap(sys.winsize())
+                ));
             }
         }
     }
@@ -250,7 +260,9 @@ setapi.helptext = function(def) {
     print (t.format());
     if (def.text) {
         echo ("");
-        print (def.text.rewrap (sys.winsize()));
+        print ($colorize (
+            def.text.rewrap (sys.winsize())
+        ));
     }
 }
 

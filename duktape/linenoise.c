@@ -530,7 +530,9 @@ static void refreshSingleLine(struct linenoiseState *l) {
     snprintf(seq,64,"\r");
     abAppend(&ab,seq,strlen(seq));
     /* Write the prompt and the current buffer content */
+    abAppend(&ab,"\033[2m",4);
     abAppend(&ab,l->prompt,strlen(l->prompt));
+    abAppend(&ab,"\033[0m",4);
     abAppend(&ab,buf,len);
     /* Show hits if any. */
     refreshShowHints(&ab,l,plen);
@@ -584,7 +586,9 @@ static void refreshMultiLine(struct linenoiseState *l) {
     abAppend(&ab,seq,strlen(seq));
 
     /* Write the prompt and the current buffer content */
+    abAppend(&ab,"\033[2m",4);
     abAppend(&ab,l->prompt,strlen(l->prompt));
+    abAppend(&ab,"\033[0m",4);
     abAppend(&ab,l->buf,l->len);
 
     /* Show hits if any. */
@@ -799,7 +803,9 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
      * initially is just an empty string. */
     linenoiseHistoryAdd("");
 
+    if (write(l.ofd,"\033[2m",4) == -1) return -1;
     if (write(l.ofd,prompt,l.plen) == -1) return -1;
+    if (write(l.ofd,"\033[0m",4) == -1) return -1;
     while(1) {
         char c;
         int nread;
@@ -1058,7 +1064,7 @@ char *linenoise(const char *prompt) {
     } else if (isUnsupportedTerm()) {
         size_t len;
 
-        printf("%s",prompt);
+        printf("\033[2m%s\033[0m",prompt);
         fflush(stdout);
         if (fgets(buf,LINENOISE_MAX_LINE,stdin) == NULL) return NULL;
         len = strlen(buf);
