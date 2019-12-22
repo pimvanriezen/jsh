@@ -1,16 +1,23 @@
 // ============================================================================
 // Various printing functions
 // ============================================================================
-dump = function(x) {
+mkdump = function(x,mkshort) {
     var codes = {
         "number":"\033[34m",
         "key":"\033[97m",
         "string":"\033[32m",
         "boolean":"\033[36m",
-        "null":"\033[31m"
+        "null":"\033[31m",
+        "end":"\033[0m"
     }
-    if (typeof (x) == "object") {
-        var json = JSON.stringify(x,null,2);
+    if (typeof (x) == "object" || typeof(x) == "string") {
+        var json;
+        if (mkshort) {
+            json = JSON.stringify (x);
+        }
+        else {
+            json = JSON.stringify(x,null,2);
+        }
         if (env.TERM != "vt100") {
             var re = new RegExp ('("(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\"])*"'+
                                  '(\\s*:)?|\\b(true|false|null)\\b|-?\\d+'+
@@ -28,12 +35,25 @@ dump = function(x) {
                 } else if (/null/.test(match)) {
                     cls = 'null';
                 }
-                return codes[cls] + match + '\033[0m';
+                return codes[cls] + match + codes.end;
             });
         }
-        print (json + '\033[0m\n');
+        return (json + codes.end);
     }
-    else console.log (x);
+    else if (typeof (x) == "boolean") {
+        return codes.boolean + (x?"true":"false") + codes.end;
+    }
+    else if (typeof (x) == "number") {
+        return codes.number + x + codes.end;
+    }
+    else if (typeof (x) == "null") {
+        return codes["null"] + "null" + codes.end;
+    }
+    return ""+x;
+}
+
+dump = function(x) {
+    echo (mkdump (x));
 }
 
 dump.help = function() {
@@ -44,6 +64,10 @@ dump.help = function() {
         ],
         text:"Pretty-prints an object as JSON to the console."
     });
+}
+
+jshFormat = function(x) {
+    return mkdump(x,true);
 }
 
 String.prototype.wrap = function (cols) {

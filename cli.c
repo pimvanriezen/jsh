@@ -197,8 +197,8 @@ static duk_ret_t wrapped_compile_execute(duk_context *ctx, void *udata) {
 		 */
 
         if (! duk_is_undefined(ctx, -1)) {
-            duk_push_global_stash(ctx);
-            duk_get_prop_string(ctx, -1, "dukFormat");
+            duk_push_global_object(ctx);
+            duk_get_prop_string(ctx, -1, "jshFormat");
             duk_dup(ctx, -3);
             duk_call(ctx, 1);  /* -> [ ... res stash formatted ] */
     		fprintf(stdout, "= %s\n", duk_to_string(ctx, -1));
@@ -700,7 +700,7 @@ static duk_context *create_duktape_heap(int alloc_provider,
 	duk_module_duktape_init(ctx);
 
 	/* Stash a formatting function for evaluation results. */
-	duk_push_global_stash(ctx);
+	duk_push_global_object(ctx);
 	duk_eval_string(ctx,
 		"(function (E) {"
 		    "return function format(v){"
@@ -711,7 +711,7 @@ static duk_context *create_duktape_heap(int alloc_provider,
 		        "}"
 		    "};"
 		"})(Duktape.enc)");
-	duk_put_prop_string(ctx, -2, "dukFormat");
+	duk_put_prop_string(ctx, -2, "jshFormat");
 	duk_pop(ctx);
 
     sys_init (ctx);
