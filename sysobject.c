@@ -16,6 +16,7 @@
 #include <strings.h>
 #include <sys/ioctl.h>
 #include "duktape.h"
+#include "quoting.h"
 
 char *mystrdup (const char *orig) {
     size_t len = strlen (orig);
@@ -730,7 +731,9 @@ void sys_init (duk_context *ctx) {
         filno = open (osglobal, O_RDONLY);
         if (filno >= 0) {
             read (filno, buffer, st.st_size);
-            duk_eval_string (ctx, buffer);
+            char *tbuffer = handle_quoting (buffer);
+            duk_eval_string (ctx, tbuffer);
+            free (tbuffer);
         }
         free (buffer);
         close (filno);

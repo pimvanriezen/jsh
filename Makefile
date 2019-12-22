@@ -7,10 +7,10 @@ OBJS_DUKTAPE = \
 	duktape/duktape.o duktape/duk_console.o \
 	duktape/duk_module_duktape.o duktape/linenoise.o
 
-OBJS_CLI = sysobject.o cli.o
+OBJS_CLI = sysobject.o cli.o quoting.o
 
 CC = gcc
-CCOPTS = -std=c99 -Wall
+CCOPTS = -g -std=c99 -Wall
 CCOPTS += -D_GNU_SOURCE -I./duktape   # duktape.h and duk_config.h must be in include path
 CCLIBS = -lm
 

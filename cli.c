@@ -27,6 +27,7 @@
 #include "duk_console.h"
 #include "duk_module_duktape.h"
 #include "duktape.h"
+#include "quoting.h"
 
 extern void sys_init (duk_context *);
 
@@ -471,16 +472,19 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
     if (buf[0] == '#' && buf[1] == '!') {
         bufptr = strchr (buf, '\n');
     }
+    
+    char *translated = handle_quoting (bufptr);
 
 	duk_push_string(ctx, bytecode_filename);
-	duk_push_pointer(ctx, (void *) bufptr);
-	duk_push_uint(ctx, (duk_uint_t) bufoff - (bufptr-buf));
+	duk_push_pointer(ctx, (void *) translated);
+	duk_push_uint(ctx, (duk_uint_t) strlen (translated));
 	duk_push_string(ctx, filename);
 
 	interactive_mode = 0;  /* global */
 
 	rc = duk_safe_call(ctx, wrapped_compile_execute, NULL, 4, 1);
 
+    free(translated);
 	free(buf);
 	buf = NULL;
 

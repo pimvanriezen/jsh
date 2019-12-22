@@ -153,11 +153,11 @@ ls = function (path) {
                 suffix = suffx.link;
             }
             
-            outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+" : "+
-                     o.user.padEnd(ulen) + "/ " +
-                     o.group.padEnd(glen+1) +
-                     (""+o.size).padStart(szlen+1) + " " +
-                     fnstart + name + fnend + suffix + '\n';
+            var outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+
+                         " : "+ o.user.padEnd(ulen) + "/ " +
+                         o.group.padEnd(glen+1) +
+                         (""+o.size).padStart(szlen+1) + " " +
+                         fnstart + name + fnend + suffix + '\n';
             sys.print (outstr);
         }
     }
