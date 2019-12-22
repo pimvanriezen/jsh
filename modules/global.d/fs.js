@@ -317,7 +317,7 @@ prompt = function(val) {
     if (val) {
         this.setval = val;
     }
-    var fmt = "%p%# ";
+    var fmt = "[%p]: ";
     if (this.setval) fmt = this.setval;
     fmt = fmt.replace(/%p/,cwd());
     fmt = fmt.replace(/%h/,hostname());

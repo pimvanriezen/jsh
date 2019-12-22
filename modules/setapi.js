@@ -6,13 +6,18 @@ var $apidb = {};
 
 help = function(helpfor) {
     if (helpfor && helpfor.help) return helpfor.help();
+    
+    var boldf = function(match) { return '\033[1m'+match+'\033[0m'; }
+    var fre = new RegExp ("[.a-zA-Z_]+\\([._a-zA-Z]*\\)","g");
+    
     print (<<<
         Call help(command) with a function of this list to check for its
         syntax. Document your own global functions by defining a
         help() property and calling setapi() on it.
         
         Available commands:
-    >>>.rewrap(sys.winsize()));
+    >>>.rewrap(80).replace (fre, boldf));
+        
     var list = [];
     var row = 0;
     for (var k in $apidb) list.push(k);
