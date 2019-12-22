@@ -283,6 +283,90 @@ mkdir = setapi ([
     {helptext:"Creates a directory."}
 ]);
 
+sys.ps = function(matchopt) {
+    var psout = run ("ps axuw");
+    var fields = [
+        "user",
+        "pid",
+        "pcpu",
+        "pmem",
+        "vsz",
+        "rss",
+        "tty",
+        "stat",
+        "started",
+        "time",
+        "command"
+    ];
+    
+    var match = {};
+    if (matchopt) {
+        for (var mk in matchopt) {
+            match[mk] = new RegExp(matchopt[mk]);
+        }
+    }
+    
+    var res = {};
+    var listing = psout.replace(/  */g, " ").split('\n');
+    for (var ri=1;ri<listing.length;++ri) {
+        var row = listing[ri].split(' ');
+        var rowdata = {};
+        for (var i=0; i<fields.length;++i) {
+            if (i+1 < fields.length) {
+                var cell = row.splice(0,1)[0];
+                var cellstr = ""+cell;
+                if (cellstr.indexOf(':') < 0) {
+                    if (cell == "0.0" ||
+                        (cellstr.indexOf(".")>0 && parseFloat(cell))) {
+                        cell = parseFloat(cell).toFixed(2);
+                    }
+                    else if (cell == "0" || parseInt(cell)) {
+                        cell = parseInt(cell);
+                    }
+                }
+                rowdata[fields[i]] = cell;
+            }
+            else {
+                rowdata[fields[i]] = row.join(' ');
+            }
+            if (rowdata.pid && rowdata.command) {
+                var printit = true;
+                if (matchopt) {
+                    for (var mi in matchopt) {
+                        if (! (""+rowdata[mi]).match (matchopt[mi])) {
+                            printit = false;
+                            break;
+                        }
+                    }
+                }
+                if (printit) res[rowdata.pid] = rowdata;
+            }
+        }
+    }
+    return res;
+}
+
+ps = setapi ([
+    {name:"ps"},
+    {opt:{command:true},helptext:"Match command"},
+    {opt:{user:true},helptext:"Match user"},
+    {helptext:"Returns a list of processes"},
+    {f:function(args) {
+        var listing = sys.ps(args);
+        var t = new texttable(8);
+        for (var i in listing) {
+            var p = listing[i];
+            p.user = p.user.padEnd(8);
+            p.vsz = humanSize (p.vsz);
+            p.rss = humanSize (p.rss);
+            p.command = p.command.replace (/.*\//,"").replace (/ .*/,"");
+            t.addRow(p.user, p.pid, p.pcpu, p.pmem, p.vsz, p.rss, p.time, p.command);
+        }
+        t.boldcolumn = 1;
+        print (t.format());
+    }}
+]);
+
 // ----------------------------------------------------------------------------
 stty = setapi ([
     {name:"stty"},

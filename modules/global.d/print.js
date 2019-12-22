@@ -207,9 +207,11 @@ texttable.prototype.format = function() {
         
         var line = 0;
         for (var line=0; line<numlines; ++line) {
+            var ln = "";
+            var ww = 0;
             for (var i=0; i<this.columns; ++i) {
                 if (i == this.boldcolumn) {
-                    res += '\033[1m';
+                    if (out[i][line]) ln += '\033[1m';
                 }
                 var w = widths[i];
                 var addcol;
@@ -221,12 +223,17 @@ texttable.prototype.format = function() {
                 else {
                     if ((i+1)<this.columns) addcol = ("").padEnd (w);
                 }
-                res += addcol;
+                ln += addcol;
+                ww += addcol.length;
                 if (i == this.boldcolumn) {
-                    res += '\033[0m';
+                    if (out[i][line]) ln += '\033[0m';
                 }
             }
-            res += '\n';
+            while ((ww>sys.winsize()) && (ln[0] == ' ')) {
+                ln = ln.substr(1);
+                ww--;
+            }
+            res += ln + '\n';
         }
     }
     return res;
