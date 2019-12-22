@@ -132,10 +132,10 @@ duk_ret_t sys_read (duk_context *ctx) {
     if (stat (path, &st)) return 0;
     if (st.st_size == 0) st.st_size = 10240;
     if (st.st_size > maxsz) {
-        buffer = (char *) calloc (maxsz+2, 1);
+        buffer = (char *) calloc (maxsz+3, 1);
     }
     else {
-        buffer = (char *) calloc ((size_t) st.st_size+2, 1);
+        buffer = (char *) calloc ((size_t) st.st_size+3, 1);
     }
     
     filno = open (path, O_RDONLY);
