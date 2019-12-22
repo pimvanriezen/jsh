@@ -36,6 +36,13 @@ fquery.prototype.line = function (i) {
     return this.cat().split('\n')[i];
 }
 
+fquery.prototype.chmod = function (mode) {
+    var matches = sys.glob (this.query);
+    for (var k in matches) {
+        chmod (matches[k], mode);
+    }
+}    
+
 fquery.prototype.cat = function() {
     var res = "";
     var matches = sys.glob (this.query);
