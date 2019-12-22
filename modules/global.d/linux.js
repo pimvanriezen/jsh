@@ -22,7 +22,7 @@ iptables = {
         {opt:{"dstport":"--dport"},helptext:"Destination port"},
         {opt:{"state":["-m","state","--state"]},helptext:"State match"},
         {opt:{"target":"-j"},helptext:"Target chain"},
-        {helptext:"Adds a rule to a chain"}
+        {helptext:"Adds a rule to a chain."}
     ]),
     remove:setapi ([
         {name:"iptables.remove"},
@@ -40,7 +40,7 @@ iptables = {
         {opt:{"dstport":"--dport"},helptext:"Destination port"},
         {opt:{"state":["-m","state","--state"]},helptext:"State match"},
         {opt:{"target":"-j"},helptext:"Target chain"},
-        {helptext:"Removes a rule from a chain"}
+        {helptext:"Removes a rule from a chain."}
     ]),
     create:setapi ([
         {name:"iptables.create"},
@@ -49,7 +49,7 @@ iptables = {
         {opt:{"table":"-t"},helptext:"Table to use (filter,nat,mangle)"},
         {literal:"-C"},
         {arg:"chain",helptext:"Name of the new chain"},
-        {helptext:"Creates a chain"}
+        {helptext:"Creates a chain."}
     ])
 };
 
@@ -58,21 +58,21 @@ hwclock = setapi([
     {name:"hwclock"},
     {literal:"hwclock"},
     {literal:"-r"},
-    {helptext:"Reads out the hardware clock"}
+    {helptext:"Reads out the hardware clock."}
 ]);
 
 hwclock.load = setapi([
     {name:"hwclock.load"},
     {literal:"hwclock"},
     {literal:"--hctosys"},
-    {helptext:"Loads hardware clock into system clock"}
+    {helptext:"Loads hardware clock into system clock."}
 ]);
 
 hwclock.save = setapi([
     {name:"hwclock.save"},
     {literal:"hwclock"},
     {literal:"--systohc"},
-    {helptext:"Saves system clock into hardware clock"}
+    {helptext:"Saves system clock into hardware clock."}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ mount = setapi ([
     {opt:{"options":"-o"},helptext:"Mount options (fs-specific)"},
     {arg:"device",helptext:"Device name"},
     {arg:"at",helptext:"Mount point"},
-    {helptext:"Mount a filesystem"}
+    {helptext:"Mounts a filesystem."}
 ]);
 
 mount.all = setapi ([
@@ -93,7 +93,7 @@ mount.all = setapi ([
     {literal:"mount"},
     {opt:{"type":"-t"},helptext:"Filesystem type"},
     {literal:"-a"},
-    {helptext:"Mount all filesystems set up in /etc/fstab"}
+    {helptext:"Mounts all filesystems set up in /etc/fstab."}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ cp = setapi ([
     {flag:{"preserve":"-p"},helptext:"Preserve permissions"},
     {arg:"from",helptext:"Source file"},
     {arg:"to",helptext:"Destination path"},
-    {helptext:"Copies a file"}
+    {helptext:"Copies a file."}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ mv = setapi ([
     {literal:"mv"},
     {arg:"from",helptext:"Original name/location"},
     {arg:"to",helptext:"New name/location"},
-    {helptext:"Moves/renames a filesystem object"}
+    {helptext:"Moves/renames a filesystem object."}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ ln = {
         {literal:"-s"},
         {arg:"to",helptext:"Filesystem object to link to"},
         {arg:"path",helptext:"Location of the link to be created"},
-        {helptext:"Creates a softlink"}
+        {helptext:"Creates a softlink."}
     ]),
     hard:setapi([
         {name:"ln.hard"},
@@ -137,7 +137,7 @@ ln = {
         {literal:"ln"},
         {arg:"to",helptext:"Filesystem object to link to"},
         {arg:"path",helptext:"Location of the link to be created"},
-        {helptext:"Creates a hardlink"}
+        {helptext:"Creates a hardlink."}
     ])
 };
 
@@ -148,7 +148,7 @@ var $signal_mkapi = function(type) {
         {setarg:"pid"},
         {literal:"kill"},{literal:"-"+type},
         {arg:"pid",helptext:"Process id to signal"},
-        {helptext:"Sends SIG"+type+" signal to process"}
+        {helptext:"Sends SIG"+type+" signal to process."}
     ]);
 };
 
@@ -209,8 +209,10 @@ chmod = setapi ([
         }
         return sys.chmod (args.path, mode);
     }},
-    {helptext:"Changes file permissions. Accepts either an integer for the new "+
-              "mode or a relative specification, e.g. [u|g|o|a][+|-][r|w|x|s]"}
+    {helptext:<<<
+        Changes file permissions. Accepts either an integer for the new
+        mode or a relative specification, e.g. "a+x".
+    >>>}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -227,7 +229,7 @@ md5sum = setapi ([
         if (md5cmd == "md5sum") return dat.split(' ')[0];
         return dat.replace (/^.* /,"");
     }},
-    {helptext:"Get md5 checksum for a file"}
+    {helptext:"Get md5 checksum for a file."}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -244,7 +246,7 @@ chown = setapi ([
         var gid = stat(args.path).gid;
         sys.chown (path, uid, gid);
     }},
-    {helptext:"Change owner of filesystem object"}
+    {helptext:"Change owner of filesystem object."}
 ]);
 
 // ----------------------------------------------------------------------------
@@ -289,5 +291,5 @@ stty = setapi ([
     {literal:"-F"},
     {arg:"device",helptext:"Path of the tty device"},
     {arg:"speed",helptext:"Speed in bits/sec"},
-    {helptext:"Set serial device speed"}
+    {helptext:"Sets serial device speed."}
 ]);

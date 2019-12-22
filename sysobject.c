@@ -494,7 +494,9 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     }
     
     read (filno, buffer, st.st_size);
-    duk_push_string (ctx, buffer);
+    char *translated = handle_quoting (buffer);
+    duk_push_string (ctx, translated);
+    free (translated);
     free (buffer);
     return 1;
 }
@@ -627,6 +629,16 @@ duk_ret_t sys_hostname (duk_context *ctx) {
     return 1;
 }
 
+duk_ret_t sys_eval (duk_context *ctx) {
+    const char *src;
+    char *translated;
+    src = duk_to_string (ctx, 0);
+    translated = handle_quoting (src);
+    duk_eval_string (ctx, translated);
+    free (translated);
+    return 0;
+}
+
 void sys_init (duk_context *ctx) {
     struct stat st;
     int filno;
@@ -655,6 +667,10 @@ void sys_init (duk_context *ctx) {
     
     duk_push_string (ctx, "dir");
     duk_push_c_function (ctx, sys_dir, DUK_VARARGS);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "eval");
+    duk_push_c_function (ctx, sys_eval, 1);
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     
     duk_push_string (ctx, "glob");

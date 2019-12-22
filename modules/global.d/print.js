@@ -64,6 +64,19 @@ String.prototype.wrap = function (cols) {
     return res;
 }
 
+String.prototype.rewrap = function (cols) {
+    var res = "";
+    var str = ""+this;
+    var paragraphs = str.split ("\n\n");
+    for (var k in paragraphs) {
+        var p = paragraphs[k].split("\n").join(" ");
+        p = p.wrap(cols).join('\n');
+        paragraphs[k] = p;
+    }
+    res = paragraphs.join("\n\n") + '\n';
+    return res;   
+}
+
 texttable = function(cols) {
     this.columns = cols;
     this.stretchcolumn = cols-1;

@@ -6,7 +6,7 @@ include = function(name) {
     for (var i in scripts) {
         var script = sys.read (scripts[i]);
         try {
-            eval(script);
+            sys.eval(script);
         }
         catch (e) {
             sys.print ("% "+scripts[i]+": "+e+'\n');

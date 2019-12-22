@@ -6,8 +6,13 @@ var $apidb = {};
 
 help = function(helpfor) {
     if (helpfor && helpfor.help) return helpfor.help();
-    echo ("Invoke the .help() method on a command to check for its syntax.");
-    echo ("Available commands:");
+    echo (<<<
+        Call help(command) with a function of this list to check for its
+        syntax. Document your own global functions by defining a
+        help() property.
+        
+        Available commands:
+    >>>.rewrap(sys.winsize()));
     var list = [];
     var row = 0;
     for (var k in $apidb) list.push(k);
@@ -204,8 +209,8 @@ var setapi = function(arg1,arg2) {
                 }
             }
             else if (def.helptext) {
-                print (t.format());
-                echo ("\n"+def.helptext.wrap(sys.winsize()).join('\n'));
+                echo (t.format());
+                print (def.helptext.rewrap(sys.winsize()));
             }
         }
     }
