@@ -120,7 +120,7 @@ duk_ret_t sys_read (duk_context *ctx) {
     int filno;
     size_t rdsz = 0;
     size_t ressz = 0;
-    char *buffer = NULL;
+    char buffer[8192];
     const char *path = duk_to_string (ctx, 0);
     if (duk_get_top (ctx) > 1) {
         maxsz = duk_get_int (ctx, 1);
@@ -130,34 +130,30 @@ duk_ret_t sys_read (duk_context *ctx) {
     }
     
     if (stat (path, &st)) return 0;
-    if (st.st_size == 0) st.st_size = 10240;
-    if (st.st_size > maxsz) {
-        buffer = (char *) calloc (maxsz+3, 1);
-    }
-    else {
-        buffer = (char *) calloc ((size_t) st.st_size+3, 1);
-    }
     
     filno = open (path, O_RDONLY);
     if (filno < 0) {
         return 0;
     }
     
+    struct textbuffer *t = textbuffer_alloc();
+
     rdsz = 8192;
     if (rdsz > maxsz) rdsz = maxsz;
     
-    while ((ressz < maxsz) && ((rdsz = read (filno, buffer+ressz, rdsz)))) {
-        if (rdsz < 0) break;
-        ressz += rdsz;
+    while ((t->wpos < maxsz) &&
+           (rdsz = read (filno, buffer, rdsz))>0) {
+        textbuffer_add_data (t, buffer, rdsz);
         rdsz = 8192;
-        if ((ressz + rdsz) > maxsz) {
-            rdsz = (maxsz - ressz);
+        if ((t->wpos + rdsz) > maxsz) {
+            rdsz = (maxsz - t->wpos);
         }
     }
     
     close (filno);
-    duk_push_string (ctx, buffer);
-    free (buffer);
+    duk_push_string (ctx, t->alloc);
+    free (t->alloc);
+    free (t);
     return 1;
 }
 
