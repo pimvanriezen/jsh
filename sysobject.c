@@ -627,6 +627,7 @@ duk_ret_t sys_run (duk_context *ctx) {
     size_t bufsz = 1024;
     size_t bufpos = 0;
     char *buf = (char *) malloc (1024);
+    buf[0] = 0;
     
     while (1) {
         if (bufpos+256 >= bufsz) {
