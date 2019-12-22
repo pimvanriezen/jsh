@@ -755,7 +755,8 @@ void sys_init (duk_context *ctx) {
         if (filno >= 0) {
             read (filno, buffer, st.st_size);
             char *tbuffer = handle_quoting (buffer);
-            duk_eval_string (ctx, tbuffer);
+            duk_push_string (ctx, tbuffer);
+            duk_eval_noresult (ctx);
             free (tbuffer);
         }
         free (buffer);

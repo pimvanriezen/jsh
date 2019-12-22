@@ -698,7 +698,6 @@ static duk_context *create_duktape_heap(int alloc_provider,
 
 	/* Register require() (removed in Duktape 2.x). */
 	duk_module_duktape_init(ctx);
-    sys_init (ctx);
 
 	/* Stash a formatting function for evaluation results. */
 	duk_push_global_stash(ctx);
@@ -714,6 +713,8 @@ static duk_context *create_duktape_heap(int alloc_provider,
 		"})(Duktape.enc)");
 	duk_put_prop_string(ctx, -2, "dukFormat");
 	duk_pop(ctx);
+
+    sys_init (ctx);
 
 	if (debugger) {
 		fprintf(stderr, "Warning: option --debugger ignored, "

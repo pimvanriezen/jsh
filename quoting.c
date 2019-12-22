@@ -8,7 +8,7 @@
 #include "quoting.h"
 
 void textbuffer_add_c (struct textbuffer *t, char c) {
-    if ((t->wpos +1) > t->size) {
+    if ((t->wpos +2) > t->size) {
         size_t newsz = t->size;
         if (newsz < 16384) newsz = 2 * t->size;
         else newsz = t->size + 16384;
@@ -38,7 +38,7 @@ void textbuffer_add_str (struct textbuffer *t, const char *dt) {
 
 void textbuffer_add_data (struct textbuffer *t, const char *dt, size_t sz) {
     size_t origsize = t->size;
-    while ((t->wpos + sz + 1) > t->size) {
+    while ((t->wpos + sz + 2) > t->size) {
         if (t->size < 16384) t->size = 2*t->size;
         else t->size = t->size + 16384;
     }
