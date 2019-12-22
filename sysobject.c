@@ -119,7 +119,6 @@ duk_ret_t sys_read (duk_context *ctx) {
     struct stat st;
     int filno;
     size_t rdsz = 0;
-    size_t ressz = 0;
     char buffer[8192];
     const char *path = duk_to_string (ctx, 0);
     if (duk_get_top (ctx) > 1) {
@@ -191,10 +190,19 @@ duk_ret_t sys_write (duk_context *ctx) {
     fchmod (filno, mode);
     
     size_t sz;
-    size_t wrsz;
+    size_t wrsz = 0;
+    size_t rdoffs = 0;
+    size_t wres;
     
     sz = (size_t) strlen (data);
-    wrsz = write (filno, data, sz);
+    
+    while (1) {
+        wres = write (filno, data+rdoffs, sz);
+        if (wres>0) wrsz += wres;
+        if (wres<=0) break;
+        rdoffs += wrsz;
+        if (rdoffs >= sz) break;
+    }
     close (filno);
     
     if (wrsz == sz) {
