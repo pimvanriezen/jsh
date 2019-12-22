@@ -14,6 +14,7 @@ mkdump = function(x,mkshort) {
         var json;
         if (mkshort) {
             json = JSON.stringify (x);
+            if (json.length < 500) json = JSON.stringify (x,null,2);
         }
         else {
             json = JSON.stringify(x,null,2);
