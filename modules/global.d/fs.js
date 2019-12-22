@@ -4,9 +4,9 @@ which = function(cmd) {
             if (cmd.unixcmd()) {
                 cmd = cmd.unixcmd();
             }
-            else return "{function}";
+            else return cmd;
         }
-        else return "{function}";
+        else return cmd;
     }
     var pathstr = env.PATH;
     var path = pathstr.split(':');

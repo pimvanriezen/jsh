@@ -8,6 +8,7 @@ mkdump = function(x,mkshort) {
         "string":"\033[32m",
         "boolean":"\033[36m",
         "null":"\033[31m",
+        "function":"\033[1m",
         "end":"\033[0m"
     }
     if (typeof (x) == "object" || typeof(x) == "string") {
@@ -49,6 +50,9 @@ mkdump = function(x,mkshort) {
     }
     else if (typeof (x) == "null") {
         return codes["null"] + "null" + codes.end;
+    }
+    else if (typeof (x) == "function") {
+        return codes["function"]+"function()"+codes.end+" {..js code..}";
     }
     return ""+x;
 }
