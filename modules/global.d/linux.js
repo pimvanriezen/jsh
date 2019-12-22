@@ -229,7 +229,8 @@ md5sum = setapi ([
         if ($md5cmd == "md5sum") return dat.split(' ')[0];
         return dat.replace (/^.* /,"");
     }},
-    {helptext:"Get md5 checksum for a file."}
+    {helptext:"Get md5 checksum for a file. Returns a hexadecimal string "+
+              "representing the checksum."}
 ]);
 
 // ----------------------------------------------------------------------------
