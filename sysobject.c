@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <strings.h>
 #include <sys/ioctl.h>
+#include <sys/utsname.h>
 #include "duktape.h"
 #include "quoting.h"
 
@@ -164,6 +165,41 @@ duk_ret_t sys_winsize (duk_context *ctx) {
     else {
         duk_push_int (ctx, 80);
     }
+    return 1;
+}
+
+duk_ret_t sys_getuid (duk_context *ctx) {
+    uid_t uid = getuid();
+    duk_push_number (ctx, uid);
+    return 1;
+}
+
+duk_ret_t sys_getgid (duk_context *ctx) {
+    gid_t gid = getgid();
+    duk_push_number (ctx, gid);
+    return 1;
+}
+
+duk_ret_t sys_getpid (duk_context *ctx) {
+    pid_t pid = getpid();
+    duk_push_number (ctx, pid);
+    return 1;
+}
+
+duk_ret_t sys_uname (duk_context *ctx) {
+    struct utsname name;
+    uname (&name);
+    duk_idx_t obj_idx = duk_push_object (ctx);
+    duk_push_string (ctx, name.sysname);
+    duk_put_prop_string (ctx, obj_idx, "sysname");
+    duk_push_string (ctx, name.nodename);
+    duk_put_prop_string (ctx, obj_idx, "nodename");
+    duk_push_string (ctx, name.release);
+    duk_put_prop_string (ctx, obj_idx, "release");
+    duk_push_string (ctx, name.version);
+    duk_put_prop_string (ctx, obj_idx, "version");
+    duk_push_string (ctx, name.machine);
+    duk_put_prop_string (ctx, obj_idx, "machine");
     return 1;
 }
 
@@ -664,85 +700,39 @@ void sys_init (duk_context *ctx) {
     #define PROPFLAGS DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | \
             DUK_DEFPROP_SET_CONFIGURABLE
     
+    #define defcall(xxx,type) \
+        duk_push_string (ctx, #xxx); \
+        duk_push_c_function (ctx, sys_##xxx, type); \
+        duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
     duk_push_global_object (ctx);
     duk_push_string (ctx, "sys");
     obj_idx = duk_push_object (ctx);
-    
-    duk_push_string (ctx, "cd");
-    duk_push_c_function (ctx, sys_cd, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "cwd");
-    duk_push_c_function (ctx, sys_cwd, 0);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "dir");
-    duk_push_c_function (ctx, sys_dir, DUK_VARARGS);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "eval");
-    duk_push_c_function (ctx, sys_eval, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "glob");
-    duk_push_c_function (ctx, sys_glob, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "getenv");
-    duk_push_c_function (ctx, sys_getenv, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "setenv");
-    duk_push_c_function (ctx, sys_setenv, 2);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "print");
-    duk_push_c_function (ctx, sys_print, DUK_VARARGS);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
 
-    duk_push_string (ctx, "read");
-    duk_push_c_function (ctx, sys_read, DUK_VARARGS);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "write");
-    duk_push_c_function (ctx, sys_write, 2);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "run");
-    duk_push_c_function (ctx, sys_run, DUK_VARARGS);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "mkdir");
-    duk_push_c_function (ctx, sys_mkdir, DUK_VARARGS);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "chmod");
-    duk_push_c_function (ctx, sys_chmod, 2);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "chown");
-    duk_push_c_function (ctx, sys_chown, 3);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "getpwnam");
-    duk_push_c_function (ctx, sys_getpwnam, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "getpwuid");
-    duk_push_c_function (ctx, sys_getpwuid, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "hostname");
-    duk_push_c_function (ctx, sys_hostname, DUK_VARARGS);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
-    
-    duk_push_string (ctx, "winsize");
-    duk_push_c_function (ctx, sys_winsize, 0);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    defcall (cd, 1);
+    defcall (cwd, 0);
+    defcall (dir, DUK_VARARGS);
+    defcall (eval, 1);
+    defcall (glob, 1);
+    defcall (getenv, 1);
+    defcall (setenv, 2);
+    defcall (print, DUK_VARARGS);
+    defcall (read, DUK_VARARGS);
+    defcall (write, 2);
+    defcall (run, DUK_VARARGS);
+    defcall (mkdir, DUK_VARARGS);
+    defcall (chmod, 2);
+    defcall (chown, 3);
+    defcall (getpwnam, 1);
+    defcall (getpwuid, 1);
+    defcall (hostname, DUK_VARARGS);
+    defcall (winsize, 0);
+    defcall (stat, 1);
+    defcall (getuid, 0);
+    defcall (getgid, 0);
+    defcall (getpid, 0);
+    defcall (uname, 0);
 
-    duk_push_string (ctx, "stat");
-    duk_push_c_function (ctx, sys_stat, 1);
-    duk_def_prop (ctx, obj_idx, PROPFLAGS);
     duk_def_prop (ctx, -3, PROPFLAGS);
     duk_pop (ctx);
     
