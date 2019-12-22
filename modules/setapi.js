@@ -7,7 +7,8 @@ var $textformat = function(x) {
     var matches = {
         "@function":1,
         "(\\b(true|false))":36,
-        "(\\b(null))":31
+        "(\\b(null))":31,
+        "\"[^\"]+\"":32
     }
     x = x.rewrap (sys.winsize());
     for (var k in matches) {
@@ -265,6 +266,6 @@ setapi.helptext = function(def) {
     }
 }
 
-
+setapi.textformat = $textformat;
 
 module.exports = setapi;

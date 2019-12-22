@@ -1,6 +1,22 @@
 // ============================================================================
 // Various printing functions
 // ============================================================================
+strescape = function(str) {
+    var res = "";
+    for (var i=0; i<str.length; ++i) {
+        var c = str[i];
+        if (c == '\n') res += "\\n";
+        else if (c.charCodeAt(0) < 32) {
+            res += "\\" + c.charCodeAt(0).toString(16) + "x";
+        }
+        else if (c == '"') {
+            res += "\\\"";
+        }
+        else res += c;
+    }
+    return res;
+}
+
 mkdump = function(x,mkshort) {
     var codes = {
         "number":"\033[34m",
@@ -11,7 +27,7 @@ mkdump = function(x,mkshort) {
         "function":"\033[1m",
         "end":"\033[0m"
     }
-    if (typeof (x) == "object" || typeof(x) == "string") {
+    if (typeof (x) == "object") {
         var json;
         if (mkshort) {
             json = JSON.stringify (x);
@@ -21,7 +37,7 @@ mkdump = function(x,mkshort) {
             json = JSON.stringify(x,null,2);
         }
         if (env.TERM != "vt100") {
-            var re = new RegExp ('("(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\"])*"'+
+            var re = new RegExp ('("(\\\\u[.+- /a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\"])*"'+
                                  '(\\s*:)?|\\b(true|false|null)\\b|-?\\d+'+
                                  '(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)','g');
             json = json.replace(re, function (match) {
@@ -54,7 +70,7 @@ mkdump = function(x,mkshort) {
     else if (typeof (x) == "function") {
         return codes["function"]+"function()"+codes.end+" {..js code..}";
     }
-    return ""+x;
+    return codes["string"]+'"'+strescape(x)+'"'+codes.end;
 }
 
 dump = function(x) {
