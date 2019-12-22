@@ -36,6 +36,24 @@ void textbuffer_add_str (struct textbuffer *t, const char *dt) {
     t->alloc[t->wpos] = 0;
 }
 
+void textbuffer_add_data (struct textbuffer *t, const char *dt, size_t sz) {
+    size_t origsize = t->size;
+    while ((t->wpos + sz + 1) > t->size) {
+        if (t->size < 16384) t->size = 2*t->size;
+        else t->size = t->size + 16384;
+    }
+    if (t->size > origsize) {
+        t->alloc = (char *) realloc (t->alloc, t->size);
+        if (! t->alloc) {
+            fprintf (stderr, "%% FATAL allocation error\n");
+            exit (1);
+        }
+    }
+    memcpy (t->alloc + t->wpos, dt, sz);
+    t->wpos += sz;
+    t->alloc[t->wpos] = 0;
+}
+
 struct textbuffer *textbuffer_alloc (void) {
     struct textbuffer *t;
     t = (struct textbuffer *) calloc (sizeof(struct textbuffer),1);

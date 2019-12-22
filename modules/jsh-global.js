@@ -73,6 +73,21 @@ echo.help = function() {
     });
 }
 
+cat = function(fn) {
+    if (exists (fn)) print (sys.read (fn));
+    else return false;
+}
+
+cat.help = function() {
+    setapi.helptext ({
+        name:"cat",
+        args:[
+            {name:"filename",text:"File to output"}
+        ],
+        text:"Prints the raw contents of a file to the console."
+    });
+}
+
 // ============================================================================
 // Unix execution
 // ============================================================================
@@ -168,7 +183,7 @@ defaults.help = function() {
         ],
         text:<<<
             Set multiple defaults environment variables. If the key is
-            accessed through env.KEY, and KEY is not in the environment, the 
+            accessed through env.KEY, and KEY is not in the environment, the
             default will be obtained.
         >>>
     });
@@ -205,6 +220,7 @@ setapi (include, "include");
 setapi (printerr, "printerr");
 setapi (print, "print");
 setapi (echo, "echo");
+setapi (cat, "cat");
 
 include (env.JSH_MODULE_PATH + "/global.d/*.js");
 

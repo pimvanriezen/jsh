@@ -260,14 +260,34 @@ save.help = function() {
 // ============================================================================
 // Working directory tools
 // ============================================================================
-cd = sys.cd;
+cd = function(arg) {
+    if (! cd.history) cd.history = [];
+    var newdir = arg;
+    if (typeof (arg) == 'number') {
+        if (arg < 0 && cd.history.length + arg >= 0) {
+            newdir = cd.history[cd.history.length+arg];
+        }
+        else return false;
+    }
+    cd.history.push(cwd());
+    return sys.cd (newdir);
+}
+
+cd.history = [];
+
 cd.help = function() {
     setapi.helptext ({
         name:"cd",
         args:[
-            {name:"path",text:"Relative or absolute path of new directory."}
+            {name:"path",text:"Relative or absolute path of the new "+
+                              "directory, "+
+                              "or a negative number indicating a relative "+
+                              "position in the history."}
         ],
-        text:"Change current working directory"
+        text:<<<
+            Pushes the current working directory into the history, and changes
+            it to a new directory.
+        >>>
     });
 }
 
@@ -279,6 +299,45 @@ cwd.help = function() {
     });
 }
 
+prompt = function(val) {
+    if (val) {
+        this.setval = val;
+    }
+    var fmt = "%p%# ";
+    if (this.setval) fmt = this.setval;
+    fmt = fmt.replace(/%p/,cwd());
+    fmt = fmt.replace(/%h/,hostname());
+    fmt = fmt.replace(/%i/,cd.history.length);
+    fmt = fmt.replace(/%#/,">");
+    return fmt;
+}
+
+prompt.help = function() {
+    setapi.helptext ({
+        name:"prompt",
+        args:[
+            {name:"str",text:"The prompt format string"}
+        ],
+        text:<<<
+            Changes the look of the shell prompt. The format string recognizes
+            a couple of substitutions:
+        >>>
+    });
+    echo ("");
+    var t = new texttable(3);
+    t.addRow ("   ","%h","The hostname");
+    t.addRow ("   ","%p","The current working directory");
+    t.addRow ("   ","%i","The index in the directory history");
+    t.addRow ("   ","%#","An apropriate prompt character (# for root)");
+    t.boldcolumn = 1;
+    echo (t.format());
+    print (<<<
+        You can also override the function completely to write a custom
+        prompt, that gets executed every time the shell displays a new
+        prompt.
+    >>>.rewrap(sys.winsize()));
+}
+
 setapi (which, "which");
 setapi (dir, "dir");
 setapi (ls, "ls");
@@ -287,3 +346,4 @@ setapi (load, "load");
 setapi (save, "save");
 setapi (cd, "cd");
 setapi (cwd, "cwd");
+setapi (prompt, "prompt");

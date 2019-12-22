@@ -588,10 +588,22 @@ static int handle_interactive(duk_context *ctx) {
 			linenoiseFree(buffer);
 			buffer = NULL;
 		}
-
+		
+		duk_push_global_object(ctx);
+		if (duk_has_prop_string (ctx, -1, "prompt")) {
+            duk_push_string (ctx, "prompt");
+            duk_call_prop (ctx, -2, 0);
+            prompt = duk_get_string (ctx,-1);
+        }
+        else {
+            duk_push_null (ctx);
+        }
+        
 		completion_ctx = ctx;
 		buffer = linenoise(prompt);
 		completion_ctx = NULL;
+		duk_pop (ctx);
+		duk_pop (ctx);
 
 		if (!buffer) {
 			break;

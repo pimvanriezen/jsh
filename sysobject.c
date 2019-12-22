@@ -462,7 +462,7 @@ duk_ret_t sys_getpwuid (duk_context *ctx) {
 duk_ret_t sys_modsearch (duk_context *ctx) {
     struct stat st;
     int filno;
-    char *buffer;
+    char buffer[1024];
     const char *id = duk_to_string (ctx, 0);
     const char *path = getenv("JSH_MODULE_PATH");
     if (! path) path = "./modules";
@@ -484,20 +484,27 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
             }
         }
     }
-    buffer = (char *) calloc (st.st_size+1,1);
+    
+    struct textbuffer *t = textbuffer_alloc();
     filno = open (full, O_RDONLY);
     free (full);
     
     if (filno < 0) {
-        free (buffer);
+        free (t->alloc);
+        free (t);
         return 0;
     }
     
-    read (filno, buffer, st.st_size);
-    char *translated = handle_quoting (buffer);
+    size_t rdsz = 0;
+    while ((rdsz = read (filno, buffer, 1024)) > 0) {
+        textbuffer_add_data (t, buffer, rdsz);
+    }
+
+    char *translated = handle_quoting (t->alloc);
     duk_push_string (ctx, translated);
     free (translated);
-    free (buffer);
+    free (t->alloc);
+    free (t);
     return 1;
 }
 

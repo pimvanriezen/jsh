@@ -6,10 +6,10 @@ var $apidb = {};
 
 help = function(helpfor) {
     if (helpfor && helpfor.help) return helpfor.help();
-    echo (<<<
+    print (<<<
         Call help(command) with a function of this list to check for its
         syntax. Document your own global functions by defining a
-        help() property.
+        help() property and calling setapi() on it.
         
         Available commands:
     >>>.rewrap(sys.winsize()));
