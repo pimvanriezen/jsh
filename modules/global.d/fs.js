@@ -75,6 +75,20 @@ dir.help = function() {
     });
 }
 
+humanSize = function (sz) {
+    var res = sz;
+    var factor = "";
+    var factors = ["K","M","G","T"];
+    for (var i in factors) {
+        if (res > 10000) {
+            res = res/1024;
+            factor = factors[i];
+        }
+        else break;
+    }
+    return "" + res.toFixed(0) + factor;
+}
+
 ls = function (path) {
     var ansi = {
         dir:"\033[34m",
@@ -132,7 +146,7 @@ ls = function (path) {
     for (var k in objs) { maxlen(objs[k].group); }
     var glen = maxlen();
     maxlen(2);
-    for (var k in objs) { maxlen(""+objs[k].size); }
+    for (var k in objs) { maxlen(""+humanSize(objs[k].size)); }
     var szlen = maxlen();
     
     for (var name in objs) {
@@ -171,7 +185,7 @@ ls = function (path) {
             var outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+
                          " : "+ o.user.padEnd(ulen) + "/ " +
                          o.group.padEnd(glen+1) +
-                         (""+o.size).padStart(szlen+1) + " " +
+                         (""+humanSize(o.size)).padStart(szlen+1) + " " +
                          fnstart + name + fnend + suffix + '\n';
             sys.print (outstr);
         }
