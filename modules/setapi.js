@@ -3,39 +3,42 @@
 // ============================================================================
 
 var $apidb = {};
-$colorize = function(x) {
+var $textformat = function(x) {
     var matches = {
         "@function":1,
         "(\\b(true|false))":36,
         "(\\b(null))":31
     }
+    x = x.rewrap (sys.winsize());
     for (var k in matches) {
         x = x.colorMatch (k, matches[k]);
     }
-    return x;    
+    return x;
 }
 
 help = function(helpfor) {
     if (helpfor && helpfor.help) return helpfor.help();
+    if (helpfor) {
+        print ($textformat(<<<
+            No help available: The object provided has no .help() function
+            implemented.
+        >>>));
+        return;
+    }
     
-    print ($colorize(<<<
+    print ($textformat(<<<
         Call help(command) with a function of this list to check for its
         syntax. Document your own global functions by defining a
         help() property and calling setapi() on it.
         
         Available commands:
-    >>>.rewrap(80)));
+    >>>));
         
     var list = [];
     var row = 0;
     for (var k in $apidb) list.push(k);
     list.sort();
-    for (var k in list) {
-        print (("    "+list[k]).padEnd(40));
-        if (row & 1) print ("\n");
-        row++;
-    }
-    if (row&1) print ("\n");
+    print (autotable (list, 4));
 }
 
 var setapi = function(arg1,arg2) {
@@ -229,9 +232,7 @@ var setapi = function(arg1,arg2) {
             }
             else if (def.helptext) {
                 echo (t.format());
-                print ($colorize(
-                    def.helptext.rewrap(sys.winsize())
-                ));
+                print ($textformat(def.helptext));
             }
         }
     }
@@ -260,10 +261,10 @@ setapi.helptext = function(def) {
     print (t.format());
     if (def.text) {
         echo ("");
-        print ($colorize (
-            def.text.rewrap (sys.winsize())
-        ));
+        print ($textformat (def.text));
     }
 }
+
+
 
 module.exports = setapi;

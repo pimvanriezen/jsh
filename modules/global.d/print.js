@@ -215,3 +215,28 @@ texttable.prototype.format = function() {
     }
     return res;
 }
+
+autotable = function(arr, indent) {
+    var res = "";
+    if (! indent) indent = 0;
+    var maxsz = 0;
+    for (var i in arr) {
+        if (arr[i].length > maxsz) maxsz = arr[i].length;
+    }
+    var ncol = (((sys.winsize() - indent) / (maxsz+2))-0.5).toFixed(0);
+    ncol = parseInt (ncol);
+    var curcol = 0;
+    for (var i in arr) {
+        if (! curcol) {
+            if (indent) res += "".padEnd(indent);
+        }
+        if ((curcol+1) < ncol) {
+            res += (""+arr[i]).padEnd(maxsz+2);
+        }
+        else res += ""+arr[i]+"\n";
+        curcol++;
+        if (curcol >= ncol) curcol = 0;
+    }
+    if (curcol) res += "\n";
+    return res;
+}

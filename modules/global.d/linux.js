@@ -216,17 +216,17 @@ chmod = setapi ([
 ]);
 
 // ----------------------------------------------------------------------------
-var md5cmd = "md5sum"
-if (! which("md5sum")) md5cmd = "md5";
+var $md5cmd = "md5sum"
+if (! which("md5sum")) $md5cmd = "md5";
 
 md5sum = setapi ([
     {name:"md5sum"},
     {setarg:"path"},
-    {literal:md5cmd},
+    {literal:$md5cmd},
     {arg:"path",helptext:"File to checksum"},
     {process:function(dat) {
         dat = dat.replace('\n','');
-        if (md5cmd == "md5sum") return dat.split(' ')[0];
+        if ($md5cmd == "md5sum") return dat.split(' ')[0];
         return dat.replace (/^.* /,"");
     }},
     {helptext:"Get md5 checksum for a file."}
