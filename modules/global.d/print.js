@@ -37,7 +37,7 @@ mkdump = function(x,mkshort) {
             json = JSON.stringify(x,null,2);
         }
         if (env.TERM != "vt100") {
-            var re = new RegExp ('("(\\\\u[.+- /a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\"])*"'+
+            var re = new RegExp ('("(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\"])*"'+
                                  '(\\s*:)?|\\b(true|false|null)\\b|-?\\d+'+
                                  '(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)','g');
             json = json.replace(re, function (match) {
