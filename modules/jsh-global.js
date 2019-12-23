@@ -239,6 +239,7 @@ userdb = new Proxy ({}, $userdbproxy);
 
 $procproxy = {};
 $procproxy.get = function(target,pid) {
+    if (pid == "self") return sys.ps()[sys.getpid()];
     return sys.ps()[pid];
 }
 
