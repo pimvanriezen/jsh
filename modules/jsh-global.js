@@ -124,8 +124,8 @@ run.console = function() {
         if (arg.indexOf (' ') < 0) res = sys.runconsole (arg, []);
         else {
             args = arg.split(' ');
-            var cmd = args.splice(0,1)[0];
-            res = sys.runconsole (cmd, args);
+            var cmd = which (args.splice(0,1)[0]);
+            if (cmd) res = sys.runconsole (cmd, args);
         }
         return res;
     }

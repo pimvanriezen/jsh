@@ -3,7 +3,7 @@
 // ============================================================================
 
 // ----------------------------------------------------------------------------
-iptables = {
+if (which ("iptables")) iptables = {
     help:function(){echo ("Usage: iptables.add | iptables.remove | "+
                           "iptables.create");},
     add:setapi ([
@@ -13,13 +13,13 @@ iptables = {
         {opt:{"table":"-t"},helptext:"Table (filter,nat,mangle)"},
         {literal:"-a"},
         {arg:"chain",helptext:"Chain to use (e.g. INPUT,FORWARD,...)"},
-        {opt:{"proto":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
-        {opt:{"input":"-i"},helptext:"Input interface"},
-        {opt:{"src":"--source"},helptext:"Source address"},
-        {opt:{"srcport":"--sport"},helptext:"Source port"},
-        {opt:{"output":"-o"},helptext:"Output interface"},
-        {opt:{"dst":"--destination"},helptext:"Destination address"},
-        {opt:{"dstport":"--dport"},helptext:"Destination port"},
+        {opt:{"protocol":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
+        {opt:{"inputInterface":"-i"},helptext:"Input device"},
+        {opt:{"srcAddress":"--source"},helptext:"Source address"},
+        {opt:{"srcPort":"--sport"},helptext:"Source port"},
+        {opt:{"outputInterface":"-o"},helptext:"Output interface"},
+        {opt:{"dstAddress":"--destination"},helptext:"Destination address"},
+        {opt:{"dstPort":"--dport"},helptext:"Destination port"},
         {opt:{"state":["-m","state","--state"]},helptext:"State match"},
         {opt:{"target":"-j"},helptext:"Target chain"},
         {helptext:"Adds a rule to a chain."}
@@ -32,12 +32,12 @@ iptables = {
         {literal:"-d"},
         {arg:"chain",helptext:"Chain to use (e.g. INPUT,FORWARD,...)"},
         {opt:{"proto":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
-        {opt:{"input":"-i"},helptext:"Input interface"},
-        {opt:{"src":"--source"},helptext:"Source address"},
-        {opt:{"srcport":"--sport"},helptext:"Source port"},
-        {opt:{"output":"-o"},helptext:"Output interface"},
-        {opt:{"dst":"--destination"},helptext:"Destination address"},
-        {opt:{"dstport":"--dport"},helptext:"Destination port"},
+        {opt:{"inputInterface":"-i"},helptext:"Input interface"},
+        {opt:{"srcAddress":"--source"},helptext:"Source address"},
+        {opt:{"srcPort":"--sport"},helptext:"Source port"},
+        {opt:{"outputInterface":"-o"},helptext:"Output interface"},
+        {opt:{"dstAddress":"--destination"},helptext:"Destination address"},
+        {opt:{"dstPort":"--dport"},helptext:"Destination port"},
         {opt:{"state":["-m","state","--state"]},helptext:"State match"},
         {opt:{"target":"-j"},helptext:"Target chain"},
         {helptext:"Removes a rule from a chain."}
@@ -54,26 +54,28 @@ iptables = {
 };
 
 // ----------------------------------------------------------------------------
-hwclock = setapi([
-    {name:"hwclock"},
-    {literal:"hwclock"},
-    {literal:"-r"},
-    {helptext:"Reads out the hardware clock."}
-]);
+if (which ("hwclock")) {
+    hwclock = setapi([
+        {name:"hwclock"},
+        {literal:"hwclock"},
+        {literal:"-r"},
+        {helptext:"Reads out the hardware clock."}
+    ]);
 
-hwclock.load = setapi([
-    {name:"hwclock.load"},
-    {literal:"hwclock"},
-    {literal:"--hctosys"},
-    {helptext:"Loads hardware clock into system clock."}
-]);
+    hwclock.load = setapi([
+        {name:"hwclock.load"},
+        {literal:"hwclock"},
+        {literal:"--hctosys"},
+        {helptext:"Loads hardware clock into system clock."}
+    ]);
 
-hwclock.save = setapi([
-    {name:"hwclock.save"},
-    {literal:"hwclock"},
-    {literal:"--systohc"},
-    {helptext:"Saves system clock into hardware clock."}
-]);
+    hwclock.save = setapi([
+        {name:"hwclock.save"},
+        {literal:"hwclock"},
+        {literal:"--systohc"},
+        {helptext:"Saves system clock into hardware clock."}
+    ]);
+}
 
 // ----------------------------------------------------------------------------
 mount = setapi ([
@@ -385,24 +387,26 @@ fsck = setapi ([
     }}
 ]);
 
-mkfs = setapi ([
-    {name:"mkfs"},
-    {setarg:"device"},
-    {setarg:"type"},
-    {literal:"mkfs"},
-    {literal:"-t"},
-    {arg:"type",def:"ext4",helptext:"Filesystem type"},
-    {arg:"device",helptext:"Disk device (or image file)"},
-    {helptext:"Creates a filesystem"},
-    {process:function(res) {
-        if (res === false) {
-            printerr ("Filesystem creation failed");
-        }
-        else {
-            print (res);
-        }
-    }}
-]);
+if (which ("mkfs")) {
+    mkfs = setapi ([
+        {name:"mkfs"},
+        {setarg:"device"},
+        {setarg:"type"},
+        {literal:"mkfs"},
+        {literal:"-t"},
+        {arg:"type",def:"ext4",helptext:"Filesystem type"},
+        {arg:"device",helptext:"Disk device (or image file)"},
+        {helptext:"Creates a filesystem"},
+        {process:function(res) {
+            if (res === false) {
+                printerr ("Filesystem creation failed");
+            }
+            else {
+                print (res);
+            }
+        }}
+    ]);
+}
 
 reboot = setapi ([
     {name:"reboot"},
@@ -427,6 +431,17 @@ edit = setapi ([
     {helptext:"Opens a file in the default editor, as specified in "+
               "the env.EDITOR environment-variable."}
 ]);
+
+if (which ("make")) {
+    make = setapi ([
+        {name:"make"},
+        {literal:"make"},
+        {opt:{"file":"-f"},helptext:"Use file instead of Makefile"},
+        {opt:{"target":[]},helptext:"Build target"},
+        {console:true},
+        {helptext:"Runs the make build utility."}
+    ]);
+}
 
 // ----------------------------------------------------------------------------
 stty = setapi ([
