@@ -152,8 +152,7 @@ duk_ret_t sys_read (duk_context *ctx) {
     
     close (filno);
     duk_push_string (ctx, t->alloc);
-    free (t->alloc);
-    free (t);
+    textbuffer_free (t);
     return 1;
 }
 
@@ -501,8 +500,6 @@ duk_ret_t sys_getpwuid (duk_context *ctx) {
 
 duk_ret_t sys_modsearch (duk_context *ctx) {
     struct stat st;
-    int filno;
-    char buffer[1024];
     const char *id = duk_to_string (ctx, 0);
     const char *path;
     
@@ -566,26 +563,13 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
         return 1;
     }
 
-    struct textbuffer *t = textbuffer_alloc();
-    filno = open (full, O_RDONLY);
-    free (full);
-    
-    if (filno < 0) {
-        free (t->alloc);
-        free (t);
-        return 0;
-    }
-    
-    size_t rdsz = 0;
-    while ((rdsz = read (filno, buffer, 1024)) > 0) {
-        textbuffer_add_data (t, buffer, rdsz);
-    }
+    struct textbuffer *t = textbuffer_load(full);
+    if (! t) return 0;
 
     char *translated = handle_quoting (t->alloc);
     duk_push_string (ctx, translated);
     free (translated);
-    free (t->alloc);
-    free (t);
+    textbuffer_free (t);
     return 1;
 }
 
@@ -775,10 +759,24 @@ duk_ret_t sys_eval (duk_context *ctx) {
     return 0;
 }
 
+duk_ret_t sys_parse (duk_context *ctx) {
+    const char *fnam = duk_to_string (ctx, 0);
+    struct textbuffer *t = textbuffer_load (fnam);
+    if (! t) {
+        duk_push_boolean (ctx, 0);
+    }
+    else {
+        char *translated = handle_quoting (t->alloc);
+        duk_push_string (ctx, translated);
+        duk_eval_noresult (ctx);
+        free (translated);
+        textbuffer_free (t);
+        duk_push_boolean (ctx, 1);
+    }
+    return 1;
+}
+
 void sys_init (duk_context *ctx) {
-    struct stat st;
-    int filno;
-    char *buffer;
     const char *osglobal;
 
     bzero (uidcache, 16 * sizeof (struct xidcache));
@@ -802,6 +800,7 @@ void sys_init (duk_context *ctx) {
     defcall (cwd, 0);
     defcall (dir, DUK_VARARGS);
     defcall (eval, 1);
+    defcall (parse, 1);
     defcall (glob, 1);
     defcall (getenv, 1);
     defcall (setenv, 2);
@@ -833,17 +832,12 @@ void sys_init (duk_context *ctx) {
     
     osglobal = getenv("JSH_GLOBAL");
     if (! osglobal) osglobal = "./modules/jsh-global.js";
-    if (stat (osglobal, &st) == 0) {
-        buffer = (char *) calloc (st.st_size+1,1);
-        filno = open (osglobal, O_RDONLY);
-        if (filno >= 0) {
-            read (filno, buffer, st.st_size);
-            char *tbuffer = handle_quoting (buffer);
-            duk_push_string (ctx, tbuffer);
-            duk_eval_noresult (ctx);
-            free (tbuffer);
-        }
-        free (buffer);
-        close (filno);
+    struct textbuffer *t = textbuffer_load (osglobal);
+    if (t) {
+        char *tbuffer = handle_quoting (t->alloc);
+        duk_push_string (ctx, tbuffer);
+        duk_eval_noresult (ctx);
+        free (tbuffer);
+        textbuffer_free (t);
     }
 }

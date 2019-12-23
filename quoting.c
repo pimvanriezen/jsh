@@ -5,7 +5,32 @@
 #include <sys/resource.h>
 #include "linenoise.h"
 #include <stdint.h>  /* Assume C99/C++11 with linenoise. */
+#include <fcntl.h>
+#include <unistd.h>
 #include "quoting.h"
+
+void textbuffer_free (struct textbuffer *t) {
+    if (t->alloc) free (t->alloc);
+    free (t);
+}
+
+struct textbuffer *textbuffer_load (const char *fname) {
+    int filno;
+    char buffer[1024];
+    struct textbuffer *t = textbuffer_alloc();
+    filno = open (fname, O_RDONLY);
+    if (filno<0) {
+        textbuffer_free (t);
+        return NULL;
+    }
+    
+    size_t rdsz = 0;
+    while ((rdsz = read (filno, buffer, 1024)) > 0) {
+        textbuffer_add_data (t, buffer, rdsz);
+    }
+    close (filno);
+    return t;
+}
 
 void textbuffer_add_c (struct textbuffer *t, char c) {
     if ((t->wpos +2) > t->size) {
@@ -127,7 +152,6 @@ char *handle_quoting (const char *src) {
                 textbuffer_add_str (t, "\\\\");
             }
             else if (c[0] == '$' && c[1] == '{') {
-                // variable/statement expansion
                 textbuffer_add_str (t, "\"+");
                 c += 2;
                 while ((*c) && (*c != '}')) {
