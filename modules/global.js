@@ -262,7 +262,7 @@ proc = new Proxy ({}, $procproxy);
 // Load in modules and globals
 // ============================================================================
 defaults({
-    JSH_MODULE_PATH:"./modules:"+env.HOME+"/.jsh/modules:"+
+    JSH_MODULE_PATH:env.HOME+"/.jsh/modules:"+
                     "/usr/local/etc/jsh-modules:/etc/jsh-modules",
     PATH:"/sbin:/usr/sbin:/bin:/usr/sbin",
     EDITOR:"vi"
