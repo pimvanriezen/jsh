@@ -376,15 +376,8 @@ fsck = setapi ([
     {literal:"fsck"},
     {literal:"-y"},
     {arg:"device",helptext:"Device where the filesystem resides"},
-    {helptext:"Performs a filesystem check"},
-    {process:function(res) {
-        if (res === false) {
-            printerr ("Filesystem check failed");
-        }
-        else {
-            print (res);
-        }
-    }}
+    {console:true},
+    {helptext:"Performs a filesystem check"}
 ]);
 
 if (which ("mkfs")) {
@@ -396,15 +389,8 @@ if (which ("mkfs")) {
         {literal:"-t"},
         {arg:"type",def:"ext4",helptext:"Filesystem type"},
         {arg:"device",helptext:"Disk device (or image file)"},
-        {helptext:"Creates a filesystem"},
-        {process:function(res) {
-            if (res === false) {
-                printerr ("Filesystem creation failed");
-            }
-            else {
-                print (res);
-            }
-        }}
+        {console:true},
+        {helptext:"Creates a filesystem"}
     ]);
 }
 
