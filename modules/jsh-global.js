@@ -202,6 +202,13 @@ $userdbproxy.set = function () {
 
 userdb = new Proxy ({}, $userdbproxy);
 
+$procproxy = {};
+$procproxy.get = function(target,pid) {
+    return sys.ps()[pid];
+}
+
+proc = new Proxy ({}, $procproxy);
+
 // ============================================================================
 // Load in modules and globals
 // ============================================================================
@@ -221,6 +228,7 @@ setapi (printerr, "printerr");
 setapi (print, "print");
 setapi (echo, "echo");
 setapi (cat, "cat");
+setapi ($, "$");
 
 include (env.JSH_MODULE_PATH + "/global.d/*.js");
 

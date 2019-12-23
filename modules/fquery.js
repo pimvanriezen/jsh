@@ -1,3 +1,5 @@
+var setapi = require("setapi");
+
 // ============================================================================
 // Filesystem query implementation
 // ============================================================================
@@ -53,6 +55,39 @@ fquery.prototype.cat = function() {
     return res;
 }
 
-module.exports = function(match) {
+var query = function(match) {
     return new fquery(match);
 }
+
+query.help = function() {
+    setapi.helptext ({
+        name:"$",
+        args:[
+            {name:"wildcard",text:"Filesystem wildcard match"}
+        ],
+        text:<<<
+            Sets up a wildcard query against paths on the filesystem.
+            The returned object has a couple of functions to deal with
+            actually processing the query results, which are evaluated
+            just before a function is called.
+            
+            The following functions are supported:
+        >>>
+    });
+    echo ("");
+    var t = new texttable(3);
+    t.addRow ("    ","write(data)","Overwrites matching files with data");
+    t.addRow ("","run(...)","Executes the matching files, with arguments "+
+                             "provided in the argument list.");
+    t.addRow ("","count()","Returns the number of matching objects");
+    t.addRow ("","each(func)","Calls func for every match with the file "+
+                              "path as its argument");
+    t.addRow ("","cat()","Concatenates contents of all matching files");
+    t.addRow ("","line(nr)","Gets a specific line index of the concatenated "+
+                            "data from matching files");
+    t.addRow ("","chmod(spec)","Changes permissions on all matches");
+    t.boldcolumn = 1;
+    echo (t.format(sys.winsize()));    
+}
+
+module.exports = query;
