@@ -89,6 +89,8 @@ char *handle_quoting (const char *src) {
             else if (ciswhite (*c) && !skippedspaces) {
                 // keep skipping until a trend is set
                 if (spacestoskip) {
+                    // if we went past the first line, we know
+                    // where new lines start, so we can go on.
                     if ((c - linestart + 1) >= spacestoskip) {
                         skippedspaces = 1;
                     }
@@ -96,12 +98,18 @@ char *handle_quoting (const char *src) {
                 c++;
             }
             else if (! skippedspaces) {
+                // non-whitespace
                 if (quoteline == 1) {
                     spacestoskip = (c - linestart);
                 }
                 skippedspaces = 1;
             }
             else if (*c == '\n') {
+                // if we start with only whitespace after <<<,
+                // we skip the first line. Otherwise, we
+                // incorporate the newline. We add '\n"+"',
+                // to keep line numbering consistent with the
+                // original source.
                 if (quoteline || hadcontent) {
                     textbuffer_add_str (t, "\\n\"+\n\"");
                 }
@@ -115,9 +123,11 @@ char *handle_quoting (const char *src) {
                 c++;
             }
             else if (*c == '\\') {
+                // Escape backslash
                 textbuffer_add_str (t, "\\\\");
             }
             else if (c[0] == '$' && c[1] == '{') {
+                // variable/statement expansion
                 textbuffer_add_str (t, "\"+");
                 c += 2;
                 while ((*c) && (*c != '}')) {
