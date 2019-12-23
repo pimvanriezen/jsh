@@ -114,6 +114,9 @@ char *handle_quoting (const char *src) {
                 // Skip windows EOL noise
                 c++;
             }
+            else if (*c == '\\') {
+                textbuffer_add_str (t, "\\\\");
+            }
             else if (c[0] == '$' && c[1] == '{') {
                 textbuffer_add_str (t, "\"+");
                 c += 2;
