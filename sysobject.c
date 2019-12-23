@@ -573,7 +573,21 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     char *translated = handle_quoting (t->alloc);
     duk_push_string (ctx, translated);
     free (translated);
+    duk_get_global_string (ctx, "sys");
+    duk_get_prop_string (ctx, -1, "modules");
+    duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
+    duk_push_string (ctx, full);
+    duk_put_prop_string (ctx, obj_idx, "fileName");
+    duk_push_number (ctx, t->wpos);
+    duk_put_prop_string (ctx, obj_idx, "size");
+    duk_push_string (ctx, "require");
+    duk_put_prop_string (ctx, obj_idx, "type");
+    duk_put_prop_string (ctx, -2, id);
+    duk_pop(ctx);
+    duk_pop(ctx);
+    
     textbuffer_free (t);
+    free (full);
     return 1;
 }
 
@@ -773,9 +787,21 @@ duk_ret_t sys_parse (duk_context *ctx) {
         char *translated = handle_quoting (t->alloc);
         duk_push_string (ctx, translated);
         duk_eval_noresult (ctx);
+        duk_push_boolean (ctx, 1);
+        duk_get_global_string (ctx, "sys");
+        duk_get_prop_string (ctx, -1, "modules");
+        duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
+        duk_push_string (ctx, fnam);
+        duk_put_prop_string (ctx, obj_idx, "fileName");
+        duk_push_number (ctx, t->wpos);
+        duk_put_prop_string (ctx, obj_idx, "size");
+        duk_push_string (ctx, "parse");
+        duk_put_prop_string (ctx, obj_idx, "type");
+        duk_put_prop_string (ctx, -2, fnam);
+        duk_pop(ctx);
+        duk_pop(ctx);
         free (translated);
         textbuffer_free (t);
-        duk_push_boolean (ctx, 1);
     }
     return 1;
 }
@@ -799,6 +825,10 @@ void sys_init (duk_context *ctx) {
     duk_push_global_object (ctx);
     duk_push_string (ctx, "sys");
     obj_idx = duk_push_object (ctx);
+    
+    duk_push_string (ctx, "modules");
+    duk_push_object (ctx);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
 
     defcall (cd, 1);
     defcall (cwd, 0);
@@ -839,14 +869,32 @@ void sys_init (duk_context *ctx) {
     osglobal = getenv("JSH_GLOBAL");
     if (osglobal) t = textbuffer_load (osglobal);
     else {
-        t = textbuffer_load ("/etc/jsh/modules/global.js");
-        if (! t) t = textbuffer_load ("/usr/local/etc/jsh/modules/global.js");
+        osglobal = "/etc/jsh/modules/global.js";
+        t = textbuffer_load (osglobal);
+        if (! t) {
+            osglobal = "/usr/local/etc/jsh/modules/global.js";
+            t = textbuffer_load (osglobal);
+        }
     }
 
     if (t) {
         char *tbuffer = handle_quoting (t->alloc);
         duk_push_string (ctx, tbuffer);
         duk_eval_noresult (ctx);
+
+        duk_get_global_string (ctx, "sys");
+        duk_get_prop_string (ctx, -1, "modules");
+        duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
+        duk_push_string (ctx, osglobal);
+        duk_put_prop_string (ctx, obj_idx, "fileName");
+        duk_push_number (ctx, t->wpos);
+        duk_put_prop_string (ctx, obj_idx, "size");
+        duk_push_string (ctx, "bootstrap");
+        duk_put_prop_string (ctx, obj_idx, "type");
+        duk_put_prop_string (ctx, -2, "__global__");
+        duk_pop(ctx);
+        duk_pop(ctx);
+
         free (tbuffer);
         textbuffer_free (t);
     }

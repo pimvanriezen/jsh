@@ -20,6 +20,13 @@ include = function(name) {
         var script = sys.read (scripts[i]);
         try {
             sys.eval(script);
+            if (! sys.modules) sys.modules = {};
+            var modname = scripts[i].replace(/.*\//,"");
+            sys.modules[modname] = {
+                file:scripts[i],
+                size:script.length,
+                type:"include"
+            }
         }
         catch (e) {
             sys.print ("% "+scripts[i]+": "+e+'\n');
@@ -321,8 +328,8 @@ String.prototype.save = function(path) {
 defaults({
     JSH_MODULE_PATH:[
         env.HOME+"/.jsh/modules",
-        "/usr/local/etc/jsh-modules",
-        "/etc/jsh-modules"
+        "/usr/local/etc/jsh/modules",
+        "/etc/jsh/modules"
     ],
     PATH:["/sbin","/usr/sbin","/bin","/usr/sbin"],
     EDITOR:"vi"
