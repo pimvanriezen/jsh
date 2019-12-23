@@ -368,6 +368,56 @@ ps = setapi ([
     }}
 ]);
 
+fsck = setapi ([
+    {name:"fsck"},
+    {setarg:"device"},
+    {literal:"fsck"},
+    {literal:"-y"},
+    {arg:"device",helptext:"Device where the filesystem resides"},
+    {helptext:"Performs a filesystem check"},
+    {process:function(res) {
+        if (res === false) {
+            printerr ("Filesystem check failed");
+        }
+        else {
+            print (res);
+        }
+    }}
+]);
+
+mkfs = setapi ([
+    {name:"mkfs"},
+    {setarg:"device"},
+    {setarg:"type"},
+    {literal:"mkfs"},
+    {literal:"-t"},
+    {arg:"type",def:"ext4",helptext:"Filesystem type"},
+    {arg:"device",helptext:"Disk device (or image file)"},
+    {helptext:"Creates a filesystem"},
+    {process:function(res) {
+        if (res === false) {
+            printerr ("Filesystem creation failed");
+        }
+        else {
+            print (res);
+        }
+    }}
+]);
+
+reboot = setapi ([
+    {name:"reboot"},
+    {literal:"reboot"},
+    {helptext:"Reboots the system."}
+]);
+
+shutdown = setapi ([
+    {name:"shutdown"},
+    {literal:"shutdown"},
+    {literal:"-h"},
+    {arg:"when",def:"now",helptext:"Requested shutdown time"},
+    {helptext:"Shuts down the system."}
+]);
+
 // ----------------------------------------------------------------------------
 stty = setapi ([
     {name:"stty"},

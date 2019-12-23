@@ -101,7 +101,7 @@ char *handle_quoting (const char *src) {
             }
             else if (*c == '\n') {
                 if (quoteline || hadcontent) {
-                    textbuffer_add_str (t, "\\n");
+                    textbuffer_add_str (t, "\\n\"+\n\"");
                 }
                 quoteline++;
                 c++;
