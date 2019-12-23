@@ -352,8 +352,11 @@ ps = setapi ([
     {name:"ps"},
     {opt:{command:true},helptext:"Match command against regexp"},
     {opt:{user:true},helptext:"Match user against regexp"},
-    {helptext:"Displays a list of processes, optionally filtered against "+
-              "provided match criteria."},
+    {helptext:<<<
+        Displays a list of processes, optionally filtered against provided
+        match criteria. If you want programmatic access to the process
+        list, use sys.ps() or access details through the proc[] object.
+    >>>},
     {f:function(args) {
         var listing = sys.ps(args);
         var t = new texttable(8);
@@ -473,8 +476,13 @@ dd = setapi ([
         else argv.push ("bs=1024");
         if (args.inputOffset) argv.push ("skip="+parseInt(args.inputOffset));
         if (args.outputOffset) argv.push ("seek="+parseInt(args.outputOffset));
-        if (args.noTruncate) argv.push ("notrunc");
-        if (args.sparse) argv.push ("sparse");
+        if (args.noTruncate) {
+            if (args.sparce) {
+                argv.push ("conv=notrunc,sparse");
+            }
+            else argv.push("conv=notrunc");
+        }
+        else if (args.sparse) argv.push ("conv=sparse");
         if (! sys.runconsole ("dd", argv)) return false;
         return;
     }}
