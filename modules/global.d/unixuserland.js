@@ -488,6 +488,20 @@ dd = setapi ([
     }}
 ]);
 
+dd.zero = setapi ([
+    {name:"dd.zero"},
+    {setarg:"file"},
+    {setarg:"size"},
+    {arg:"file",helptext:"Output file"},
+    {arg:"size",helptext:"Desired size in 1KB blocks"},
+    {helptext:<<<
+        Creates a new file, filled with zeroes to a specific size.
+    >>>},
+    {f:function(args) {
+        return dd({outputFile:args.file,count:args.size});
+    }}
+]);
+
 // ----------------------------------------------------------------------------
 stty = setapi ([
     {name:"stty"},
