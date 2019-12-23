@@ -205,7 +205,7 @@ texttable.prototype.addRow = function() {
 
 texttable.prototype.format = function() {
     var res = "";
-    var maxw = sys.winsize() - 1 - ((this.columns-1) * this._padding);
+    var maxw = sys.winsize() - ((this.columns-1) * this._padding);
     maxw -= this._indent;
     if (maxw < this.columns) {
         res = "Content too wide\n";
@@ -231,7 +231,7 @@ texttable.prototype.format = function() {
         res = "Content too wide\n";
         return res;
     }
-    widths[this._stretchcolumn] = maxw - totalwidth;
+    widths[this._stretchcolumn] = (maxw - totalwidth);
     
     for (var ri in this.rows) {
         var out = [];
