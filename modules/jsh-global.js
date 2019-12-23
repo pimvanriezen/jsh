@@ -3,6 +3,19 @@
 // ============================================================================
 include = function(name) {
     var scripts = sys.glob (name);
+    if ((! name.startsWith('/')) && (! scripts.length)) {
+        var paths = env.JSH_MODULE_PATH.split(':');
+        for (var i in paths) {
+            var path = paths[i];
+            var nscripts = sys.glob (path + "/" + name);
+            if (nscripts.length) {
+                for (var ii in nscripts) {
+                    scripts.push (nscripts[ii]);
+                }
+                break;
+            }
+        }
+    }
     for (var i in scripts) {
         var script = sys.read (scripts[i]);
         try {
@@ -249,7 +262,8 @@ proc = new Proxy ({}, $procproxy);
 // Load in modules and globals
 // ============================================================================
 defaults({
-    JSH_MODULE_PATH:"./modules",
+    JSH_MODULE_PATH:"./modules:"+env.HOME+"/.jsh/modules:"+
+                    "/usr/local/etc/jsh-modules:/etc/jsh-modules",
     PATH:"/sbin:/usr/sbin:/bin:/usr/sbin",
     EDITOR:"vi"
 });
@@ -268,7 +282,7 @@ setapi (echo, "echo");
 setapi (cat, "cat");
 setapi ($, "$");
 
-include (env.JSH_MODULE_PATH + "/global.d/*.js");
+include ("global.d/*.js");
 
 // ============================================================================
 // Augmentations for the string class

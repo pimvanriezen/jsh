@@ -504,27 +504,68 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     int filno;
     char buffer[1024];
     const char *id = duk_to_string (ctx, 0);
-    const char *path = getenv("JSH_MODULE_PATH");
+    const char *path;
+    
+    duk_push_global_object (ctx);
+    duk_get_prop_string (ctx, -1, "env");
+    duk_get_prop_string (ctx, -1, "JSH_MODULE_PATH");
+    path = duk_get_string (ctx, -1);
     if (! path) path = "./modules";
-    char *full = (char *) malloc ((size_t) (strlen(path)+strlen(id)+16));
+    char *paths = strdup(path);
+    
+    duk_pop(ctx);
+    duk_pop(ctx);
+    duk_pop(ctx);
+    duk_pop(ctx);
+    
+    char *pathp = paths;
+    char *p;
     char *end;
-    strcpy (full, path);
-    strcat (full, "/");
-    strcat (full, id);
-    if (stat (full, &st)) {
-        end = full + strlen(full);
-        strcpy (end, ".js");
-        if (stat (full, &st)) {
-            strcpy (end, "/index.js");
-            if (stat (full, &st)) {
-                free (full);
-                fprintf (stderr, "%% Could not load module: '%s'\n", id);
-                exit (1);
-                return 0;
+    char *full = NULL;
+    while (pathp) {
+        p = strchr (pathp, ':');
+        if (p) {
+            *p = 0;
+            p++;
+        }
+        
+        full = (char *) malloc ((size_t) (strlen(pathp)+strlen(id)+16));
+
+        strcpy (full, pathp);
+        strcat (full, "/");
+        strcat (full, id);
+        if (! stat (full, &st)) {
+            p = NULL;
+            break;
+        }
+        else {
+            end = full + strlen(full);
+            strcpy (end, ".js");
+            if (! stat (full, &st)) {
+                p = NULL;
+                break;
+            }
+            else {
+                strcpy (end, "/index.js");
+                if (! stat (full, &st)) {
+                    p = NULL;
+                    break;
+                }
             }
         }
+        free (full);
+        full = NULL;
+        pathp = p;
     }
-    
+
+    free (paths);
+
+    if (! full) {
+        fprintf (stderr, "%% Could not load module %s\n", id);
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+
     struct textbuffer *t = textbuffer_alloc();
     filno = open (full, O_RDONLY);
     free (full);
