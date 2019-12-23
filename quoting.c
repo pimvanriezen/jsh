@@ -66,6 +66,7 @@ struct textbuffer *textbuffer_alloc (void) {
 #define cisquote(c) (c=='"' || c=='\'')
 
 char *handle_quoting (const char *src) {
+    const char *hexdigits = "0123456789abcdef";
     char currentquote = 0;
     const char *c = src;
     struct textbuffer *t;
@@ -124,6 +125,12 @@ char *handle_quoting (const char *src) {
                 textbuffer_add (t, *c);
                 c++;
                 hadcontent=1;
+            }
+            else if ((*c < 32) || (*c > 128)) {
+                textbuffer_add_c (t, '\\');
+                textbuffer_add_c (t, 'x');
+                textbuffer_add_c (t, hexdigits[(*c & 0xf0) >> 4]);
+                textbuffer_add (t, hexdigits[(*c & 0x0f)]);
             }
             else {
                 textbuffer_add (t, *c);
