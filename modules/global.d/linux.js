@@ -424,7 +424,8 @@ edit = setapi ([
     {literal:function(){ return env.EDITOR; }},
     {arg:"file",helptext:"The file to edit"},
     {console:true},
-    {helptext:"Opens a file in the default editor"}
+    {helptext:"Opens a file in the default editor, as specified in "+
+              "the env.EDITOR environment-variable."}
 ]);
 
 // ----------------------------------------------------------------------------
