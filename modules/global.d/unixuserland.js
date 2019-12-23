@@ -286,7 +286,6 @@ mkdir = setapi ([
 ]);
 
 sys.ps = function(matchopt) {
-    var psout = run ("ps axuw");
     var fields = [
         "user",
         "pid",
@@ -301,12 +300,18 @@ sys.ps = function(matchopt) {
         "command"
     ];
     
+    var pid = 0;
     var match = {};
     if (matchopt) {
         for (var mk in matchopt) {
-            match[mk] = new RegExp(matchopt[mk]);
+            if (mk == pid) pid = parseInt(matchopt[mk]);
+            else match[mk] = new RegExp(matchopt[mk]);
         }
     }
+
+    var psout;
+    if (! pid) psout = run ("ps axuw");
+    else psout = run ("ps axuw "+pid);
     
     var res = {};
     var listing = psout.replace(/  */g, " ").split('\n');
