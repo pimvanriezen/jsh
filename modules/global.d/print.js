@@ -114,7 +114,7 @@ String.prototype.rewrap = function (cols) {
     var str = ""+this;
     var paragraphs = str.split ("\n\n");
     for (var k in paragraphs) {
-        var p = paragraphs[k].split("\n").join(" ");
+        var p = (""+paragraphs[k]).split("\n").join(" ");
         p = p.wrap(cols).join('\n');
         paragraphs[k] = p;
     }

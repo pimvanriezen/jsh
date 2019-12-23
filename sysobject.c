@@ -506,6 +506,10 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     duk_push_global_object (ctx);
     duk_get_prop_string (ctx, -1, "env");
     duk_get_prop_string (ctx, -1, "JSH_MODULE_PATH");
+    duk_push_string (ctx, "join");
+    duk_push_string (ctx, ":");
+    duk_call_prop (ctx, -3, 1);
+    
     path = duk_get_string (ctx, -1);
     if (! path) path = "./modules";
     char *paths = strdup(path);

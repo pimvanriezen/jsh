@@ -4,7 +4,7 @@
 include = function(name) {
     var scripts = sys.glob (name);
     if ((! name.startsWith('/')) && (! scripts.length)) {
-        var paths = env.JSH_MODULE_PATH.split(':');
+        var paths = env.JSH_MODULE_PATH;
         for (var i in paths) {
             var path = paths[i];
             var nscripts = sys.glob (path + "/" + name);
@@ -36,7 +36,9 @@ include.help = function() {
         opts:[],
         text:<<<
             Includes one or more javascript files, parsing them into the
-            global scope.
+            global scope. The system will look through all elements
+            of env.JSH_MODULE_PATH, and will pick the first one that
+            has matches on the glob.
         >>>
     });
 }
@@ -190,12 +192,35 @@ $envproxy.has = function (target, key) {
 $envproxy.get = function (target, key) {
     if (key == "_defaults") return target.defaults;
     var v = sys.getenv (key);
-    if (v === undefined) return target.defaults[key];
+    if (v === undefined) v = target.defaults[key];
+    if (key.indexOf("PATH") >= 0) {
+        v = (""+v).split(':');
+        v.addPathElement = function(str) {
+            var res = [];
+            for (var i=0; i<this.length; ++i) {
+                res.push (this[i]);
+            }
+            res.push(str);
+            $envproxy.set (target, key, res);
+        }
+        v.removePathElement = function(str) {
+            var res = [];
+            for (var i=0; i<this.length; ++i) {
+                if (this[i] != str) res.push (this[i]);
+            }
+            $envproxy.set (target, key, res);
+        }
+    }
     return v;
 }
 $envproxy.set = function (target, key, value) {
     if (key == "_defaults") return;
-    sys.setenv (key, ""+value);
+    if (value.constructor == Array) {
+        sys.setenv (key, value.join(':'));
+    }
+    else {
+        sys.setenv (key, ""+value);
+    }
 }
 env = new Proxy ({defaults:{}}, $envproxy);
 
@@ -218,7 +243,10 @@ setenv.help = function() {
 
 defaults = function(def) {
     for (var k in def) {
-        env._defaults[k] = def[k];
+        if (def[k].length != undefined && typeof(def[k])!="string") {
+            env._defaults[k] = def[k].join(':');
+        }
+        else env._defaults[k] = def[k];
     }
 }
 
@@ -237,6 +265,9 @@ defaults.help = function() {
     });
 }
 
+// ============================================================================
+// User database
+// ============================================================================
 $userdbproxy = {}
 $userdbproxy.get = function (target, key) {
     if ((key=="0")||(parseInt(key))) {
@@ -250,6 +281,9 @@ $userdbproxy.set = function () {
 
 userdb = new Proxy ({}, $userdbproxy);
 
+// ============================================================================
+// Process
+// ============================================================================
 $procproxy = {};
 $procproxy.get = function(target,pid) {
     if (pid == "self") return sys.ps({pid:sys.getpid()})[sys.getpid()];
@@ -257,32 +291,6 @@ $procproxy.get = function(target,pid) {
 }
 
 proc = new Proxy ({}, $procproxy);
-
-// ============================================================================
-// Load in modules and globals
-// ============================================================================
-defaults({
-    JSH_MODULE_PATH:env.HOME+"/.jsh/modules:"+
-                    "/usr/local/etc/jsh-modules:/etc/jsh-modules",
-    PATH:"/sbin:/usr/sbin:/bin:/usr/sbin",
-    EDITOR:"vi"
-});
-
-$ = require("fquery");
-setapi = require("setapi");
-
-setapi (setenv, "setenv");
-setapi (defaults, "defaults");
-setapi (run, "run");
-setapi (run.console, "run.console");
-setapi (include, "include");
-setapi (printerr, "printerr");
-setapi (print, "print");
-setapi (echo, "echo");
-setapi (cat, "cat");
-setapi ($, "$");
-
-include ("global.d/*.js");
 
 // ============================================================================
 // Augmentations for the string class
@@ -307,3 +315,35 @@ String.prototype.save = function(path) {
     sys.write (""+this, ""+path);
 }
 
+// ============================================================================
+// Load in modules and globals
+// ============================================================================
+defaults({
+    JSH_MODULE_PATH:[
+        env.HOME+"/.jsh/modules",
+        "/usr/local/etc/jsh-modules",
+        "/etc/jsh-modules"
+    ],
+    PATH:["/sbin","/usr/sbin","/bin","/usr/sbin"],
+    EDITOR:"vi"
+});
+
+$ = require("fquery");
+setapi = require("setapi");
+
+setapi (setenv, "setenv");
+setapi (defaults, "defaults");
+setapi (run, "run");
+setapi (run.console, "run.console");
+setapi (include, "include");
+setapi (printerr, "printerr");
+setapi (print, "print");
+setapi (echo, "echo");
+setapi (cat, "cat");
+setapi ($, "$");
+
+include ("global.d/*.js");
+
+if (exists (env.HOME + "/.jshrc")) {
+    sys.parse (env.HOME + "/.jshrc");
+}

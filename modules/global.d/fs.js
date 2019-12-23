@@ -8,8 +8,7 @@ which = function(cmd) {
         }
         else return cmd;
     }
-    var pathstr = env.PATH;
-    var path = pathstr.split(':');
+    var path = env.PATH;
     for (var k in path) {
         var st = sys.stat (path[k]+'/'+cmd);
         if (st && st.isExecutable) {
