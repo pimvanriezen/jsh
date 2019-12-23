@@ -86,7 +86,10 @@ var setapi = function(arg1,arg2) {
                 }
             }
             if (def.literal) {
-                argv.push (def.literal);
+                if (typeof (def.literal) == "function") {
+                    argv.push (def.literal());
+                }
+                else argv.push (def.literal);
                 continue;
             }
             if (def.opt) {
@@ -144,6 +147,7 @@ var setapi = function(arg1,arg2) {
             if (cmd) cmd = which(cmd);
             if (useconsole) {
                 res = sys.runconsole (cmd, argv);
+                if (res === true) res = undefined;
             }
             else if (stdin) {
                 res = sys.run (cmd, argv, stdin);
@@ -160,7 +164,11 @@ var setapi = function(arg1,arg2) {
     }
     obj.unixcmd = function() {
         for (var ii in defarr) {
-            if (defarr[ii].literal) return defarr[ii].literal;
+            var lit = defarr[ii].literal;
+            if (lit) {
+                if (typeof (lit) == "function") return lit();
+                return lit;
+            }
         }
         return null;
     }

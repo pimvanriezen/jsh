@@ -421,7 +421,7 @@ shutdown = setapi ([
 edit = setapi ([
     {name:"edit"},
     {setarg:"file"},
-    {literal:env.EDITOR},
+    {literal:function(){ return env.EDITOR; }},
     {arg:"file",helptext:"The file to edit"},
     {console:true},
     {helptext:"Opens a file in the default editor"}
