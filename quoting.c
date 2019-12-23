@@ -109,6 +109,10 @@ char *handle_quoting (const char *src) {
                 linestart = c;
                 skippedspaces = 0;
             }
+            else if (*c == '\r') {
+                // Skip windows EOL noise
+                c++;
+            }
             else if (c[0] == '$' && c[1] == '{') {
                 textbuffer_add_str (t, "\"+");
                 c += 2;
@@ -126,7 +130,8 @@ char *handle_quoting (const char *src) {
                 c++;
                 hadcontent=1;
             }
-            else if ((*c < 32) || (*c > 128)) {
+            else if (*c < 32) {
+                /* Signed char, so high ascii is negative */
                 textbuffer_add_c (t, '\\');
                 textbuffer_add_c (t, 'x');
                 textbuffer_add_c (t, hexdigits[(*c & 0xf0) >> 4]);
