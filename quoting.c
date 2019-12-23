@@ -81,7 +81,8 @@ char *handle_quoting (const char *src) {
     while ((*c)) {
         if (currentquote == '<') {
             if (c[0] == '>' && c[1] == '>' && c[2] == '>') {
-                textbuffer_add (t, '"');
+                textbuffer_add_c (t, '"');
+                textbuffer_add (t, ')');
                 currentquote = 0;
                 c += 3;
             }
@@ -157,6 +158,7 @@ char *handle_quoting (const char *src) {
             spacestoskip = 0;
             hadcontent = 0;
             linestart = c;
+            textbuffer_add_c (t, '(');
             textbuffer_add (t, '"');
         }
         else if (currentquote && *c == '\\') {
@@ -178,7 +180,7 @@ char *handle_quoting (const char *src) {
         }
     }
     
-    //fprintf (stderr, "---\n%s\n---\n", t->alloc);
+    // fprintf (stderr, "---\n%s\n---\n", t->alloc);
     
     char *res = t->alloc;
     free (t);

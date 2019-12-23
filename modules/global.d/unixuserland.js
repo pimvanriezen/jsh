@@ -368,7 +368,7 @@ ps = setapi ([
             p.command = p.command.replace (/^\/.*\//,"").replace (/ .*/,"");
             t.addRow(p.user, p.pid, p.pcpu, p.pmem, p.vsz, p.rss, p.time, p.command);
         }
-        t.boldcolumn = 1;
+        t.boldColumn (1);
         print (t.format());
     }}
 ]);

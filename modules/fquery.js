@@ -75,18 +75,19 @@ query.help = function() {
         >>>
     });
     echo ("");
-    var t = new texttable(3);
-    t.addRow ("    ","write(data)","Overwrites matching files with data");
-    t.addRow ("","run(...)","Executes the matching files, with arguments "+
+    var t = new texttable(2);
+    t.addRow ("write(data)","Overwrites matching files with data");
+    t.addRow ("run(...)","Executes the matching files, with arguments "+
                              "provided in the argument list.");
-    t.addRow ("","count()","Returns the number of matching objects");
-    t.addRow ("","each(func)","Calls func for every match with the file "+
+    t.addRow ("count()","Returns the number of matching objects");
+    t.addRow ("each(func)","Calls func for every match with the file "+
                               "path as its argument");
-    t.addRow ("","cat()","Concatenates contents of all matching files");
-    t.addRow ("","line(nr)","Gets a specific line index of the concatenated "+
+    t.addRow ("cat()","Concatenates contents of all matching files");
+    t.addRow ("line(nr)","Gets a specific line index of the concatenated "+
                             "data from matching files");
-    t.addRow ("","chmod(spec)","Changes permissions on all matches");
-    t.boldcolumn = 1;
+    t.addRow ("chmod(spec)","Changes permissions on all matches");
+    t.boldColumn (0);
+    t.indent (4);
     echo (t.format(sys.winsize()));    
 }
 

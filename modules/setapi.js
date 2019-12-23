@@ -176,7 +176,7 @@ var setapi = function(arg1,arg2) {
     obj.help = function() {
         var t = new texttable(4);
         var argi = {}
-        t.boldcolumn = 2;
+        t.boldColumn(2);
         var cmd = "command";
         for (var ii in defarr) {
             if (defarr[ii].name) {
@@ -258,7 +258,7 @@ var setapi = function(arg1,arg2) {
 
 setapi.helptext = function(def) {
     var t = new texttable(4);
-    t.boldcolumn = 2;
+    t.boldColumn (2);
     var arglist = [];
     for (var ai in def.args) arglist.push (def.args[ai].name);
     if (def.opts && def.opts.length) arglist.push ("{..options..}");

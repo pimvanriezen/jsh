@@ -119,6 +119,9 @@ String.prototype.rewrap = function (cols) {
         paragraphs[k] = p;
     }
     res = paragraphs.join("\n\n") + '\n';
+    if (res.endsWith("\n\n")) {
+        res = res.substr (0,res.length-1);
+    }
     return res;   
 }
 
@@ -145,10 +148,27 @@ String.prototype.colorMatch = function (expr, code) {
 
 texttable = function(cols) {
     this.columns = cols;
-    this.stretchcolumn = cols-1;
-    this.boldcolumn = -1;
-    this.padding = 1;
+    this._stretchcolumn = cols-1;
+    this._boldcolumn = -1;
+    this._padding = 1;
+    this._indent = 0;
     this.rows = [];
+}
+
+texttable.prototype.stretchColumn = function(c) {
+    if (c < this.columns) this._stretchcolumn = c;
+}
+
+texttable.prototype.boldColumn = function(c) {
+    if (c < this.columns) this._boldcolumn = c;
+}
+
+texttable.prototype.padding = function(p) {
+    this._padding = p;
+}
+
+texttable.prototype.indent = function(i) {
+    this._indent = i;
 }
 
 texttable.prototype.addRow = function() {
@@ -164,7 +184,8 @@ texttable.prototype.addRow = function() {
 
 texttable.prototype.format = function() {
     var res = "";
-    var maxw = sys.winsize() - 1 - ((this.columns-1) * this.padding);
+    var maxw = sys.winsize() - 1 - ((this.columns-1) * this._padding);
+    maxw -= this._indent;
     if (maxw < this.columns) {
         res = "Content too wide\n";
         return res;
@@ -172,7 +193,7 @@ texttable.prototype.format = function() {
     var widths = [];
     var totalwidth = 0;
     for (var c=0;c<this.columns;++c) {
-        if (c == this.stretchcolumn) {
+        if (c == this._stretchcolumn) {
             widths[c] = 1;
         }
         else {
@@ -189,14 +210,14 @@ texttable.prototype.format = function() {
         res = "Content too wide\n";
         return res;
     }
-    widths[this.stretchcolumn] = maxw - totalwidth;
+    widths[this._stretchcolumn] = maxw - totalwidth;
     
     for (var ri in this.rows) {
         var out = [];
         var numlines = 0;
         
         for (var i=0; i<this.columns; ++i) {
-            if (i == this.stretchcolumn) {
+            if (i == this._stretchcolumn) {
                 out[i] = (""+this.rows[ri][i]).wrap(widths[i]);
                 if (out[i].length > numlines) numlines = out[i].length;
             }
@@ -207,15 +228,15 @@ texttable.prototype.format = function() {
         
         var line = 0;
         for (var line=0; line<numlines; ++line) {
-            var ln = "";
+            var ln = "".padEnd(this._indent);
             var ww = 0;
             for (var i=0; i<this.columns; ++i) {
-                if (i == this.boldcolumn) {
+                if (i == this._boldcolumn) {
                     if (out[i][line]) ln += '\033[1m';
                 }
                 var w = widths[i];
                 var addcol;
-                if ((i+1)<this.columns) w += this.padding;
+                if ((i+1)<this.columns) w += this._padding;
                 if (out[i].length > line) {
                     if ((i+1)<this.columns) addcol = out[i][line].padEnd (w);
                     else addcol = out[i][line];
@@ -225,7 +246,7 @@ texttable.prototype.format = function() {
                 }
                 ln += addcol;
                 ww += addcol.length;
-                if (i == this.boldcolumn) {
+                if (i == this._boldcolumn) {
                     if (out[i][line]) ln += '\033[0m';
                 }
             }
