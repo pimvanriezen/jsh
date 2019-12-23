@@ -348,9 +348,10 @@ sys.ps = function(matchopt) {
 
 ps = setapi ([
     {name:"ps"},
-    {opt:{command:true},helptext:"Match command"},
-    {opt:{user:true},helptext:"Match user"},
-    {helptext:"Returns a list of processes"},
+    {opt:{command:true},helptext:"Match command against regexp"},
+    {opt:{user:true},helptext:"Match user against regexp"},
+    {helptext:"Displays a list of processes, optionally filtered against "+
+              "provided match criteria."},
     {f:function(args) {
         var listing = sys.ps(args);
         var t = new texttable(8);
