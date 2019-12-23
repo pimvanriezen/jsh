@@ -360,7 +360,7 @@ ps = setapi ([
             p.user = p.user.padEnd(8);
             p.vsz = humanSize (p.vsz);
             p.rss = humanSize (p.rss);
-            p.command = p.command.replace (/.*\//,"").replace (/ .*/,"");
+            p.command = p.command.replace (/^\/.*\//,"").replace (/ .*/,"");
             t.addRow(p.user, p.pid, p.pcpu, p.pmem, p.vsz, p.rss, p.time, p.command);
         }
         t.boldcolumn = 1;
