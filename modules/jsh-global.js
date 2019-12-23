@@ -116,18 +116,53 @@ run = function() {
     return res;
 }
 
+run.console = function() {
+    var args = [];
+    var res;
+    if (arguments.length == 1) {
+        var arg = ""+arguments[0];
+        if (arg.indexOf (' ') < 0) res = sys.runconsole (arg, []);
+        else {
+            args = arg.split(' ');
+            var cmd = args.splice(0,1)[0];
+            res = sys.runconsole (cmd, args);
+        }
+        return res;
+    }
+    var cmd = arguments[0];
+    for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
+    res = sys.runconsole (cmd, args);
+    return res;
+}
+
+run.console.help = function() {
+    setapi.helptext({
+        name:"run.console",
+        args:[
+            {name:"cmd",text:"Command to run"},
+            {name:"args",text:"Argument list"}
+        ],
+        text:<<<
+            Behaves like run(), but executes connected to the shell's
+            console, instead of exchanging data with the javascript
+            layer.
+        >>>
+    });
+}
+
 run.help = function() {
-    echo ("Usage:     run (cmd, <args>)");
-    echo ("");
-    echo ("Executes a program and returns its output. Arguments can be provided");
-    echo ("in three ways:");
-    echo ("");
-    echo ("  1. run ('command','arg1','arg2')");
-    echo ("  2. run ('command arg1 arg2')");
-    echo ("  3. run ('command',[arg1,arg2])");
-    echo ("");
-    echo ("If execution fails, a boolean is returned with the value set to "+
-          "false.");
+    setapi.helptext({
+        name:"run",
+        args:[
+            {name:"cmd",text:"Command to run"},
+            {name:"args",text:"Argument list"}
+        ],
+        text:<<<
+            Executes a program and returns its output. Arguments an either
+            be provided as a straight array, or as the rest of the argument
+            list, or inline in the "cmd" key, separated by spaces.
+        >>>
+    });
 }
 
 // ============================================================================
@@ -214,7 +249,8 @@ proc = new Proxy ({}, $procproxy);
 // ============================================================================
 defaults({
     JSH_MODULE_PATH:"./modules",
-    PATH:"/sbin:/usr/sbin:/bin:/usr/sbin"
+    PATH:"/sbin:/usr/sbin:/bin:/usr/sbin",
+    EDITOR:"vi"
 });
 
 $ = require("fquery");
@@ -223,6 +259,7 @@ setapi = require("setapi");
 setapi (setenv, "setenv");
 setapi (defaults, "defaults");
 setapi (run, "run");
+setapi (run.console, "run.console");
 setapi (include, "include");
 setapi (printerr, "printerr");
 setapi (print, "print");

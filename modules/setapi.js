@@ -62,6 +62,7 @@ var setapi = function(arg1,arg2) {
     }
 
     var obj = function() {
+        var useconsole = false;
         var stdin = null;
         var argp = 0;
         var args = {};
@@ -76,6 +77,9 @@ var setapi = function(arg1,arg2) {
         var argv = [];
         for (var ai in defarr) {
             var def = defarr[ai];
+            if (def.console) {
+                useconsole = true;
+            }
             if (def.setarg) {
                 if (argp < lastp) {
                     args[def.setarg] = arguments[argp++];
@@ -138,7 +142,10 @@ var setapi = function(arg1,arg2) {
             var cmd = argv.splice (0,1);
             if (cmd) cmd = cmd[0];
             if (cmd) cmd = which(cmd);
-            if (stdin) {
+            if (useconsole) {
+                res = sys.runconsole (cmd, argv);
+            }
+            else if (stdin) {
                 res = sys.run (cmd, argv, stdin);
             }
             else {

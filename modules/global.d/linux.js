@@ -418,6 +418,15 @@ shutdown = setapi ([
     {helptext:"Shuts down the system."}
 ]);
 
+edit = setapi ([
+    {name:"edit"},
+    {setarg:"file"},
+    {literal:env.EDITOR},
+    {arg:"file",helptext:"The file to edit"},
+    {console:true},
+    {helptext:"Opens a file in the default editor"}
+]);
+
 // ----------------------------------------------------------------------------
 stty = setapi ([
     {name:"stty"},

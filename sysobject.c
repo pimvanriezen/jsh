@@ -659,6 +659,53 @@ duk_ret_t sys_run (duk_context *ctx) {
     return 1;
 }
 
+duk_ret_t sys_runconsole (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    int i;
+    pid_t pid;
+    int numarg = 0;
+    char **args = NULL;
+    const char *command = duk_to_string (ctx, 0);
+    duk_get_prop_string(ctx,1,"length");
+    numarg = duk_get_int(ctx,-1);
+    duk_pop(ctx);
+    
+    args = (char **) calloc (sizeof(char*),numarg+2);
+    args[0] = mystrdup (command);
+    for (i=0; i<numarg; ++i) {
+        duk_get_prop_index(ctx,1,i);
+        args[i+1] = mystrdup(duk_to_string(ctx,-1));
+        duk_pop(ctx);
+    }
+    args[i+1] = NULL;
+    
+    switch (pid = fork()) {
+        case -1:
+            for (i=0; i<(numarg+1);++i) free (args[i]);
+            free (args);
+            return 0;
+            
+        case 0:
+            for (i=3; i<255;++i) close (i);
+            execvp (command, args);
+            fprintf (stderr, "Exec failed: %s", strerror (errno));
+            exit (1);
+    }
+    
+    for (i=0; i<(numarg+1);++i) free (args[i]);
+    free (args);
+    int retstatus;
+    waitpid (pid, &retstatus, 0);
+
+    if (WEXITSTATUS(retstatus) != 0) {
+        duk_push_boolean (ctx, 0);
+    }
+    else {
+        duk_push_boolean (ctx, 1);
+    }
+    return 1;
+}
+
 duk_ret_t sys_hostname (duk_context *ctx) {
     char nm[256];
     if (duk_get_top (ctx) == 0) {
@@ -721,6 +768,7 @@ void sys_init (duk_context *ctx) {
     defcall (read, DUK_VARARGS);
     defcall (write, 2);
     defcall (run, DUK_VARARGS);
+    defcall (runconsole, 2);
     defcall (mkdir, DUK_VARARGS);
     defcall (chmod, 2);
     defcall (chown, 3);
