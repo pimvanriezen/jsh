@@ -152,15 +152,36 @@ texttable = function(cols) {
     this._boldcolumn = -1;
     this._padding = 1;
     this._indent = 0;
+    this._nowrap = false;
     this.rows = [];
+    this._colprefix = [];
+    this._colsuffix = [];
+    for (var i=0; i<cols; ++i) {
+        this._colprefix.push ("");
+        this._colsuffix.push ("");
+    }
 }
 
 texttable.prototype.stretchColumn = function(c) {
     if (c < this.columns) this._stretchcolumn = c;
 }
 
+texttable.prototype.noWrap = function() {
+    this._nowrap = true;
+}
+
 texttable.prototype.boldColumn = function(c) {
-    if (c < this.columns) this._boldcolumn = c;
+    if (c < this.columns) {
+        this._colprefix[c] = '\033[1m';
+        this._colsuffix[c] = '\033[0m';
+    }
+}
+
+texttable.prototype.colorColumn = function(c,color) {
+    if (c < this.columns) {
+        this._colprefix[c] = '\033[' + (30 + parseInt(color)) + 'm';
+        this._colsuffix[c] = '\033[0m';
+    }
 }
 
 texttable.prototype.padding = function(p) {
@@ -218,7 +239,14 @@ texttable.prototype.format = function() {
         
         for (var i=0; i<this.columns; ++i) {
             if (i == this._stretchcolumn) {
-                out[i] = (""+this.rows[ri][i]).wrap(widths[i]);
+                if (this._nowrap) {
+                    out[i] = [(""+this.rows[ri][i]).substr(0,widths[i])];
+                }
+                else {
+                    out[i] = (""+this.rows[ri][i]).wrap(widths[i]);
+                }
+                // After wrapping, if we have the highest number of lines,
+                // ours is what counts.
                 if (out[i].length > numlines) numlines = out[i].length;
             }
             else {
@@ -231,8 +259,8 @@ texttable.prototype.format = function() {
             var ln = "".padEnd(this._indent);
             var ww = 0;
             for (var i=0; i<this.columns; ++i) {
-                if (i == this._boldcolumn) {
-                    if (out[i][line]) ln += '\033[1m';
+                if (this._colprefix[i]) {
+                    if (out[i][line]) ln += this._colprefix[i];
                 }
                 var w = widths[i];
                 var addcol;
@@ -246,6 +274,9 @@ texttable.prototype.format = function() {
                 }
                 ln += addcol;
                 ww += addcol.length;
+                if (this._colsuffix[i]) {
+                    if (out[i][line]) ln += this._colsuffix[i];
+                }
                 if (i == this._boldcolumn) {
                     if (out[i][line]) ln += '\033[0m';
                 }
