@@ -830,9 +830,15 @@ void sys_init (duk_context *ctx) {
     duk_put_prop_string (ctx, -2, "modSearch");
     duk_pop (ctx);
     
+    struct textbuffer *t;
+    
     osglobal = getenv("JSH_GLOBAL");
-    if (! osglobal) osglobal = "./modules/jsh-global.js";
-    struct textbuffer *t = textbuffer_load (osglobal);
+    if (osglobal) t = textbuffer_load (osglobal);
+    else {
+        t = textbuffer_load ("/etc/jsh/modules/global.js");
+        if (! t) t = textbuffer_load ("/usr/local/etc/jsh/modules/global.js");
+    }
+
     if (t) {
         char *tbuffer = handle_quoting (t->alloc);
         duk_push_string (ctx, tbuffer);
