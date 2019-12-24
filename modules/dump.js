@@ -24,6 +24,7 @@ var isShortArray = function(arr,indent) {
         }
         else if (typeof (arr[i]) == "string") totalWidth += arr[i].length;
         else if (typeof (arr[i]) == "number") totalWidth += 6;
+        else if (typeof (arr[i]) == "function") totalWidth += 16;
         else {
             totalWidth += 10;
         }
@@ -42,6 +43,7 @@ var isShortObject = function(obj,indent) {
         if (typeof (obj[i]) == "object") return false;
         else if (typeof (obj[i]) == "string") totalWidth += obj[i].length;
         else if (typeof (obj[i]) == "number") totalWidth += 6;
+        else if (typeof (obj[i]) == "function") totalWidth += 16;
         else {
             totalWidth += 10;
         }
