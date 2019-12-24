@@ -768,13 +768,22 @@ duk_ret_t sys_hostname (duk_context *ctx) {
 }
 
 duk_ret_t sys_eval (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     const char *src;
+    const char *fname = "eval";
     char *translated;
     src = duk_to_string (ctx, 0);
+    if (duk_get_top (ctx) > 1) fname = duk_to_string (ctx, 1);
     translated = handle_quoting (src);
-    duk_eval_string (ctx, translated);
+    duk_push_string (ctx, fname);
+    if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
+        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "%s",
+                               duk_safe_to_string (ctx,-1));
+        return duk_throw(ctx);
+    }
+    duk_call (ctx, 0);
     free (translated);
-    return 0;
+    return 1;
 }
 
 duk_ret_t sys_parse (duk_context *ctx) {
@@ -851,7 +860,7 @@ void sys_init (duk_context *ctx) {
     defcall (cd, 1);
     defcall (cwd, 0);
     defcall (dir, DUK_VARARGS);
-    defcall (eval, 1);
+    defcall (eval, DUK_VARARGS);
     defcall (parse, DUK_VARARGS);
     defcall (glob, 1);
     defcall (getenv, 1);

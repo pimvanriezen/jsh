@@ -177,6 +177,17 @@ defaults.help = function() {
     });
 }
 
+loadapps = function() {
+    for (var i in env.JSH_MODULE_PATH) {
+        var glob = env.JSH_MODULE_PATH[i] + "/app/*/app.js";
+        $(glob).each (function (match) {
+            var appname = match.substr(0,match.length - "/app.js".length);
+            var appname = appname.replace (/.*\//, "");
+            sys.appload (appname, match);
+        });
+    }
+}
+
 // ============================================================================
 // Load in modules and globals
 // ============================================================================
