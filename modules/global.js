@@ -26,7 +26,7 @@ include = function(name) {
             sys.parse (script, "include", scriptid);
         }
         catch (e) {
-            sys.print ("% "+scripts+": "+e+'\n');
+            sys.print ("["+scriptid+"]: "+e+'\n');
         }
     }
 }
@@ -95,98 +95,6 @@ echo.help = function() {
     });
 }
 
-cat = function(fn) {
-    if (exists (fn)) print (sys.read (fn));
-    else return false;
-}
-
-cat.help = function() {
-    setapi.helptext ({
-        name:"cat",
-        args:[
-            {name:"filename",text:"File to output"}
-        ],
-        text:"Prints the raw contents of a file to the console."
-    });
-}
-
-// ============================================================================
-// Unix execution
-// ============================================================================
-run = function() {
-    var args = [];
-    var res;
-    if (arguments.length == 1) {
-        var arg = ""+arguments[0];
-        if (arg.indexOf (' ') < 0) res = sys.run (arg, []);
-        else {
-            args = arg.split(' ');
-            var cmd = args.splice(0,1)[0];
-            res = sys.run (cmd, args);
-        }
-        if (typeof(res) == "string" && res.indexOf('\n') == res.length-1) {
-            res = res.substr (0,res.length-1);
-        }
-        return res;
-    }
-    var cmd = arguments[0];
-    for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
-    res = sys.run (cmd, args);
-    if (typeof(res) == "string" && res.indexOf('\n') == res.length-1) {
-        res = res.substr (0,res.length-1);
-    }
-    return res;
-}
-
-run.console = function() {
-    var args = [];
-    var res;
-    if (arguments.length == 1) {
-        var arg = ""+arguments[0];
-        if (arg.indexOf (' ') < 0) res = sys.runconsole (arg, []);
-        else {
-            args = arg.split(' ');
-            var cmd = which (args.splice(0,1)[0]);
-            if (cmd) res = sys.runconsole (cmd, args);
-        }
-        return res;
-    }
-    var cmd = arguments[0];
-    for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
-    res = sys.runconsole (cmd, args);
-    return res;
-}
-
-run.console.help = function() {
-    setapi.helptext({
-        name:"run.console",
-        args:[
-            {name:"cmd",text:"Command to run"},
-            {name:"args",text:"Argument list"}
-        ],
-        text:<<<
-            Behaves like run(), but executes connected to the shell's
-            console, instead of exchanging data with the javascript
-            layer.
-        >>>
-    });
-}
-
-run.help = function() {
-    setapi.helptext({
-        name:"run",
-        args:[
-            {name:"cmd",text:"Command to run"},
-            {name:"args",text:"Argument list"}
-        ],
-        text:<<<
-            Executes a program and returns its output. Arguments an either
-            be provided as a straight array, or as the rest of the argument
-            list, or inline in the "cmd" key, separated by spaces.
-        >>>
-    });
-}
-
 // ============================================================================
 // Environment
 // ============================================================================
@@ -202,7 +110,7 @@ $envproxy.get = function (target, key) {
     if (v === undefined) v = target.defaults[key];
     if (key.indexOf("PATH") >= 0) {
         v = (""+v).split(':');
-        v.addPathElement = function(str) {
+        v.add = function(str) {
             var res = [];
             for (var i=0; i<this.length; ++i) {
                 res.push (this[i]);
@@ -210,7 +118,7 @@ $envproxy.get = function (target, key) {
             res.push(str);
             $envproxy.set (target, key, res);
         }
-        v.removePathElement = function(str) {
+        v.remove = function(str) {
             var res = [];
             for (var i=0; i<this.length; ++i) {
                 if (this[i] != str) res.push (this[i]);
@@ -273,110 +181,12 @@ defaults.help = function() {
 }
 
 // ============================================================================
-// User database
-// ============================================================================
-$userdbproxy = {}
-$userdbproxy.get = function (target, key) {
-    if ((key=="0")||(parseInt(key))) {
-        return sys.getpwuid(parseInt(key));
-    }
-    return sys.getpwnam(key);
-}
-$userdbproxy.set = function () {
-    throw ("Cannot change userdb");
-}
-
-userdb = new Proxy ({}, $userdbproxy);
-
-// ============================================================================
-// Process
-// ============================================================================
-$procproxy = {};
-$procproxy.get = function(target,pid) {
-    if (pid == "self") return sys.ps({pid:sys.getpid()})[sys.getpid()];
-    return sys.ps({pid:pid})[pid];
-}
-
-proc = new Proxy ({}, $procproxy);
-
-// ============================================================================
-// Augmentations for the string class
-// ============================================================================
-String.prototype.padStart = function(len,c) {
-    if (c === undefined) c = " ";
-    var res = this.slice(0,len);
-    if (res.length > len) res.splice (len, res.length-len);
-    while (res.length < len) res = c+res;
-    return res;
-}
-
-String.prototype.padEnd = function(len,c) {
-    if (c === undefined) c = " ";
-    var res = this.slice(0,len);
-    if (res.length > len) res.splice (len, res.length-len);
-    while (res.length < len) res = res+c;
-    return res;
-}
-
-String.prototype.save = function(path) {
-    sys.write (""+this, ""+path);
-}
-
-Object.defineProperty (Array.prototype, 'contains', {
-    value: function(id) { return this.indexOf(id)>=0; }
-});
-
-Object.defineProperty (Array.prototype, 'remove', {
-    value: function(match) {
-        if (typeof(match) == "string") {
-            var idx = this.indexOf(match);
-            while (idx>=0) {
-                this.splice (idx,1);
-                idx = this.indexOf(match);
-            }
-        }
-        else if (typeof(match) == "number") {
-            this.splice (match,1);
-        }
-    }
-});
-
-Object.defineProperty (Object.prototype, 'save', {
-    value: function(name) {
-        return sys.write (JSON.stringify(this,null,2), name);
-    }
-});
-
-// ============================================================================
 // Load in modules and globals
 // ============================================================================
-defaults({
-    JSH_MODULE_PATH:[
-        env.HOME+"/.jsh/modules",
-        "/usr/local/etc/jsh/modules",
-        "/etc/jsh/modules"
-    ],
-    PATH:["/sbin","/usr/sbin","/bin","/usr/sbin"],
-    EDITOR:"vi"
-});
-
-$ = require("fquery");
-setapi = require("setapi");
-
-setapi (setenv, "setenv");
-setapi (defaults, "defaults");
-setapi (run, "run");
-setapi (run.console, "run.console");
-setapi (include, "include");
-setapi (printerr, "printerr");
-setapi (print, "print");
-setapi (echo, "echo");
-setapi (cat, "cat");
-setapi ($, "$");
-
-include ("global.d/*.js");
-
-if (exists ("/etc/jsh/jshrc")) {
+if (env.JSHRC) {
+    sys.parse (env.JSHRC, "bootstrap", "__sysrc__");
+}
+else if (exists ("/etc/jsh/jshrc")) {
     sys.parse ("/etc/jsh/jshrc", "bootstrap", "__sysrc__");
 }
 else if (exists ("/usr/local/etc/jsh/jshrc")) {
@@ -386,3 +196,11 @@ else if (exists ("/usr/local/etc/jsh/jshrc")) {
 if (exists (env.HOME + "/.jshrc")) {
     sys.parse (env.HOME + "/.jshrc", "bootstrap", "__userrc__");
 }
+
+setapi (setenv, "setenv");
+setapi (defaults, "defaults");
+setapi (include, "include");
+setapi (printerr, "printerr");
+setapi (print, "print");
+setapi (echo, "echo");
+setapi (cat, "cat");

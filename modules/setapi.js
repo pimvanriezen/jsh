@@ -40,7 +40,11 @@ help = function(helpfor) {
     var row = 0;
     for (var k in $apidb) list.push(k);
     list.sort();
-    print (autotable (list, 4));
+
+    var a = new autotable();
+    a.setData (list);
+    a.indent (4);
+    print (a.format());
 }
 
 var setapi = function(arg1,arg2) {

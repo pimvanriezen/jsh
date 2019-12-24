@@ -1,0 +1,26 @@
+// ============================================================================
+// Global rc-file for the jsh environment
+// ============================================================================
+defaults({
+    JSH_MODULE_PATH:[
+        env.HOME+"/.jsh/modules",
+        "/usr/local/etc/jsh/modules",
+        "/etc/jsh/modules"
+    ],
+    PATH:["/sbin","/usr/sbin","/bin","/usr/sbin"],
+    EDITOR:"vi"
+});
+
+              require("sys.prototypes");
+$           = require("fquery");
+userdb      = require("userdb");
+proc        = require("proc");
+run         = require("run");
+setapi      = require("setapi");
+texttable   = require("texttable");
+autotable   = require("autotable");
+              include("global.d/*.js");
+
+              setapi (run, "run");
+              setapi (run.console, "run.console");
+              setapi ($, "$");
