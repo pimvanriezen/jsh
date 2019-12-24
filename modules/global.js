@@ -17,19 +17,13 @@ include = function(name) {
         }
     }
     for (var i in scripts) {
-        var script = sys.read (scripts[i]);
+        var script = scripts[i];
+        var scriptid = script.replace (/.*\//,"");
         try {
-            sys.eval(script);
-            if (! sys.modules) sys.modules = {};
-            var modname = scripts[i].replace(/.*\//,"");
-            sys.modules[modname] = {
-                file:scripts[i],
-                size:script.length,
-                type:"include"
-            }
+            sys.parse (script, "include", scriptid);
         }
         catch (e) {
-            sys.print ("% "+scripts[i]+": "+e+'\n');
+            sys.print ("% "+scripts+": "+e+'\n');
         }
     }
 }
@@ -322,6 +316,16 @@ String.prototype.save = function(path) {
     sys.write (""+this, ""+path);
 }
 
+Object.defineProperty (Array.prototype, 'contains', {
+    value: function(id) { return this.indexOf(id)>=0; }
+});
+
+Object.defineProperty (Object.prototype, 'save', {
+    value: function(name) {
+        return sys.write (JSON.stringify(this,null,2), name);
+    }
+});
+
 // ============================================================================
 // Load in modules and globals
 // ============================================================================
@@ -352,5 +356,5 @@ setapi ($, "$");
 include ("global.d/*.js");
 
 if (exists (env.HOME + "/.jshrc")) {
-    sys.parse (env.HOME + "/.jshrc");
+    sys.parse (env.HOME + "/.jshrc", "bootstrap", "__userrc__");
 }

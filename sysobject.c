@@ -778,28 +778,46 @@ duk_ret_t sys_eval (duk_context *ctx) {
 }
 
 duk_ret_t sys_parse (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    const char *ctxnam = "parse";
     const char *fnam = duk_to_string (ctx, 0);
+    const char *modnam = fnam;
     struct textbuffer *t = textbuffer_load (fnam);
     if (! t) {
         duk_push_boolean (ctx, 0);
+        textbuffer_free (t);
     }
     else {
+        if (duk_get_top(ctx) > 1) {
+            ctxnam = duk_to_string (ctx, 1);
+            if (duk_get_top(ctx) > 2) {
+                modnam = duk_to_string (ctx, 2);
+            }
+        }
         char *translated = handle_quoting (t->alloc);
-        duk_push_string (ctx, translated);
-        duk_eval_noresult (ctx);
-        duk_push_boolean (ctx, 1);
-        duk_get_global_string (ctx, "sys");
-        duk_get_prop_string (ctx, -1, "modules");
-        duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
         duk_push_string (ctx, fnam);
-        duk_put_prop_string (ctx, obj_idx, "fileName");
-        duk_push_number (ctx, t->wpos);
-        duk_put_prop_string (ctx, obj_idx, "size");
-        duk_push_string (ctx, "parse");
-        duk_put_prop_string (ctx, obj_idx, "type");
-        duk_put_prop_string (ctx, -2, fnam);
-        duk_pop(ctx);
-        duk_pop(ctx);
+        if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
+            fprintf (stderr, "%% %s: %s\n",
+                     fnam, duk_safe_to_string (ctx, -1));
+            duk_pop (ctx);
+            duk_push_boolean (ctx, 0);
+        }
+        else {
+            duk_call (ctx, 0);
+            duk_push_boolean (ctx, 1);
+            duk_get_global_string (ctx, "sys");
+            duk_get_prop_string (ctx, -1, "modules");
+            duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
+            duk_push_string (ctx, fnam);
+            duk_put_prop_string (ctx, obj_idx, "fileName");
+            duk_push_number (ctx, t->wpos);
+            duk_put_prop_string (ctx, obj_idx, "size");
+            duk_push_string (ctx, ctxnam);
+            duk_put_prop_string (ctx, obj_idx, "type");
+            duk_put_prop_string (ctx, -2, modnam);
+            duk_pop(ctx);
+            duk_pop(ctx);
+        }
         free (translated);
         textbuffer_free (t);
     }
@@ -834,7 +852,7 @@ void sys_init (duk_context *ctx) {
     defcall (cwd, 0);
     defcall (dir, DUK_VARARGS);
     defcall (eval, 1);
-    defcall (parse, 1);
+    defcall (parse, DUK_VARARGS);
     defcall (glob, 1);
     defcall (getenv, 1);
     defcall (setenv, 2);

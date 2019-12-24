@@ -101,7 +101,7 @@ static void print_pop_error(duk_context *ctx, FILE *f) {
     duk_pop(ctx);
 }
 
-static duk_ret_t wrapped_compile_execute(duk_context *ctx, void *udata) {
+duk_ret_t wrapped_compile_execute(duk_context *ctx, void *udata) {
     const char *src_data;
     duk_size_t src_len;
     duk_uint_t comp_flags;
