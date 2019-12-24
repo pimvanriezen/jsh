@@ -574,7 +574,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     duk_push_string (ctx, translated);
     free (translated);
     duk_get_global_string (ctx, "sys");
-    duk_get_prop_string (ctx, -1, "modules");
+    duk_get_prop_string (ctx, -1, "_modules");
     duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
     duk_push_string (ctx, full);
     duk_put_prop_string (ctx, obj_idx, "fileName");
@@ -806,7 +806,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
             duk_call (ctx, 0);
             duk_push_boolean (ctx, 1);
             duk_get_global_string (ctx, "sys");
-            duk_get_prop_string (ctx, -1, "modules");
+            duk_get_prop_string (ctx, -1, "_modules");
             duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
             duk_push_string (ctx, fnam);
             duk_put_prop_string (ctx, obj_idx, "fileName");
@@ -844,7 +844,7 @@ void sys_init (duk_context *ctx) {
     duk_push_string (ctx, "sys");
     obj_idx = duk_push_object (ctx);
     
-    duk_push_string (ctx, "modules");
+    duk_push_string (ctx, "_modules");
     duk_push_object (ctx);
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
 
@@ -901,7 +901,7 @@ void sys_init (duk_context *ctx) {
         duk_eval_noresult (ctx);
 
         duk_get_global_string (ctx, "sys");
-        duk_get_prop_string (ctx, -1, "modules");
+        duk_get_prop_string (ctx, -1, "_modules");
         duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
         duk_push_string (ctx, osglobal);
         duk_put_prop_string (ctx, obj_idx, "fileName");

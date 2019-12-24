@@ -27,17 +27,17 @@ dump        = require("dump");
 // ============================================================================
 // Set up the result formatter for the interactive shell
 // ============================================================================
-jshFormat   = function(x) { return dump.dumper(x,false,0,2); }
+jshFormat = function(x) { return dump.dumper(x,false,0,2); }
 
 // ============================================================================
 // Set up help texts for the built-ins we loaded above
 // ============================================================================
-              setapi (dump, "dump");
-              setapi (run, "run");
-              setapi (run.console, "run.console");
-              setapi ($, "$");
+setapi (dump, "dump");
+setapi (run, "run");
+setapi (run.console, "run.console");
+setapi ($, "$");
 
 // ============================================================================
 // Run the global includes
 // ============================================================================
-              include("global.d/*.js");
+include("global.d/*.js");

@@ -9,9 +9,11 @@ var texttable = function(cols) {
     this.rows = [];
     this._colprefix = [];
     this._colsuffix = [];
+    this._colralign = [];
     for (var i=0; i<cols; ++i) {
         this._colprefix.push ("");
         this._colsuffix.push ("");
+        this._colralign.push (false);
     }
 }
 
@@ -39,6 +41,14 @@ texttable.prototype.colorColumn = function(c,color) {
         this._colprefix[c] = '\033[' + (30 + parseInt(color)) + 'm';
         this._colsuffix[c] = '\033[0m';
     }
+}
+
+texttable.prototype.rightAlignColumn = function (c) {
+    if (c<this.columns) this._colralign[c] = true;
+}
+
+texttable.prototype.leftAlignColumn = function (c) {
+    if (c<this.columns) this._colralign[c] = false;
 }
 
 texttable.prototype.padding = function(p) {
@@ -116,6 +126,7 @@ texttable.prototype.format = function() {
             var ln = "".padEnd(this._indent);
             var ww = 0;
             for (var i=0; i<this.columns; ++i) {
+                var padf = this._colralign[i] ? "padStart":"padEnd";
                 if (this._colprefix[i]) {
                     if (out[i][line]) ln += this._colprefix[i];
                 }
@@ -123,7 +134,10 @@ texttable.prototype.format = function() {
                 var addcol;
                 if ((i+1)<this.columns) w += this._padding;
                 if (out[i].length > line) {
-                    if ((i+1)<this.columns) addcol = out[i][line].padEnd (w);
+                    if ((i+1)<this.columns) {
+                        addcol = out[i][line][padf] (w - this._padding);
+                        addcol = addcol.padEnd (w);
+                    }
                     else addcol = out[i][line];
                 }
                 else {

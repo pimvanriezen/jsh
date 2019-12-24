@@ -7,9 +7,6 @@ include = function(name) {
         var paths = env.JSH_MODULE_PATH;
         for (var i in paths) {
             var path = paths[i];
-            if (path.startsWith('./')) {
-                path = sys.cwd() + path.substr(1);
-            }
             var nscripts = sys.glob (path + "/" + name);
             if (nscripts.length) {
                 for (var ii in nscripts) {
