@@ -7,6 +7,9 @@ include = function(name) {
         var paths = env.JSH_MODULE_PATH;
         for (var i in paths) {
             var path = paths[i];
+            if (path.startsWith('./')) {
+                path = sys.cwd() + path.substr(1);
+            }
             var nscripts = sys.glob (path + "/" + name);
             if (nscripts.length) {
                 for (var ii in nscripts) {
@@ -40,6 +43,9 @@ include.help = function() {
             global scope. The system will look through all elements
             of env.JSH_MODULE_PATH, and will pick the first one that
             has matches on the glob.
+            
+            You can check up on loaded modules and includes by calling
+            dump(sys.modules).
         >>>
     });
 }
@@ -320,6 +326,21 @@ Object.defineProperty (Array.prototype, 'contains', {
     value: function(id) { return this.indexOf(id)>=0; }
 });
 
+Object.defineProperty (Array.prototype, 'remove', {
+    value: function(match) {
+        if (typeof(match) == "string") {
+            var idx = this.indexOf(match);
+            while (idx>=0) {
+                this.splice (idx,1);
+                idx = this.indexOf(match);
+            }
+        }
+        else if (typeof(match) == "number") {
+            this.splice (match,1);
+        }
+    }
+});
+
 Object.defineProperty (Object.prototype, 'save', {
     value: function(name) {
         return sys.write (JSON.stringify(this,null,2), name);
@@ -354,6 +375,13 @@ setapi (cat, "cat");
 setapi ($, "$");
 
 include ("global.d/*.js");
+
+if (exists ("/etc/jsh/jshrc")) {
+    sys.parse ("/etc/jsh/jshrc", "bootstrap", "__sysrc__");
+}
+else if (exists ("/usr/local/etc/jsh/jshrc")) {
+    sys.parse ("/usr/local/etc/jsh/jshrc", "bootstrap", "__sysrc__");
+}
 
 if (exists (env.HOME + "/.jshrc")) {
     sys.parse (env.HOME + "/.jshrc", "bootstrap", "__userrc__");
