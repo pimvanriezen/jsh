@@ -375,6 +375,12 @@ ps = setapi ([
                      p.rss, p.time, p.command);
         }
         t.marginRight(0);
+        t.rightAlignColumn(1);
+        t.rightAlignColumn(2);
+        t.rightAlignColumn(3);
+        t.rightAlignColumn(4);
+        t.rightAlignColumn(5);
+        t.rightAlignColumn(6);
         t.noWrap();
         t.boldColumn (1);
         print (t.format());
