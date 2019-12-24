@@ -19,6 +19,9 @@ all: bin/jsh
 bin:
 	mkdir bin
 
+install: all
+	JSHRC=./jshrc JSH_GLOBAL=./modules/global.js JSH_MODULE_PATH=./modules bin/jsh ./install.js
+
 clean:
 	rm -f $(OBJS_DUKTAPE) $(OBJS_CLI) bin/jsh
 
