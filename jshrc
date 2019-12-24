@@ -33,6 +33,7 @@ jshFormat = function(x) { return dump.dumper(x,false,0,2); }
 // ============================================================================
 // Set up help texts for the built-ins we loaded above
 // ============================================================================
+setapi (which, "which");
 setapi (dump, "dump");
 setapi (run, "run");
 setapi (run.console, "run.console");
