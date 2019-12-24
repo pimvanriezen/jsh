@@ -38,7 +38,7 @@ $isShortArray = function(arr) {
 
 $isShortObject = function(obj) {
     var k = Object.keys(obj).length;
-    if (k > 2) return false;
+    if (k > 3) return false;
     var totalWidth = 0;
     
     for (var i in obj) {
@@ -66,6 +66,18 @@ $dumper = function(x,mkshort,indent,realindent) {
         "function":"\033[1m",
         "end":"\033[0m"
     }
+    if (env.TERM == "vt100") {
+        codes = {
+            "number":"",
+            "key":"",
+            "string":"",
+            "boolean":"\033[1m",
+            "null":"\033[1m",
+            "function":"\033[1m",
+            "end":"\033[0m"
+        }
+    }
+    
     var res = "";
     var comma="";
     if (! indent) indent = 0;
@@ -170,7 +182,7 @@ dump.help = function() {
 }
 
 jshFormat = function(x) {
-    return $dumper(x,false);
+    return $dumper(x,false,0,2);
 }
 
 String.prototype.wrap = function (cols) {
