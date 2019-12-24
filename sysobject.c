@@ -792,6 +792,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
     const char *fnam = duk_to_string (ctx, 0);
     const char *modnam = fnam;
     struct textbuffer *t = textbuffer_load (fnam);
+    duk_size_t bufsz = 0;
     if (! t) {
         duk_push_boolean (ctx, 0);
         textbuffer_free (t);
