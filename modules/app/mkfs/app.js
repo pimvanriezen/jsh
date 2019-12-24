@@ -1,4 +1,4 @@
-if (sys.stat ("mkfs")) {
+if (which ("mkfs")) {
     var mkfs = setapi ([
         {name:"mkfs"},
         {setarg:"device"},

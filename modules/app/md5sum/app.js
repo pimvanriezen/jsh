@@ -1,5 +1,5 @@
 var md5cmd = "md5sum"
-if (! sys.stat("md5sum")) md5cmd = "md5";
+if (! which("md5sum")) md5cmd = "md5";
 
 var md5sum = setapi ([
     {name:"md5sum"},

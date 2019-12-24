@@ -1,4 +1,4 @@
-if (sys.stat ("hwclock")) {
+if (which ("hwclock")) {
     var hwclock = setapi([
         {name:"hwclock"},
         {literal:"hwclock"},

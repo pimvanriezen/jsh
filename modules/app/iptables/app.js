@@ -1,4 +1,4 @@
-if (sys.stat ("iptables")) {
+if (which ("iptables")) {
     var iptables = {
         help:function(){echo ("Usage: iptables.add | iptables.remove | "+
                               "iptables.create");},
