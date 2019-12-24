@@ -61,9 +61,9 @@ $dumper = function(x,mkshort,indent,realindent) {
         "number":"\033[34m",
         "key":"\033[97m",
         "string":"\033[32m",
-        "boolean":"\033[36m",
+        "boolean":"\033[1m",
         "null":"\033[31m",
-        "function":"\033[1m",
+        "function":"\033[36m",
         "end":"\033[0m"
     }
     if (env.TERM == "vt100") {
@@ -114,7 +114,7 @@ $dumper = function(x,mkshort,indent,realindent) {
             
         case "function":
             if (indent) res += "".padEnd(indent);
-            res += codes["null"] + "function() {...}" + codes.end;
+            res += codes["function"] + "function() {...}" + codes.end;
             break;
                 
         case "array":
