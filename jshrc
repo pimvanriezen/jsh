@@ -23,6 +23,7 @@ setapi      = require("setapi");
 texttable   = require("texttable");
 autotable   = require("autotable");
 dump        = require("dump");
+which       = require("which");
 
 // ============================================================================
 // Set up the result formatter for the interactive shell
