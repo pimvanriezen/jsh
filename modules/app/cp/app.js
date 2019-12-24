@@ -8,4 +8,5 @@ var cp = setapi ([
     {helptext:"Copies a file."}
 ]);
 
+module.version = "1.0.0";
 module.exports = cp;

@@ -20,4 +20,5 @@ var signal = {
     usr1:signal_mkapi("USR1")
 };
 
+module.version = "1.0.0";
 module.exports = signal;

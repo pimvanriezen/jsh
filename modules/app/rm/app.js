@@ -7,4 +7,5 @@ var rm = setapi ([
     {helptext:"Deletes filesystem object(s)."}
 ]);
 
+module.version = "1.0.0";
 module.exports = rm;

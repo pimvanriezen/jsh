@@ -15,4 +15,5 @@ var md5sum = setapi ([
               "representing the checksum."}
 ]);
 
+module.version = "1.0.0";
 module.exports = md5sum;

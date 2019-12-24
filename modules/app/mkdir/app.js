@@ -13,4 +13,5 @@ var mkdir = setapi ([
     {helptext:"Creates a directory."}
 ]);
 
+module.version = "1.0.0";
 module.exports = mkdir;

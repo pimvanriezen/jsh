@@ -20,5 +20,6 @@ if (sys.stat ("hwclock")) {
         {helptext:"Saves system clock into hardware clock."}
     ]);
     
+    module.version = "1.0.0";
     module.exports = hwclock;
 }

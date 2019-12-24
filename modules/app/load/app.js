@@ -23,4 +23,5 @@ load.help = function() {
     });
 }
 
+module.version = "1.0.0";
 module.exports = load;

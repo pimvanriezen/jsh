@@ -18,4 +18,5 @@ mount.all = setapi ([
     {helptext:"Mounts all filesystems set up in /etc/fstab."}
 ]);
 
+module.version = "1.0.0";
 module.exports = mount;

@@ -48,6 +48,7 @@ if (sys.stat ("iptables")) {
             {helptext:"Creates a chain."}
         ])
     }
-    
+
+    module.version = "1.0.0";
     module.exports = iptables;
 };

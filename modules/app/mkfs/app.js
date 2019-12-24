@@ -10,5 +10,7 @@ if (sys.stat ("mkfs")) {
         {console:true},
         {helptext:"Creates a filesystem"}
     ]);
+
+    module.version = "1.0.0";
     module.exports = mkfs;
 }

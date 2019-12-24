@@ -38,4 +38,5 @@ prompt.help = function() {
     >>>.rewrap(sys.winsize()));
 }
 
+module.version = "1.0.0";
 module.exports = prompt;

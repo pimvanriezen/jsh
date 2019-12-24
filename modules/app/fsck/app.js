@@ -8,4 +8,5 @@ var fsck = setapi ([
     {helptext:"Performs a filesystem check"}
 ]);
 
+module.version = "1.0.0";
 module.exports = fsck;

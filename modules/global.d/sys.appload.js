@@ -17,6 +17,9 @@ sys.appload = function(appname, apppath) {
             if (module.exports) {
                 globalThis[appname] = module.exports;
                 globalThis[appname].app = {path:apppath};
+                if (module.version) {
+                    globalThis[appname].app.version = module.version;
+                }
                 if (module.exports.help) {
                     setapi (module.exports, appname);
                 }

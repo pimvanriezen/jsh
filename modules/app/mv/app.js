@@ -7,4 +7,5 @@ var mv = setapi ([
     {helptext:"Moves/renames a filesystem object."}
 ]);
 
+module.version = "1.0.0";
 module.exports = mv;
