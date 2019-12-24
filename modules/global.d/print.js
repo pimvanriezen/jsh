@@ -17,7 +17,46 @@ strescape = function(str) {
     return res;
 }
 
-mkdump = function(x,mkshort) {
+$isShortArray = function(arr) {
+    if (arr.length > 12) return false;
+    var totalWidth = 0;
+    
+    for (var i=0; i<arr.length; ++i) {
+        if (typeof (arr[i]) == "object") {
+            return false;
+        }
+        else if (typeof (arr[i]) == "string") totalWidth += arr[i].length;
+        else if (typeof (arr[i]) == "number") totalWidth += 6;
+        else {
+            totalWidth += 10;
+        }
+    }
+    
+    if (totalWidth < 60) return true;
+    return false;
+}
+
+$isShortObject = function(obj) {
+    var k = Object.keys(obj).length;
+    if (k > 2) return false;
+    var totalWidth = 0;
+    
+    for (var i in obj) {
+        if (typeof (obj[i]) == "object") return false;
+        else if (typeof (obj[i]) == "string") totalWidth += obj[i].length;
+        else if (typeof (obj[i]) == "number") totalWidth += 6;
+        else {
+            totalWidth += 10;
+        }
+        totalWidth += (""+i).length;
+        if (totalWidth > 59) break;
+    }
+    
+    if (totalWidth < 60) return true;
+    return false;
+}
+
+$dumper = function(x,mkshort,indent,realindent) {
     var codes = {
         "number":"\033[34m",
         "key":"\033[97m",
@@ -27,54 +66,97 @@ mkdump = function(x,mkshort) {
         "function":"\033[1m",
         "end":"\033[0m"
     }
-    if (typeof (x) == "object") {
-        var json;
-        if (mkshort) {
-            json = JSON.stringify (x);
-            if (json.length < 500) json = JSON.stringify (x,null,2);
-        }
-        else {
-            json = JSON.stringify(x,null,2);
-        }
-        if (env.TERM != "vt100") {
-            var re = new RegExp ('("(\\\\u[a-zA-Z0-9]{4}|\\\\[^u]|[^\\\\"])*"'+
-                                 '(\\s*:)?|\\b(true|false|null)\\b|-?\\d+'+
-                                 '(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)','g');
-            json = json.replace(re, function (match) {
-                var cls = 'number';
-                if (/^"/.test(match)) {
-                    if (/:$/.test(match)) {
-                        cls = 'key';
-                    } else {
-                        cls = 'string';
-                    }
-                } else if (/true|false/.test(match)) {
-                    cls = 'boolean';
-                } else if (/null/.test(match)) {
-                    cls = 'null';
+    var res = "";
+    var comma="";
+    if (! indent) indent = 0;
+    if (! realindent) realindent = indent;
+    if (mkshort) indent = 0;
+    var type = typeof(x);
+    if (type == "object") {
+        if (x === null) type = "null";
+        else if (x.constructor == Array) type = "array";
+    }
+    switch (type) {
+        case "string":
+            if (indent) res += "".padEnd(indent);
+            res += "\"" + codes["string"];
+            res += strescape (x);
+            res += codes.end + "\"";
+            break;
+            
+        case "number":
+            if (indent) res += "".padEnd(indent);
+            res += codes["number"] + x + codes.end;
+            break;
+        
+        case "boolean":
+            if (indent) res += "".padEnd(indent);
+            res += codes["boolean"] + (x?"true":"false") + codes.end;
+            break;
+        
+        case "null":
+        case "undefined":
+            if (indent) res += "".padEnd(indent);
+            res += codes["null"] + type + codes.end;
+            break;
+            
+        case "function":
+            if (indent) res += "".padEnd(indent);
+            res += codes["null"] + "function() {...}" + codes.end;
+            break;
+                
+        case "array":
+            var isshort = $isShortArray (x);
+            if (indent) res += "".padEnd(indent);
+            res += "[";
+            
+            comma="";
+            for (var i=0; i<x.length; ++i) {
+                res += comma;
+                if (! isshort) {
+                    if (!mkshort) res += "\n";
+                    res += "".padEnd(realindent+2);
                 }
-                return codes[cls] + match + codes.end;
-            });
-        }
-        return (json + codes.end);
+                comma = ",";
+                res += $dumper (x[i],mkshort||isshort,0,realindent+2);
+            }
+            if (!isshort) {
+                if (!mkshort) res += "\n";
+                res+= "".padEnd(realindent);
+            }
+            res += "]";
+            break;
+        
+        case "object":
+            var isshort = $isShortObject (x);
+            if (indent) res += "".padEnd(indent);
+            res += "{";
+            
+            comma="";
+            for (var i in x) {
+                res += comma;
+                if (! isshort) {
+                    if (!mkshort) res += "\n";
+                    res +="".padEnd(realindent+2);
+                }
+                comma = ",";
+                res += "\"" + codes["key"];
+                res += strescape (i);
+                res += codes.end + "\":";
+                res += $dumper (x[i],mkshort,0,realindent+2);
+            }
+            if (! isshort) {
+                if (!mkshort) res += "\n";
+                res += "".padEnd (realindent);
+            }
+            res += "}";
+            break;
     }
-    else if (typeof (x) == "boolean") {
-        return codes.boolean + (x?"true":"false") + codes.end;
-    }
-    else if (typeof (x) == "number") {
-        return codes.number + x + codes.end;
-    }
-    else if (typeof (x) == "null") {
-        return codes["null"] + "null" + codes.end;
-    }
-    else if (typeof (x) == "function") {
-        return codes["function"]+"function()"+codes.end+" {..js code..}";
-    }
-    return codes["string"]+'"'+strescape(x)+'"'+codes.end;
+    return res;
 }
 
 dump = function(x) {
-    echo (mkdump (x));
+    echo ($dumper (x));
 }
 
 dump.help = function() {
@@ -88,7 +170,7 @@ dump.help = function() {
 }
 
 jshFormat = function(x) {
-    return mkdump(x,true);
+    return $dumper(x,false);
 }
 
 String.prototype.wrap = function (cols) {
@@ -151,6 +233,7 @@ texttable = function(cols) {
     this._stretchcolumn = cols-1;
     this._boldcolumn = -1;
     this._padding = 1;
+    this._marginright = 1;
     this._indent = 0;
     this._nowrap = false;
     this.rows = [];
@@ -168,6 +251,10 @@ texttable.prototype.stretchColumn = function(c) {
 
 texttable.prototype.noWrap = function() {
     this._nowrap = true;
+}
+
+texttable.prototype.marginRight = function(i) {
+    this._marginright = i;
 }
 
 texttable.prototype.boldColumn = function(c) {
@@ -205,8 +292,8 @@ texttable.prototype.addRow = function() {
 
 texttable.prototype.format = function() {
     var res = "";
-    var maxw = sys.winsize() - ((this.columns-1) * this._padding);
-    maxw -= this._indent;
+    var maxw = sys.winsize() - this._marginright - this._indent -
+               ((this.columns-1) * this._padding);
     if (maxw < this.columns) {
         res = "Content too wide\n";
         return res;

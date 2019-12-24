@@ -371,8 +371,10 @@ ps = setapi ([
             p.vsz = humanSize (p.vsz);
             p.rss = humanSize (p.rss);
             p.command = p.command.replace (/^\/[\/_.0-9a-zA-Z]*\//,"");
-            t.addRow(p.user, p.pid, p.pcpu, p.pmem, p.vsz, p.rss, p.time, p.command);
+            t.addRow(p.user, p.pid, p.pcpu, p.pmem, p.vsz,
+                     p.rss, p.time, p.command);
         }
+        t.marginRight(0);
         t.noWrap();
         t.boldColumn (1);
         print (t.format());
