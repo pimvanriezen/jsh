@@ -11,6 +11,9 @@ defaults({
     EDITOR:"vi"
 });
 
+// ============================================================================
+// Load all core modules
+// ============================================================================
               require("sys.prototypes");
 $           = require("fquery");
 userdb      = require("userdb");
@@ -19,8 +22,22 @@ run         = require("run");
 setapi      = require("setapi");
 texttable   = require("texttable");
 autotable   = require("autotable");
-              include("global.d/*.js");
+dump        = require("dump");
 
+// ============================================================================
+// Set up the result formatter for the interactive shell
+// ============================================================================
+jshFormat   = function(x) { return dump.dumper(x,false,0,2); }
+
+// ============================================================================
+// Set up help texts for the built-ins we loaded above
+// ============================================================================
+              setapi (dump, "dump");
               setapi (run, "run");
               setapi (run.console, "run.console");
               setapi ($, "$");
+
+// ============================================================================
+// Run the global includes
+// ============================================================================
+              include("global.d/*.js");
