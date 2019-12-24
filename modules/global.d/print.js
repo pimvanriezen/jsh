@@ -62,7 +62,7 @@ $dumper = function(x,mkshort,indent,realindent,realpos) {
         "number":"\033[34m",
         "key":"\033[97m",
         "string":"\033[32m",
-        "boolean":"\033[1m",
+        "boolean":"\033[36m",
         "null":"\033[31m",
         "function":"\033[33m",
         "end":"\033[0m"
@@ -190,7 +190,7 @@ jshFormat = function(x) {
 }
 
 cat = function(fn) {
-    if (exists (fn)) print (sys.read (fn));
+    if (sys.stat (fn)) print (sys.read (fn));
     else return false;
 }
 

@@ -186,14 +186,14 @@ defaults.help = function() {
 if (env.JSHRC) {
     sys.parse (env.JSHRC, "bootstrap", "__sysrc__");
 }
-else if (exists ("/etc/jsh/jshrc")) {
+else if (sys.stat ("/etc/jsh/jshrc")) {
     sys.parse ("/etc/jsh/jshrc", "bootstrap", "__sysrc__");
 }
-else if (exists ("/usr/local/etc/jsh/jshrc")) {
+else if (sys.stat ("/usr/local/etc/jsh/jshrc")) {
     sys.parse ("/usr/local/etc/jsh/jshrc", "bootstrap", "__sysrc__");
 }
 
-if (exists (env.HOME + "/.jshrc")) {
+if (sys.stat (env.HOME + "/.jshrc")) {
     sys.parse (env.HOME + "/.jshrc", "bootstrap", "__userrc__");
 }
 
@@ -203,4 +203,3 @@ setapi (include, "include");
 setapi (printerr, "printerr");
 setapi (print, "print");
 setapi (echo, "echo");
-setapi (cat, "cat");
