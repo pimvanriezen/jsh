@@ -105,7 +105,7 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
         case "date":
             if (indent) res += "".padEnd(indent);
             res += "\"";
-            res += x.toUTCString();
+            res += x.toLocaleString();
             res += "\"";
             break;
             
