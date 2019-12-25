@@ -23,11 +23,18 @@ help = function(helpfor) {
     
     if (helpfor > 0) helplevel = helpfor;
     
+    var helpstr = <<<
+        These are the user level functions. You can
+        call help(1) to show a list of documented system commands.
+    >>>;
+    if (helplevel) helpstr = <<<
+        These are the system level functions. You can call help()
+        to show user level functions instead.
+    >>>;
+    
     print ($textformat(<<<
-        Call help(command) with a function of this list to check for its
-        syntax. Document your own global functions by defining a
-        help() property and calling setapi() on it. System routines are
-        only included if you call help(1).
+        Call help(command) with a function from this list to check for its
+        syntax. ${helpstr}
         
         Available commands:
     >>>));
@@ -36,6 +43,7 @@ help = function(helpfor) {
     var row = 0;
     for (var k in $apidb) {
         if ((!helplevel) && k.startsWith("sys.")) continue;
+        else if (helplevel && (! k.startsWith("sys."))) continue;
         list.push(k);
     }
     list.sort();
