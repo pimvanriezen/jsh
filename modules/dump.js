@@ -16,7 +16,7 @@ var strescape = function(str) {
 
 var isShortArray = function(arr,indent) {
     if (arr.length > 12) return false;
-    var totalWidth = 0;
+    var totalWidth = 2;
     
     for (var i=0; i<arr.length; ++i) {
         if (typeof (arr[i]) == "object") {
@@ -28,6 +28,8 @@ var isShortArray = function(arr,indent) {
         else {
             totalWidth += 10;
         }
+        totalWidth += 3;
+        if (totalWidth >= (sys.winsize() - indent)) break;
     }
     
     if (totalWidth < (sys.winsize() - indent)) return true;

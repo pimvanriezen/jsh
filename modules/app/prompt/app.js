@@ -23,11 +23,12 @@ prompt.help = function() {
         >>>
     });
     echo ("");
-    var t = new texttable(2);
-    t.addRow ("%h","The hostname");
-    t.addRow ("%p","The current working directory");
-    t.addRow ("%i","The index in the directory history");
-    t.addRow ("%#","An apropriate prompt character (# for root)");
+    var t = texttable.auto(<<<
+        %h The hostname
+        %p The current working directory (summarized)
+        %i The index in the directory history
+        %# Prompt character, ":" for users, "#" for root
+    >>>,2);
     t.boldColumn(0);
     t.indent(4);
     echo (t.format());
@@ -38,5 +39,5 @@ prompt.help = function() {
     >>>.rewrap(sys.winsize()));
 }
 
-module.version = "1.0.1";
+module.version = "1.0.2";
 module.exports = prompt;
