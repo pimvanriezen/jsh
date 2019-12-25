@@ -13,6 +13,7 @@ void textbuffer_add_str (struct textbuffer *t, const char *dt);
 void textbuffer_add_data (struct textbuffer *t, const char *dt, size_t sz);
 struct textbuffer *textbuffer_alloc (void);
 struct textbuffer *textbuffer_load (const char *);
+struct textbuffer *textbuffer_load_fd (int);
 void textbuffer_free (struct textbuffer *t);
 
 #endif

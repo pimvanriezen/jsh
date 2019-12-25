@@ -13,20 +13,24 @@ void textbuffer_free (struct textbuffer *t) {
     free (t);
 }
 
-struct textbuffer *textbuffer_load (const char *fname) {
-    int filno;
+struct textbuffer *textbuffer_load_fd (int filno) {
     char buffer[1024];
     struct textbuffer *t = textbuffer_alloc();
-    filno = open (fname, O_RDONLY);
-    if (filno<0) {
-        textbuffer_free (t);
-        return NULL;
-    }
-    
     size_t rdsz = 0;
     while ((rdsz = read (filno, buffer, 1024)) > 0) {
         textbuffer_add_data (t, buffer, rdsz);
     }
+    return t;
+}
+
+struct textbuffer *textbuffer_load (const char *fname) {
+    int filno;
+    filno = open (fname, O_RDONLY);
+    if (filno<0) {
+        return NULL;
+    }
+    
+    struct textbuffer *t = textbuffer_load_fd (filno);
     close (filno);
     return t;
 }

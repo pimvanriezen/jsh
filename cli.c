@@ -22,12 +22,14 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/resource.h>
+#include <sys/errno.h>
 #include "linenoise.h"
 #include <stdint.h>  /* Assume C99/C++11 with linenoise. */
 #include "duk_console.h"
 #include "duk_module_duktape.h"
 #include "duktape.h"
 #include "quoting.h"
+#include "textbuffer.h"
 
 extern void sys_init (duk_context *);
 
@@ -412,10 +414,6 @@ static void linenoise_completion(const char *buf, linenoiseCompletions *lc) {
 static int handle_fh(duk_context *ctx, FILE *f, char *argv[], 
                      int argc, const char *filename, 
                      const char *bytecode_filename) {
-    char *buf = NULL;
-    size_t bufsz;
-    size_t bufoff;
-    size_t got;
     int rc;
     int retval = -1;
     duk_idx_t arr_idx;
@@ -436,44 +434,15 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
                            DUK_DEFPROP_SET_CONFIGURABLE);
     duk_pop (ctx);
 
-    buf = (char *) malloc(1024);
-    if (!buf) {
-        goto error;
-    }
-    bufsz = 1024;
-    bufoff = 0;
+    struct textbuffer *t = textbuffer_load_fd(fileno (f));
 
-    /* Read until EOF, avoid fseek/stat because it won't work with stdin. */
-    for (;;) {
-        size_t avail;
-
-        avail = bufsz - bufoff;
-        if (avail < 1024) {
-            size_t newsz;
-            char *buf_new;
-            newsz = bufsz + (bufsz >> 2) + 1024;  /* +25% and some extra */
-            buf_new = (char *) realloc(buf, newsz);
-            if (!buf_new) {
-                goto error;
-            }
-            buf = buf_new;
-            bufsz = newsz;
-        }
-
-        avail = bufsz - bufoff;
-        got = fread((void *) (buf + bufoff), (size_t) 1, avail, f);
-        if (got == 0) {
-            break;
-        }
-        bufoff += got;
-    }
-
-    char *bufptr = buf;
-    if (buf[0] == '#' && buf[1] == '!') {
-        bufptr = strchr (buf, '\n');
+    char *bufptr = t->alloc;
+    if (bufptr[0] == '#' && bufptr[1] == '!') {
+        bufptr = strchr (bufptr, '\n');
     }
     
-    char *translated = handle_quoting (bufptr);
+    char *translated = handle_quoting (t->alloc);
+    textbuffer_free (t);
 
     duk_push_string(ctx, bytecode_filename);
     duk_push_pointer(ctx, (void *) translated);
@@ -485,8 +454,6 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
     rc = duk_safe_call(ctx, wrapped_compile_execute, NULL, 4, 1);
 
     free(translated);
-    free(buf);
-    buf = NULL;
 
     if (rc != DUK_EXEC_SUCCESS) {
         print_pop_error(ctx, stderr);
@@ -498,10 +465,6 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
     /* fall thru */
 
  cleanup:
-    if (buf) {
-        free(buf);
-        buf = NULL;
-    }
     return retval;
 
  error:

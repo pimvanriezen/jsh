@@ -10,7 +10,7 @@ if (argv.length>1) {
 }*/
 
 var mycp = function(src,dst) {
-    console.log (src, " - ", dst);
+    console.log (src, " -> ", dst);
     cp (src, dst);
 }
 
