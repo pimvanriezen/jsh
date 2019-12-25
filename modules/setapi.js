@@ -9,26 +9,35 @@ var $textformat = function(x,width) {
 }
 
 help = function(helpfor) {
-    if (helpfor && helpfor.help) return helpfor.help();
-    if (helpfor) {
-        print ($textformat(<<<
-            No help available: The object provided has no .help() function
-            implemented.
-        >>>));
-        return;
+    var helplevel = 0;
+    if (typeof (helpfor) != "number") {
+        if (helpfor && helpfor.help) return helpfor.help();
+        if (helpfor) {
+            print ($textformat(<<<
+                No help available: The object provided has no .help() function
+                implemented.
+            >>>));
+            return;
+        }
     }
+    
+    if (helpfor > 0) helplevel = helpfor;
     
     print ($textformat(<<<
         Call help(command) with a function of this list to check for its
         syntax. Document your own global functions by defining a
-        help() property and calling setapi() on it.
+        help() property and calling setapi() on it. System routines are
+        only included if you call help(1).
         
         Available commands:
     >>>));
         
     var list = [];
     var row = 0;
-    for (var k in $apidb) list.push(k);
+    for (var k in $apidb) {
+        if ((!helplevel) && k.startsWith("sys.")) continue;
+        list.push(k);
+    }
     list.sort();
 
     var a = new autotable();
