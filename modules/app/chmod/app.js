@@ -9,25 +9,28 @@ var chmod = setapi ([
         var mode = args.mode;
         var mmap = {"r":0444,"w":0222,"x":0111,"s":07000};
         var wmap = {"a":07777,"u":04700,"g":02070,"o":01007};
-        var do_and = 0777;
+        var do_and = 0;
         if (typeof (mode) == "string") {
             var curmode = stat(args.path).mode & 07777;
             var newmode = null;
-            if (wmap[mode[0]]) {
-                do_and = wmap[mode[0]];
-                if (mode[1] == '+' || mode[1] == '-') {
-                    if (mmap[mode[2]]) {
-                        var outmode = mmap[mode[2]] & do_and;
-                        if (mode[1] == '+') {
-                            newmode = curmode | outmode;
-                        }
-                        else {
-                            newmode = curmode & (~outmode);
-                        }
-                    }
-                }
+            var i = 0;
+            while (wmap[mode[i]]) {
+                do_and |= wmap[mode[i]];
+                i++;
             }
-            if (! newmode) return false;
+            if (mode[i] == '+' || mode[i] == '-') {
+                var act = mode[i];
+                var outmode = 0;
+                i++;
+                while (mmap[mode[i]]) {
+                    outmode |= mmap[mode[i]];
+                    i++;
+                }
+                outmode &= do_and;
+                if (act == '+') newmode = curmode|outmode;
+                else newmode = curmode & (~outmode);
+            }
+            if (newmode === null) return false;
             mode = newmode;
         }
         return sys.chmod (args.path, mode);
@@ -38,5 +41,5 @@ var chmod = setapi ([
     >>>}
 ]);
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = chmod;
