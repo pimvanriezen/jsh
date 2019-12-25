@@ -1,7 +1,4 @@
-// ============================================================================
-// Various printing functions
-// ============================================================================
-cat = function(fn) {
+var cat = function(fn) {
     if (sys.stat (fn)) print (sys.read (fn));
     else return false;
 }
@@ -16,4 +13,5 @@ cat.help = function() {
     });
 }
 
-setapi (cat, "cat");
+module.version = "1.0.0";
+module.exports = cat;
