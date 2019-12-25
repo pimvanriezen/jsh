@@ -99,7 +99,11 @@ var setapi = function(arg1,arg2) {
             }
             if (def.literal) {
                 if (typeof (def.literal) == "function") {
-                    argv.push (def.literal());
+                    var dt = def.literal(args);
+                    if (dt.constructor == Array) {
+                        for (var dti in dt) argv.push (dt[dti]);
+                    }
+                    else argv.push (dt);
                 }
                 else argv.push (def.literal);
                 continue;
