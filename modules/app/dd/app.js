@@ -49,7 +49,7 @@ var dd = setapi ([
             else argv.push("conv=notrunc");
         }
         else if (args.sparse) argv.push ("conv=sparse");
-        if (! sys.runconsole ("dd", argv)) return false;
+        if (! sys.run ("dd", argv)) return false;
         return;
     }}
 ]);
@@ -68,5 +68,5 @@ dd.zero = setapi ([
     }}
 ]);
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = dd;
