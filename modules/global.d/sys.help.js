@@ -208,3 +208,161 @@ sys.runconsole.help = function() {
 }
 
 setapi (sys.runconsole, "sys.runconsole");
+
+sys.mkdir.help = function() {
+    setapi.helptext ({
+        name:"sys.mkdir",
+        args:[
+            {name:"path",text:"Name and path of the directory"},
+            {name:"mode",text:"[Optional] The mode (number)"}
+        ],
+        text:<<<
+            Creates a new directort.
+        >>>
+    });
+}
+
+setapi (sys.mkdir, "sys.mkdir");
+
+sys.chmod.help = function() {
+    setapi.helptext ({
+        name:"sys.chmod",
+        args:[
+            {name:"path",text:"The filesystem object to change"},
+            {name:"mode",text:"The new mode (number)"}
+        ],
+        text:<<<
+            Change permissions of a filesystem object.
+        >>>
+    })
+}
+
+setapi (sys.chmod, "sys.chmod");
+
+sys.chown.help = function() {
+    setapi.helptext ({
+        name:"sys.chown",
+        args:[
+            {name:"path",text:"The filesystem object to change"},
+            {name:"uid",text:"The new userid (number)"},
+            {name:"gid",text:"The new groupid (number)"}
+        ],
+        text:<<<
+            Change ownership of a filesystem object.
+        >>>
+    });
+}
+
+setapi (sys.chown, "sys.chown");
+
+sys.getpwnam.help = function() {
+    setapi.helptext ({
+        name:"sys.getpwnam",
+        args:[
+            {name:"username",text:"Requested username"}
+        ],
+        text:<<<
+            Gets information about a unix account.
+        >>>
+    });
+}
+
+setapi (sys.getpwnam, "sys.getpwnam");
+
+sys.getpwuid.help = function() {
+    setapi.helptext ({
+        name:"sys.getpwuid",
+        args:[
+            {name:"uid",text:"Requested userid (number)"}
+        ],
+        text:<<<
+            Gets information about a unix account.
+        >>>
+    });
+}
+
+setapi (sys.getpwuid, "sys.getpwuid");
+
+sys.hostname.help = function() {
+    setapi.helptext ({
+        name:"sys.hostname",
+        args:[
+            {name:"newname",text:"[Optional] new hostname"}
+        ],
+        text:<<<
+            Gets or sets the system hostname.
+        >>>
+    });
+}
+
+setapi (sys.hostname, "sys.hostname");
+
+sys.winsize.help = function() {
+    setapi.helptext ({
+        name:"sys.winsize",
+        text:<<<
+            Returns the projected width of the console.
+        >>>
+    });
+}
+
+setapi (sys.winsize, "sys.winsize");
+
+sys.stat.help = function() {
+    setapi.helptext ({
+        name:"sys.stat",
+        args:[
+            {name:"path",text:"Filesystem object to inspect"}
+        ],
+        text:<<<
+            Returns information about a filesystem object.
+        >>>
+    });
+}
+
+setapi (sys.stat, "sys.stat");
+
+sys.getuid.help = function() {
+    setapi.helptext ({
+        name:"sys.getuid",
+        text:<<<
+            Returns the current active userid.
+        >>>
+    });
+}
+
+setapi (sys.getuid, "sys.getuid");
+
+sys.getgid.help = function() {
+    setapi.helptext ({
+        name:"sys.getgid",
+        text:<<<
+            Returns the current active groupid.
+        >>>
+    });
+}
+
+setapi (sys.getgid, "sys.getgid");
+
+sys.getpid.help = function() {
+    setapi.helptext ({
+        name:"sys.getpid",
+        text:<<<
+            Returns the current process id.
+        >>>
+    });
+}
+
+setapi (sys.getuid, "sys.getpid");
+
+sys.uname.help = function() {
+    setapi.helptext ({
+        name:"sys.uname",
+        text:<<<
+            Returns information about the underlying operating system
+            kernel.
+        >>>
+    });
+}
+
+setapi (sys.uname, "sys.uname");
