@@ -139,7 +139,7 @@ char *handle_quoting (const char *src) {
         }
     }
     
-    fprintf (stderr, "---\n%s\n---\n", t->alloc);
+    // fprintf (stderr, "---\n%s\n---\n", t->alloc);
     
     char *res = t->alloc;
     free (t);

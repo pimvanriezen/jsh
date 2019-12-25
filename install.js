@@ -10,7 +10,8 @@ if (argv.length>1) {
 }*/
 
 var mycp = function(src,dst) {
-    console.log (src, " -> ", dst);
+    var srcid = src.replace(/.*\//,"");
+    console.log (srcid.padEnd(20), " -> ", dst);
     cp (src, dst);
 }
 
