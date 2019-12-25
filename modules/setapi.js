@@ -268,7 +268,7 @@ setapi.helptext = function(def) {
     if (def.opts && def.opts.length) {
         for (var oi in def.opts) {
             var ttxt = (oi==0) ? "Options:" : "";
-            t.addRow (ttxt, oi, def.opts[ai].name, def.opts[oi].text);
+            t.addRow (ttxt, "", def.opts[oi].name, def.opts[oi].text);
         }
     }
     print (t.format());

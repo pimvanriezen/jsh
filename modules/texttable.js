@@ -217,10 +217,6 @@ texttable.prototype.format = function() {
                     if (out[i][line]) ln += '\033[0m';
                 }
             }
-            while ((ww>sys.winsize()) && (ln[0] == ' ')) {
-                ln = ln.substr(1);
-                ww--;
-            }
             res += ln + '\n';
         }
     }
