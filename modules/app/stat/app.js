@@ -14,23 +14,23 @@ stat.help = function() {
         >>>
     });
     echo ("");
-    var t = new texttable(3);
-    t.addRow ("mode","number","The unix filesystem mode");
-    t.addRow ("modestring","string","The mode expressed as text");
-    t.addRow ("uid","number","The owner's userid");
-    t.addRow ("user","string","The owner's username");
-    t.addRow ("gid","number","The group's groupid");
-    t.addRow ("group","string","The group's groupname");
-    t.addRow ("size","number","The size in bytes");
-    t.addRow ("atime","Date","The last access time");
-    t.addRow ("mtime","Date","The last modification time");
-    t.addRow ("ctime","Date","The time of the file's creation");
-    t.addRow ("isDir","boolean","Set to true if object is a directory");
-    t.addRow ("isDevice","boolean","Set to true if object is a device node");
-    t.addRow ("isLink","boolean","Set to true if the file is a link");
-    t.addRow ("isSocket","boolean","Set to true if the file is a socket");
-    t.addRow ("isExecutable","boolean","Set to true if the file is "+
-                                          "executable");
+    var t = new texttable.auto(<<<
+        mode         number  The unix filesystem mode
+        modestring   string  The mode expressed as text, like ls() output.
+        uid          number  Userid of the owner
+        user         string  Username of the owner
+        gid          number  Groupid of the group
+        group        string  Groupname of the group
+        size         number  The size in bytes
+        atime        Date    The last access time
+        mtime        Date    The last modification time
+        ctime        Date    File creation time
+        isDir        boolean Set to true, if the object is a directory
+        isDevice     boolean Set to true, if the object is a device node
+        isLink       boolean Set to true, if the object is a link
+        isSocket     boolean Set to true, if the object is a socket
+        isExecutable boolean Set to true, if the object is executable
+    >>>,3);
     
     t.boldColumn (0);
     t.indent (4);
@@ -38,5 +38,5 @@ stat.help = function() {
     echo ("");
 }
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = stat;

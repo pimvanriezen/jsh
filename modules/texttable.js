@@ -85,6 +85,49 @@ texttable.colorize = function(str) {
     return x;
 }
 
+texttable.auto = function (inputstr, cols) {
+    var t = new texttable(cols);
+    var cutw = [];
+    var cutp = [0];
+    var pos = 0;
+    var col = 1;
+    var output = [];
+    
+    while (col<cols) {
+        while (inputstr[pos] != ' ' && inputstr[pos] != '\t') pos++;
+        while (inputstr[pos] == ' ' || inputstr[pos] == '\t') pos++;
+        cutw[col-1] = pos - cutp[col-1];
+        cutp[col] = pos;
+        col++;
+    }
+    cutw[cols-1] = 0;
+    
+    var lines = inputstr.split('\n');
+    var output=[];
+    
+    for (var li in lines) {
+        if (lines[li] == "") break;
+        for (var i=0; i<cols; ++i) {
+            var cdata="";
+            if (cutw[i]) {
+                cdata = lines[li].substr(cutp[i], cutw[i]);
+            }
+            else cdata = lines[li].substr(cutp[i]);
+            cdata = cdata.replace (/[ \t]*$/, "");
+            if (cdata) {
+                if (i==0) {
+                    if (output.length) t.addRow (output);
+                    output = [];
+                }
+                if (output[i]) output[i] += " " + cdata;
+                else output[i] = cdata;
+            }
+        }
+    }
+    if (output.length) t.addRow (output);
+    return t;
+}
+
 texttable.prototype.format = function() {
     var res = "";
     var maxw = sys.winsize() - this._marginright - this._indent -
