@@ -25,7 +25,7 @@ edit = setapi ([
               "the env.EDITOR environment-variable."}
 ]);
 
-if (sys.stat ("make")) {
+if (exists ("make")) {
     make = setapi ([
         {name:"make"},
         {literal:"make"},
