@@ -92,6 +92,7 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
     if (type == "object") {
         if (x === null) type = "null";
         else if (x.constructor == Array) type = "array";
+        else if (x.constructor == Date) type = "date";
     }
     switch (type) {
         case "string":
@@ -99,6 +100,13 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
             res += "\"" + codes["string"];
             res += strescape (x);
             res += codes.end + "\"";
+            break;
+            
+        case "date":
+            if (indent) res += "".padEnd(indent);
+            res += "\"";
+            res += x.toUTCString();
+            res += "\"";
             break;
             
         case "number":
