@@ -1,4 +1,4 @@
-if (exists ("make")) {
+if (which ("make")) {
     var make = setapi ([
         {name:"make"},
         {literal:"make"},
