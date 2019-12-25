@@ -56,8 +56,8 @@ var isShortObject = function(obj,indent) {
     return false;
 }
 
-var dump = function(x) {
-    echo (dump.dumper (x));
+var dump = function(x,mkshort,indent,realindent,realpos) {
+    echo (dump.dumper (x,mkshort,indent,realindent,realpos));
 }
 
 dump.dumper = function(x,mkshort,indent,realindent,realpos) {
