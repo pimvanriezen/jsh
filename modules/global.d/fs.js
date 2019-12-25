@@ -11,16 +11,3 @@ humanSize = function (sz) {
     }
     return "" + res.toFixed(0) + factor;
 }
-
-// ============================================================================
-// Working directory tools
-// ============================================================================
-cwd = sys.cwd;
-cwd.help = function() {
-    setapi.helptext ({
-        name:"cwd",
-        text:"Returns the current working directory"
-    });
-}
-
-setapi (cwd, "cwd");
