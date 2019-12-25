@@ -70,6 +70,21 @@ texttable.prototype.addRow = function() {
     this.rows.push (row);
 }
 
+texttable.colorize = function(str) {
+    var matches = {
+        "@function":1,
+        "[.a-zA-Z_]+\\[['\"._a-zA-Z]*\\]":1,
+        "(\\b(true|false))":36,
+        "(\\b(null))":31,
+        "\"[^\"]+\"":32
+    }
+    x = str;
+    for (var k in matches) {
+        x = x.colorMatch (k, matches[k]);
+    }
+    return x;
+}
+
 texttable.prototype.format = function() {
     var res = "";
     var maxw = sys.winsize() - this._marginright - this._indent -
@@ -110,7 +125,14 @@ texttable.prototype.format = function() {
                     out[i] = [(""+this.rows[ri][i]).substr(0,widths[i])];
                 }
                 else {
-                    out[i] = (""+this.rows[ri][i]).wrap(widths[i]);
+                    var wrapped = (""+this.rows[ri][i]).rewrap(widths[i]);
+                    wrapped = texttable.colorize(wrapped);
+                    wrapped = wrapped.split('\n');
+                    var l = wrapped.length;
+                    if (l) {
+                        wrapped = wrapped.slice (0,l-1);
+                    }
+                    out[i] = wrapped;
                 }
                 // After wrapping, if we have the highest number of lines,
                 // ours is what counts.

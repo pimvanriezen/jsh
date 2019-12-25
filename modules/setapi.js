@@ -3,19 +3,9 @@
 // ============================================================================
 
 var $apidb = {};
-var $textformat = function(x) {
-    var matches = {
-        "@function":1,
-        "[.a-zA-Z_]+\\[['\"._a-zA-Z]*\\]":1,
-        "(\\b(true|false))":36,
-        "(\\b(null))":31,
-        "\"[^\"]+\"":32
-    }
-    x = x.rewrap (sys.winsize());
-    for (var k in matches) {
-        x = x.colorMatch (k, matches[k]);
-    }
-    return x;
+var $textformat = function(x,width) {
+    if (! width) width = sys.winsize();
+    return texttable.colorize (x.rewrap(width));
 }
 
 help = function(helpfor) {
@@ -259,6 +249,8 @@ var setapi = function(arg1,arg2) {
     }
     return obj;
 }
+
+setapi.textformat = $textformat;
 
 setapi.helptext = function(def) {
     var t = new texttable(4);
