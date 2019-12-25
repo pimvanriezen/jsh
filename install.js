@@ -17,7 +17,7 @@ var dumpcopied = function(nocopies) {
     var endtag = " "+copied+" file"+(copied==1 ? "":"s");
     if (nocopies) endtag = "";
     endtag = endtag.padEnd (sys.winsize() - bannersize - 8);
-    echo (endtag + " [ ok ]");
+    echo (endtag + " [ \033[1mok\033[0m ]");
     if (copied) {
         dump (copiedfiles, false, 2);
     }
