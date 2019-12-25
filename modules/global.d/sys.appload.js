@@ -33,6 +33,12 @@ sys.appload = function(appname, apppath) {
                 }
                 if (module.exports.help) {
                     setapi (module.exports, appname);
+                    for (var k in module.exports) {
+                        if (k=="help") continue;
+                        if (module.exports[k].help) {
+                            setapi (module.exports[k], appname+"."+k);
+                        }
+                    }
                 }
             }
             else {
