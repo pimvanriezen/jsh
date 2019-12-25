@@ -73,6 +73,17 @@ $("modules/global.d/*.js").each (function (file) {
 });
 dumpcopied();
 
+banner("Removing outdated global includes");
+$(f("etc/jsh/modules/global.d/*.js")).each (function (file) {
+    fnam = file.replace (/.*\//, "");
+    if (! exists ("modules/global.d/"+fnam)) {
+        rm (file);
+        copiedfiles.push (file);
+        copied++;
+    }
+});
+dumpcopied();
+
 banner ("Copying apps");
 $("modules/app/*").each (function (dir) {
     mkdir (f("etc/jsh/"+dir));
