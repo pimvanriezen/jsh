@@ -25,17 +25,6 @@ edit = setapi ([
               "the env.EDITOR environment-variable."}
 ]);
 
-if (exists ("make")) {
-    make = setapi ([
-        {name:"make"},
-        {literal:"make"},
-        {opt:{"file":"-f"},helptext:"Use file instead of Makefile"},
-        {opt:{"target":[]},helptext:"Build target"},
-        {console:true},
-        {helptext:"Runs the make build utility."}
-    ]);
-}
-
 // ----------------------------------------------------------------------------
 stty = setapi ([
     {name:"stty"},
