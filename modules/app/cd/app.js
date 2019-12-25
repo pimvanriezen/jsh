@@ -8,6 +8,7 @@ var cd = function(arg) {
         else return false;
     }
     cd.history.push(cwd());
+    while (cd.history.length > 32) cd.history.slice (0,1);
     return sys.cd (newdir);
 }
 
@@ -29,5 +30,5 @@ cd.help = function() {
     });
 }
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = cd;

@@ -7,7 +7,7 @@ var prompt = function(val) {
     fmt = fmt.replace(/%h/,hostname().split('.')[0]);
     fmt = fmt.replace(/%i/,cd.history.length);
     fmt = fmt.replace(/%p/,cwd().summarize (4+(sys.winsize()/2)-fmt.length));
-    fmt = fmt.replace(/%#/,sys.getuid()==0 ? "#:":":");
+    fmt = fmt.replace(/%#/,sys.getuid()==0 ? "#":":");
     return fmt;
 }
 

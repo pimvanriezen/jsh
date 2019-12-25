@@ -37,7 +37,7 @@ mycp ("jshrc",f("etc/jsh/jshrc"));
 mycp ("bin/jsh",f("bin/jsh"));
 
 banner("Copying base modules");
-$("modules/*").each (function (file) {
+$("modules/*.js").each (function (file) {
     if (! file.isDir) {
         mycp (file, f("etc/jsh/"+file));
     }
