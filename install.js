@@ -9,10 +9,29 @@ if (argv.length>1) {
     cp (a,b);
 }*/
 
+var copied = 0;
+var bannersize = 0;
+var copiedfiles = [];
+
+var dumpcopied = function(nocopies) {
+    var endtag = " "+copied+" file"+(copied==1 ? "":"s");
+    if (nocopies) endtag = "";
+    endtag = endtag.padEnd (sys.winsize() - bannersize - 8);
+    echo (endtag + " [ ok ]");
+    if (copied) {
+        dump (copiedfiles, false, 2);
+    }
+    copied = 0;
+    copiedfiles = [];
+}
+
 var mycp = function(src,dst,srcid) {
     if (! srcid) srcid = src.replace(/.*\//,"");
-    echo (srcid.padEnd(20), " -> ", dst);
-    cp (src, dst);
+    if ((! exists (dst)) || md5sum (src) != md5sum (dst)) {
+        cp (src, dst);
+        copied++;
+        copiedfiles.push (dst);
+    }
 }
 
 var mymkdir = function(name,mode) {
@@ -21,7 +40,9 @@ var mymkdir = function(name,mode) {
 }
 
 var banner = function(txt) {
-    echo (("---[ "+txt+" ]").padEnd(sys.winsize(),"-"));
+    var bannerstr = "* "+txt+"...";
+    bannersize = bannerstr.length;
+    print (bannerstr);
 }
 
 var f = function(n) { return basedir + '/' + n; }
@@ -31,10 +52,12 @@ if (! exists (f("etc/jsh"))) mymkdir ("etc/jsh");
 if (! exists (f("etc/jsh/modules"))) mymkdir ("etc/jsh/modules");
 if (! exists (f("etc/jsh/modules/global.d"))) mymkdir ("etc/jsh/modules/global.d");
 if (! exists (f("etc/jsh/modules/app"))) mymkdir ("etc/jsh/modules/app");
+dumpcopied(true);
 
 banner ("Copying base files");
 mycp ("jshrc",f("etc/jsh/jshrc"));
 mycp ("bin/jsh",f("bin/jsh"));
+dumpcopied();
 
 banner("Copying base modules");
 $("modules/*.js").each (function (file) {
@@ -42,15 +65,17 @@ $("modules/*.js").each (function (file) {
         mycp (file, f("etc/jsh/"+file));
     }
 });
+dumpcopied();
 
 banner ("Copying global includes");
 $("modules/global.d/*.js").each (function (file) {
     mycp (file, f("etc/jsh/"+file));
 });
+dumpcopied();
 
 banner ("Copying apps");
 $("modules/app/*").each (function (dir) {
-    mkdir (f("etc/jsh"+dir));
+    mkdir (f("etc/jsh/"+dir));
     mycp (dir + "/app.js", f("etc/jsh/"+dir+"/app.js"),dir);
 });
-
+dumpcopied();
