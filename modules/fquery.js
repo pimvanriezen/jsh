@@ -73,17 +73,19 @@ query.help = function() {
         >>>
     });
     echo ("");
-    var t = new texttable(2);
-    t.addRow ("write(data)","Overwrites matching files with data");
-    t.addRow ("run(...)","Executes the matching files, with arguments "+
-                             "provided in the argument list.");
-    t.addRow ("count()","Returns the number of matching objects");
-    t.addRow ("each(func)","Calls func for every match with the file "+
-                              "path as its argument");
-    t.addRow ("cat()","Concatenates contents of all matching files");
-    t.addRow ("line(nr)","Gets a specific line index of the concatenated "+
-                            "data from matching files");
-    t.addRow ("chmod(spec)","Changes permissions on all matches");
+    var t = new texttable.auto (<<<
+        write(data)     Overwrites matching objects with data
+        run(...)        Executes the matching files, with arguments provided
+                        in the argument list
+        count()         Returns the number of matching objects
+        each(func)      Calls func(match) on each matching object
+        cat()           Concatenates contents of all matching files
+        line(nr)        Returns a numbered line from the concatenated
+                        contents of all matching files
+        chmod(spec)     Changes permissions on all matching objects. See the
+                        help page of the chmod() command for the valid 
+                        specification
+    >>>,2);
     t.boldColumn (0);
     t.indent (4);
     echo (t.format(sys.winsize()));    
