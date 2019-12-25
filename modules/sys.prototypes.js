@@ -46,6 +46,16 @@ Object.defineProperty (Object.prototype, 'save', {
     }
 });
 
+String.prototype.summarize = function(sz) {
+    if (this.length <= sz) return this;
+    var res = "";
+    var dsz = sz - "...".length;
+    var halfsz = dsz/2;
+    res = this.substr(0,halfsz) + "..." +
+          this.substr(this.length-halfsz);
+    return res;
+}
+
 String.prototype.wrap = function (cols) {
     var str = ""+this;
     var words = str.split (' ');

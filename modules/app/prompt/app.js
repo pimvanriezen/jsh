@@ -2,12 +2,12 @@ var prompt = function(val) {
     if (val) {
         this.setval = val;
     }
-    var fmt = "[%p]: ";
+    var fmt = "[%h:%p]%# ";
     if (this.setval) fmt = this.setval;
-    fmt = fmt.replace(/%p/,cwd());
-    fmt = fmt.replace(/%h/,hostname());
+    fmt = fmt.replace(/%h/,hostname().split('.')[0]);
     fmt = fmt.replace(/%i/,cd.history.length);
-    fmt = fmt.replace(/%#/,">");
+    fmt = fmt.replace(/%p/,cwd().summarize (4+(sys.winsize()/2)-fmt.length));
+    fmt = fmt.replace(/%#/,sys.getuid()==0 ? "#:":":");
     return fmt;
 }
 
@@ -38,5 +38,5 @@ prompt.help = function() {
     >>>.rewrap(sys.winsize()));
 }
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = prompt;
