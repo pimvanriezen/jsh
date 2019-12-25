@@ -94,12 +94,7 @@ String.prototype.colorMatch = function (expr, code) {
     var ansi = code;
     var re = expr;
     if (typeof (re) == "string") {
-        if (re == "@function") {
-            re = new RegExp ("[.a-zA-Z_]+\\([._a-zA-Z]*\\)","g");
-        }
-        else {
-            re = new RegExp (expr, "g");
-        }
+        re = new RegExp (expr, "g");
     }
     if (typeof (code) == "number") {
         ansi = '\033[' + code + 'm';

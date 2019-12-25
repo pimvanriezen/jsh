@@ -72,7 +72,7 @@ texttable.prototype.addRow = function() {
 
 texttable.colorize = function(str) {
     var matches = {
-        "@function":1,
+        "[.a-zA-Z_]+\\([._a-zA-Z]*\\)":1,
         "[.a-zA-Z_]+\\[['\"._a-zA-Z]*\\]":1,
         "(\\b(true|false))":36,
         "(\\b(null))":31,
