@@ -10,7 +10,7 @@ if (argv.length>1) {
 }*/
 
 var mycp = function(src,dst) {
-    console.log (src, " -> ", dst);
+    console.log (src, " - ", dst);
     cp (src, dst);
 }
 
@@ -36,3 +36,4 @@ $("modules/app/*").each (function (dir) {
     mkdir (f("etc/jsh/modules/app/"+dir));
     mycp (dir + "/app.js", f("etc/jsh/"+dir+"/app.js"));
 });
+

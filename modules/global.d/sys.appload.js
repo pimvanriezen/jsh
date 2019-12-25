@@ -13,6 +13,17 @@ sys.appload = function(appname, apppath) {
     var wrapped = pre + src + post;
     try {
         sys.eval (wrapped, apppath)(module);
+        if (globalThis[appname] !== undefined) {
+            var old = globalThis[appname];
+            if (old.app) {
+                if (old.app.version != module.version) {
+                    printerr ("Upgrading "+appname+" to "+module.version);
+                    delete globalThis[appname];
+                    module.override = true;
+                }
+                else return; // Same version, not an error.
+            }
+        }
         if (module.override || globalThis[appname] === undefined) {
             if (module.exports) {
                 globalThis[appname] = module.exports;

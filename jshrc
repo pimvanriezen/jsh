@@ -43,4 +43,4 @@ setapi ($, "$");
 // Run the global includes
 // ============================================================================
 include("global.d/*.js");
-loadapps();
+sys.loadapps();

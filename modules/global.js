@@ -177,7 +177,7 @@ defaults.help = function() {
     });
 }
 
-loadapps = function() {
+sys.loadapps = function() {
     for (var i in env.JSH_MODULE_PATH) {
         var glob = env.JSH_MODULE_PATH[i] + "/app/*/app.js";
         $(glob).each (function (match) {
