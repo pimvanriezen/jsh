@@ -333,11 +333,14 @@ pid_t channel_fork (struct channel *c) {
     
     switch ((pid = fork())) {
         case 0:
-            for (i=0; i<1023; ++i) {
+            close (0);
+            close (1);
+            close (2);
+            open ("/dev/null",O_RDONLY);
+            open ("/dev/null",O_WRONLY);
+            open ("/dev/null",O_WRONLY);
+            for (i=3; i<1023; ++i) {
                 if ((i!=togopipe[0])&&(i!=fromgopipe[1])) close (i);
-                open ("/dev/null",O_RDONLY);
-                open ("/dev/null",O_WRONLY);
-                open ("/dev/null",O_WRONLY);
             }
             channel_fork_pipe (c, parentpid, togopipe[0], fromgopipe[1]);
             return 0;
