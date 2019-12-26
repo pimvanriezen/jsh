@@ -110,7 +110,7 @@ var setSystemResolverOptions = function(domain,pri,sec) {
 }
 ```
 
-## And some more sugar
+## And some more sugar (job control)
 
 Sometimes asynchronous work makes sense. To help with this, JSH implements
 golang-style coroutines in its runtime. They work pretty much the same way,
@@ -129,6 +129,44 @@ while (numbers.length) {
     var set = numbers.splice (0,4);
     go (c, function(){ return myNumberSummer (set); });
 }
+
+var totalsum = 0;
+while (true) {
+    var m = c.recv();
+    if (m === null) break;
+    dump (m);
+    totalsum += m;
+}
+
+echo ("Total sum: "+totalsum);
+```
+
+Instead of writing one-off coroutines, you can also instigate a worker
+system to handle the load, like this:
+
+```javascript
+var myNumberSummer = function (c) {
+    while (true) {
+        var msg = c.recv();
+        if (! msg) return;
+        var sum = 0;
+        for (var i in msg) sum += msg[i];
+        if (! c.send (sum)) return;
+    }
+}
+
+var c = new channel();
+var numbers = [1,3,7,23,15,88,11,93,12,-4,2,15,11,25];
+
+for (var i=0; i<4; ++i) {
+    go (c, function(){myNumberSummer(c)});
+}
+
+while (numbers.length) {
+    c.send (numbers.splice(0,4));
+}
+
+c.exit();
 
 var totalsum = 0;
 while (true) {
