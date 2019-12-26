@@ -24,6 +24,7 @@ texttable   = require("texttable");
 autotable   = require("autotable");
 dump        = require("dump");
 which       = require("which");
+len         = require("len");
 
 // ============================================================================
 // Set up the result formatter for the interactive shell
