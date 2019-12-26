@@ -1,3 +1,5 @@
+![Screenshot](doc/img/ss1.png "JSH in action")
+
 # JSH - A cleaner environment for your dirty jobs
 
 A lot of work on a typical Unix system still gets performed by the system
