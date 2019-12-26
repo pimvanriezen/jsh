@@ -366,3 +366,96 @@ sys.uname.help = function() {
 }
 
 setapi (sys.uname, "sys.uname");
+
+sys.openchannel.help = function() {
+    setapi.helptext ({
+        name:"sys.openchannel",
+        text:<<<
+            Opens a new channel object. Returns a number representing
+            the channel id.
+        >>>
+    })
+}
+
+setapi (sys.openchannel, "sys.openchannel");
+
+sys.sendchannel.help = function() {
+    setapi.helptext ({
+        name:"sys.sendchannel",
+        args:[
+            {name:"id",text:"The channel id"},
+            {name:"data",text:"The data to send (string)"}
+        ],
+        text:<<<
+            Sends string data to a channel. Returns false if no data
+            could be sent (because there's nobody listening).
+        >>>
+    });
+}
+
+setapi (sys.sendchannel, "sys.sendchannel");
+
+sys.recvchannel.help = function() {
+    setapi.helptext ({
+        name:"sys.recvchannel",
+        args:[
+            {name:"id",text:"The channel id"}
+        ],
+        text:<<<
+            Receives string data from a channel. Returns the boolean value
+            of false if no data could be read (because there are no
+            senders). Otherwise the string data is returned.
+        >>>
+    });
+}
+
+setapi (sys.recvchannel, "sys.recvchannel");
+
+sys.exitchannel.help = function() {
+    setapi.helptext ({
+        name:"sys.exitchannel",
+        args:[
+            {name:"id",text:"The channel id"}
+        ],
+        text:<<<
+            Tells all listeners that we're quitting the circus, then
+            closes all pipes associated with a channel. Any remaining
+            queued messages are discarded.
+        >>>
+    });
+}
+
+setapi (sys.exitchannel, "sys.exitchannel");
+
+sys.closechannel.help = function() {
+    setapi.helptext ({
+        name:"sys.closechannel",
+        args:[
+            {name:"id",text:"The channel id"}
+        ],
+        text:<<<
+            Completely shuts down a channel. If there are any child
+            processes spawned on its behalf, they are unceremoniously
+            killed.
+        >>>
+    });
+}
+
+setapi (sys.closechannel, "sys.closechannel");
+
+sys.go.help = function() {
+    setapi.helptext ({
+        name:"sys.go",
+        args:[
+            {name:"id",text:"The channel id associated with the coroutine"},
+            {name:"func",text:"The function to call in the child process"}
+        ],
+        text:<<<
+            Spawns a co-routine. All open filedescriptors will be closed
+            for the child process, except for those needed to communicate
+            with the associated channel.
+        >>>
+    });
+}
+
+setapi (sys.go, "sys.go");
