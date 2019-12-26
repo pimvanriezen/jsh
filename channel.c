@@ -125,7 +125,10 @@ int channel_send (struct channel *c, const char *msg) {
                         close (c->pipes[i].fdread);
                         close (c->pipes[i].fdwrite);
                     }
-                    else return 1;
+                    else {
+                        c->pipes[i].msgsent++;
+                        return 1;
+                    }
                 }
             }
         }
@@ -293,6 +296,7 @@ int channel_handle (struct channel *c, bool nonblock) {
                         if (sz != 0) {
                             msg->nextmsg = c->firstmsg;
                             c->firstmsg = msg;
+                            c->pipes[i].msgrecv++;
                             msg = NULL;
                         }
                         if (msg) {

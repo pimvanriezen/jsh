@@ -904,6 +904,51 @@ duk_ret_t sys_closechannel (duk_context *ctx) {
     return 1;
 }
 
+duk_ret_t sys_chaninfo (duk_context *ctx) {
+    int i,j,pindex,cindex;
+    struct channel *ch;
+    struct channelmsg *msg;
+    struct channelpipe *pipe;
+    duk_idx_t ch_idx;
+    duk_idx_t pipes_idx;
+    duk_idx_t pipe_idx;
+    duk_idx_t arr_idx = duk_push_array (ctx);
+    
+    cindex = 0;
+    for (i=0; i<CHANNELS->alloc; ++i) {
+        if (CHANNELS->list[i]) {
+            ch = CHANNELS->list[i];
+            channel_handle (ch, true);
+            ch_idx = duk_push_object (ctx);
+            duk_push_int (ctx, i);
+            duk_put_prop_string (ctx, ch_idx, "id");
+            j=0;
+            msg = ch->firstmsg;
+            while (msg) { j++; msg = msg->nextmsg; }
+            duk_push_int (ctx, j);
+            duk_put_prop_string (ctx, ch_idx, "queue");
+            pipes_idx = duk_push_array (ctx);
+            pindex = 0;
+            for (j=0; j<ch->alloc; ++j) {
+                pipe = &ch->pipes[j];
+                if (pipe->st != PIPE_CLOSED) {
+                    pipe_idx = duk_push_object (ctx);
+                    duk_push_number (ctx, pipe->pid);
+                    duk_put_prop_string (ctx, pipe_idx, "pid");
+                    duk_push_number (ctx, pipe->msgsent);
+                    duk_put_prop_string (ctx, pipe_idx, "msgsent");
+                    duk_push_number (ctx, pipe->msgrecv);
+                    duk_put_prop_string (ctx, pipe_idx, "msgrecv");
+                    duk_put_prop_index (ctx, pipes_idx, pindex++);
+                }
+            }
+            duk_put_prop_string (ctx, ch_idx, "pipes");
+            duk_put_prop_index (ctx, arr_idx, cindex++);
+        }
+    }
+    return 1;
+}
+
 duk_ret_t sys_go (duk_context *ctx) {
     pid_t pid;
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
@@ -985,6 +1030,7 @@ void sys_init (duk_context *ctx) {
     defcall (recvchannel, 1);
     defcall (exitchannel, 1);
     defcall (closechannel, 1);
+    defcall (chaninfo, 0);
     defcall (go, 2);
 
     duk_def_prop (ctx, -3, PROPFLAGS);
