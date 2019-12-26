@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <signal.h>
 
 struct channel *channel_create (void) {
@@ -316,10 +317,9 @@ void channel_exit (struct channel *c) {
     /* Send a PIPEMSG_EXIT to all open pipes, then close them and mark
        them as PIPE_CLOSED */
     int i=0;
-    size_t wsz;
     for (i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) {
-            wsz = write (c->pipes[i].fdwrite, PIPEMSG_EXIT, 1);
+            write (c->pipes[i].fdwrite, PIPEMSG_EXIT, 1);
             close (c->pipes[i].fdread);
             close (c->pipes[i].fdwrite);
             c->pipes[i].st = PIPE_CLOSED;
