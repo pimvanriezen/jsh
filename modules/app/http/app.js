@@ -104,7 +104,7 @@ http.save = function (url, filename, outheaders) {
 
 http.save.help = function() {
     setapi.helptext({
-        name:"http.download",
+        name:"http.save",
         args:[
             {name:"url",text:"The URL to fetch"},
             {name:"filename",text:<<<
