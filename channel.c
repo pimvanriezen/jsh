@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <signal.h>
 
 struct channel *channel_create (void) {
     struct channel *res;
@@ -270,11 +272,9 @@ int channel_handle (struct channel *c, bool nonblock) {
                 if (sz == 0) msgtype = MSGID_EXIT;
                 switch (msgtype) {
                     case MSGID_BUSY:
-                        printf ("%d BUSY\n", c->pipes[i].pid);
                         c->pipes[i].st = PIPE_BUSY; break;
                     
                     case MSGID_FREE:
-                        printf ("%d FREE\n", c->pipes[i].pid);
                         c->pipes[i].st = PIPE_LISTENING; break;
                         
                     case MSGID_EXIT:
@@ -304,6 +304,7 @@ int channel_handle (struct channel *c, bool nonblock) {
         }
     }
     
+    waitpid (-1, &i, WNOHANG);
     return 1;
 }
 
@@ -357,68 +358,58 @@ pid_t channel_fork (struct channel *c) {
     }
 }
 
-void worker (struct channel *c) {
-    struct channelmsg *m;
-    char *outstr;
-
-    while (true) {
-        m = channel_receive (c);
-        sleep (1);
-        if (! m) break;
-        outstr = malloc (strlen (m->data) + 16);
-        sprintf (outstr, "Hello, %s", m->data);
-        channel_send (c, outstr);
-        free (outstr);
-        msg_free (m);
+void channel_destroy (struct channel *c) {
+    struct channelmsg *msg, *nextmsg;
+    int i;
+    
+    for (i=0; i<c->alloc; ++i) {
+        if (c->pipes[i].st != PIPE_CLOSED) {
+            if ((c->pipes[i].flags & PIPEFLAG_ISPARENT) == 0) {
+                kill (c->pipes[i].pid, SIGKILL);
+            }
+            close (c->pipes[i].fdread);
+            close (c->pipes[i].fdwrite);
+        }
     }
+    
+    free (c->pipes);
+    msg = c->firstmsg;
+    while (msg) {
+        nextmsg = msg->nextmsg;
+        msg_free (msg);
+        msg = nextmsg;
+    }
+    
+    free (c);
 }
 
-int main (int argc, const char *argv[]) {
-    pid_t pid;
-    struct channel *c = channel_create();
-    struct channelmsg *msg;
+struct clist *clist_create (void) {
+    struct clist *res = calloc (sizeof (struct clist), 1);
+    res->alloc = 1;
+    res->list = malloc (sizeof (struct channel **));
+    res->list[0] = NULL;
+    return res;
+}
 
-    pid = channel_fork (c);
-    if (pid == 0) {
-        worker (c);
-        exit (0);
-    }
+struct channel *clist_get (struct clist *c, int idx) {
+    if (idx >= c->alloc) return NULL;
+    return c->list[idx];
+}
 
-    pid = channel_fork (c);
-    if (pid == 0) {
-        worker (c);
-        exit (0);
+int clist_open (struct clist *c) {
+    int i;
+    for (i=0; i<c->alloc; ++i) {
+        if (c->list[i] == NULL) break;
     }
+    if (i >= c->alloc) {
+        c->list = realloc (c->list, i+1 * sizeof (struct channel*));
+    }
+    c->list[i] = channel_create();
+    return i;
+}
 
-    if (! channel_send (c, "Pim")) {
-        fprintf (stderr, "Error sending\n");
-        return 1;
-    }
-    
-    if (! channel_send (c, "Steve")) {
-        fprintf (stderr, "Error sending\n");
-        return 1;
-    }
-    
-    msg = channel_receive (c);
-    if (! msg) {
-        fprintf (stderr, "Error receiving\n");
-        return 1;
-    }
-    
-    printf ("%d %s\n", msg->from, msg->data);
-    msg_free (msg);
-
-    msg = channel_receive (c);
-    if (! msg) {
-        fprintf (stderr, "Error receiving\n");
-        return 1;
-    }
-    
-    printf ("%d %s\n", msg->from, msg->data);
-    msg_free (msg);
-
-    channel_exit(c);
-    while (channel_handle (c, false));
-    return 0;
+void clist_close (struct clist *c, int idx) {
+    if (idx >= c->alloc) return;
+    channel_destroy (c->list[idx]);
+    c->list[idx] = NULL;
 }

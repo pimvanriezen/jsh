@@ -47,14 +47,28 @@ struct channel {
     struct channelpipe  *pipes;
     struct channelmsg   *firstmsg;
 };
-struct channelmsg *msg_create (size_t);
-void msg_free (struct channelmsg *);
-struct channel *channel_create (void);
-void channel_add_pipe (struct channel *, pid_t, int, int);
-void channel_fork_pipe (struct channel *, pid_t, int, int);
-int channel_send (struct channel *, const char *);
-int channel_broadcast (struct channel *, const char *);
-struct channelmsg *channel_receive (struct channel *);
-int channel_handle (struct channel *, bool);
-void channel_exit (struct channel *);
+
+struct clist {
+    int                  alloc;
+    struct channel     **list;
+};
+
+struct channelmsg   *msg_create (size_t);
+void                 msg_free (struct channelmsg *);
+struct channel      *channel_create (void);
+void                 channel_add_pipe (struct channel *, pid_t, int, int);
+void                 channel_fork_pipe (struct channel *, pid_t, int, int);
+int                  channel_send (struct channel *, const char *);
+int                  channel_broadcast (struct channel *, const char *);
+struct channelmsg   *channel_receive (struct channel *);
+int                  channel_handle (struct channel *, bool);
+void                 channel_exit (struct channel *);
+void                 channel_destroy (struct channel *);
+pid_t                channel_fork (struct channel *);
+
+struct clist        *clist_create (void);
+struct channel      *clist_get (struct clist *, int idx);
+int                  clist_open (struct clist *);
+void                 clist_close (struct clist *, int idx);
+
 #endif

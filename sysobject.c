@@ -18,6 +18,7 @@
 #include <sys/utsname.h>
 #include "duktape.h"
 #include "quoting.h"
+#include "channel.h"
 
 char *mystrdup (const char *orig) {
     size_t len = strlen (orig);
@@ -792,7 +793,6 @@ duk_ret_t sys_parse (duk_context *ctx) {
     const char *fnam = duk_to_string (ctx, 0);
     const char *modnam = fnam;
     struct textbuffer *t = textbuffer_load (fnam);
-    duk_size_t bufsz = 0;
     if (! t) {
         duk_push_boolean (ctx, 0);
         textbuffer_free (t);
@@ -834,6 +834,101 @@ duk_ret_t sys_parse (duk_context *ctx) {
     return 1;
 }
 
+struct clist *CHANNELS;
+
+duk_ret_t sys_openchannel (duk_context *ctx) {
+    int cid = clist_open (CHANNELS);
+    duk_push_int (ctx, cid);
+    return 1;
+}
+
+duk_ret_t sys_sendchannel (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    int cid = duk_get_int (ctx, 0);
+    const char *data = duk_to_string (ctx, 1);
+    struct channel *c = clist_get (CHANNELS, cid);
+    if (! c) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    if (! channel_send (c, data)) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    duk_push_boolean (ctx, 1);
+    return 1;
+}
+
+duk_ret_t sys_recvchannel (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    int cid = duk_get_int (ctx, 0);
+    struct channelmsg *msg = NULL;
+    struct channel *c = clist_get (CHANNELS, cid);
+    if (! c) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    msg = channel_receive (c);
+    if (! msg) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+
+    duk_push_string (ctx, msg->data);
+    msg_free (msg);
+    return 1;    
+}
+
+duk_ret_t sys_exitchannel (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    int cid = duk_get_int (ctx, 0);
+    struct channel *c = clist_get (CHANNELS, cid);
+    if (! c) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    channel_exit (c);
+    while (channel_handle (c, false));
+    duk_push_boolean (ctx, 1);
+    return 1;
+}
+
+duk_ret_t sys_closechannel (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    int cid = duk_get_int (ctx, 0);
+    clist_close (CHANNELS, cid);
+    duk_push_boolean (ctx, 1);
+    return 1;
+}
+
+duk_ret_t sys_go (duk_context *ctx) {
+    pid_t pid;
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    int cid = duk_get_int (ctx, 0);
+    struct channel *c = clist_get (CHANNELS, cid);
+    if (! c) {
+        fprintf (stderr, "%% Channel not found\n");
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    switch (pid = channel_fork (c)) {
+        case 0:
+            duk_call (ctx, 0);
+            exit (0);
+        
+        case -1:
+            fprintf (stderr, "%% Fork error\n");
+            duk_push_boolean (ctx, 0);
+            return 1;
+    }
+    duk_push_int (ctx, pid);
+    return 1;
+}
+
 void sys_init (duk_context *ctx) {
     const char *osglobal;
 
@@ -841,6 +936,8 @@ void sys_init (duk_context *ctx) {
     bzero (gidcache, 16 * sizeof (struct xidcache));
     uidcpos = gidcpos = 0;
     duk_idx_t obj_idx;
+    
+    CHANNELS = clist_create();
     
     #define PROPFLAGS DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | \
             DUK_DEFPROP_SET_CONFIGURABLE
@@ -883,6 +980,12 @@ void sys_init (duk_context *ctx) {
     defcall (getgid, 0);
     defcall (getpid, 0);
     defcall (uname, 0);
+    defcall (openchannel, 0);
+    defcall (sendchannel, 2);
+    defcall (recvchannel, 1);
+    defcall (exitchannel, 1);
+    defcall (closechannel, 1);
+    defcall (go, 2);
 
     duk_def_prop (ctx, -3, PROPFLAGS);
     duk_pop (ctx);

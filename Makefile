@@ -7,7 +7,7 @@ OBJS_DUKTAPE = \
 	duktape/duktape.o duktape/duk_console.o \
 	duktape/duk_module_duktape.o duktape/linenoise.o
 
-OBJS_CLI = sysobject.o cli.o quoting.o textbuffer.o
+OBJS_CLI = sysobject.o cli.o quoting.o textbuffer.o channel.o
 
 CC = gcc
 CCOPTS = -std=c99 -Wall
