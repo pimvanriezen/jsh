@@ -40,12 +40,6 @@ Object.defineProperty (Array.prototype, 'remove', {
     }
 });
 
-Object.defineProperty (Object.prototype, 'save', {
-    value: function(name) {
-        return sys.write (JSON.stringify(this,null,2), name);
-    }
-});
-
 String.prototype.summarize = function(sz) {
     if (this.length <= sz) return this;
     var res = "";
