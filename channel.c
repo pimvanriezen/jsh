@@ -42,7 +42,7 @@ void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     if (c->alloc < 256) newalloc = c->alloc * 2;
     else newalloc = c->alloc + 128;
     
-    c->pipes = realloc (c->pipes, c->alloc * sizeof (struct channelpipe));
+    c->pipes = realloc (c->pipes, newalloc * sizeof (struct channelpipe));
     if (! c->pipes) {
         exit (666);
     }
