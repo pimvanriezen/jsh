@@ -60,6 +60,7 @@ void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     c->pipes[c->alloc].pid = pid;
     c->pipes[c->alloc].msgsent = 0;
     c->pipes[c->alloc].msgrecv = 0;
+    c->pipes[c->alloc].flags = 0;
     c->alloc = newalloc;
 }
 
