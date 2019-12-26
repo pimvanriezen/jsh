@@ -98,7 +98,7 @@ var setSystemResolverOptions = function(domain,pri,sec) {
     if (! sec) sec = "8.8.8.8";
     
     var rconf = <<<
-        ; System resolver configuration, don't edit manually.
+        ; System resolver configuration, do not edit manually.
         domain ${domain}
         nameserver ${pri}
         nameserver ${sec}
