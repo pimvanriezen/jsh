@@ -320,9 +320,6 @@ void channel_exit (struct channel *c) {
     for (i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) {
             write (c->pipes[i].fdwrite, PIPEMSG_EXIT, 1);
-            close (c->pipes[i].fdread);
-            close (c->pipes[i].fdwrite);
-            c->pipes[i].st = PIPE_CLOSED;
         }
     }
 }
