@@ -97,12 +97,12 @@ http.get.help = function() {
     });
 }
 
-http.download = function (url, filename, outheaders) {
+http.save = function (url, filename, outheaders) {
     if (! filename) filename = url.replace(/\?.*/,"").replace(/.*\//,"");
     return http("GET",url,{save:filename,headers:outheaders});
 }
 
-http.download.help = function() {
+http.save.help = function() {
     setapi.helptext({
         name:"http.download",
         args:[
@@ -244,5 +244,5 @@ http.put.help = function() {
     });
 }
 
-module.version = "1.0.2";
+module.version = "1.0.3";
 module.exports = http;
