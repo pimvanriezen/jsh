@@ -68,5 +68,41 @@ http.get = function (url, outheaders, inheaders) {
     return http("GET",url,{headers:outheaders,returnheaders:inheaders});
 }
 
+http.delete = function (url, outheaders, inheaders) {
+    return http("DELETE",url,{headers:outheaders,returnheaders:inheaders});
+}
+
+http.post = function (url, data, outheaders, inheaders) {
+    var outhdr = outheaders;
+    var outbody;
+    if (typeof (data) == "object") {
+        if (! outhdr) outhdr = {};
+        if (! outhdr["Content-type"]) {
+            outhdr["Content-type"] = "application/json";
+        }
+        outbody = JSON.stringify (data);
+    }
+    else {
+        outbody = ""+data;
+    }
+    return http("POST",url,data,{headers:outhdr,returnheaders:inheaders});
+}
+
+http.put = function (url, data, outheaders, inheaders) {
+    var outhdr = outheaders;
+    var outbody;
+    if (typeof (data) == "object") {
+        if (! outhdr) outhdr = {};
+        if (! outhdr["Content-type"]) {
+            outhdr["Content-type"] = "application/json";
+        }
+        outbody = JSON.stringify (data);
+    }
+    else {
+        outbody = ""+data;
+    }
+    return http("PUT",url,data,{headers:outhdr,returnheaders:inheaders});
+}
+
 module.version = "1.0.1";
 module.exports = http;
