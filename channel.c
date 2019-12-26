@@ -403,6 +403,7 @@ int clist_open (struct clist *c) {
     }
     if (i >= c->alloc) {
         c->list = realloc (c->list, i+1 * sizeof (struct channel*));
+        c->alloc++;
     }
     c->list[i] = channel_create();
     return i;

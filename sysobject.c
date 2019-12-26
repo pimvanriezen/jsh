@@ -910,7 +910,7 @@ duk_ret_t sys_go (duk_context *ctx) {
     int cid = duk_get_int (ctx, 0);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        fprintf (stderr, "%% Channel not found\n");
+        fprintf (stderr, "%% Channel %i not found\n", cid);
         duk_push_boolean (ctx, 0);
         return 1;
     }
