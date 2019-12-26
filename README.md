@@ -1,7 +1,7 @@
 # JSH - A cleaner environment for your dirty jobs
 
 A lot of work on a typical Unix system still gets performed by the system
-shell interpreter. Look under the hood of your typical system, and you will
+shell interpreter. Look under the hood of your average system, and you will
 find tons of bash-based glue that manages to hold a system together, but
 generally while relying on a metric ton of dirty hacks.
 
@@ -17,11 +17,11 @@ With all its warts, javascript as a base language actually matches up pretty
 well with this problem domain. It, too, is a messy language when it comes
 to types. But it can eat text data for lunch.
 
-## But hold on, you want to boot into nodejs?
+## But hold on, you want to boot into NodeJS or something?
 
 NodeJS is a nice approach for running an asynchronous application server,
 but it's actually a pretty terrible environment for exactly the problem
-domain of "do this with that, then that with that" kind of linear batch
+domain of the do-this-with-that-then-that kind of linear batch
 jobs you typically want to solve in the shell environment. So the
 answer to that is no.
 
