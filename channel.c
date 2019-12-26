@@ -3,17 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
-#ifdef DEBUG
-  #define dprintf printf
-#else
-  #define dprintf if(0) printf
-#endif
+#include <fcntl.h>
 
 struct channel *channel_create (void) {
     struct channel *res;
     res = malloc (sizeof (struct channelpipe));
     res->alloc = 1;
+    res->firstmsg = NULL;
     res->pipes = malloc (sizeof (struct channelpipe));
     res->pipes[0].st = PIPE_CLOSED;
     res->pipes[0].pid = 0;
@@ -30,7 +26,6 @@ struct channel *channel_create (void) {
 void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     unsigned int crsr = 0;
     unsigned int newalloc = 0;
-    dprintf ("add_pipe pid=%d fdread=%d fdwrite=%d\n", pid, fdread, fdwrite);
     while (crsr < c->alloc) {
         if (c->pipes[crsr].st == PIPE_CLOSED) {
             c->pipes[crsr].st = PIPE_BUSY;
@@ -78,7 +73,6 @@ void channel_fork_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
             close (c->pipes[i].fdwrite);
         }
     }
-    dprintf ("fork_pipe pid=%d fdread=%d fdwrite=%d\n", pid, fdread, fdwrite);
     free (c->pipes);
     c->pipes = malloc (sizeof (struct channelpipe));
     c->pipes[0].st = PIPE_LISTENING;
@@ -111,13 +105,14 @@ int channel_send (struct channel *c, const char *msg) {
     size_t msgsz = strlen (msg)+1; /* include nul-byte */
     size_t szsz = sizeof (size_t);
     size_t wsz;
-    dprintf ("send: <%s>\n", msg);
     while (1) {
         for (i=0; i<c->alloc; ++i) {
             if (c->pipes[i].st != PIPE_CLOSED) {
                 found++;
                 if (c->pipes[i].st == PIPE_LISTENING) {
-                    dprintf ("writing to %i\n", c->pipes[i].fdwrite);
+                    if (! (c->pipes[i].flags & PIPEFLAG_ISPARENT)) {
+                        c->pipes[i].st = PIPE_BUSY;
+                    }
                     wsz = write (c->pipes[i].fdwrite, PIPEMSG_DATA, 1);
                     if (wsz) wsz = write (c->pipes[i].fdwrite, &msgsz, szsz);
                     if (wsz) wsz = write (c->pipes[i].fdwrite, msg, msgsz);
@@ -188,14 +183,12 @@ struct channelmsg *channel_receive (struct channel *c) {
     size_t wsz = 0;
     
     if (! c->firstmsg) {
-    
-        while (! c->firstmsg) {
-            if (c->pipes[0].flags & PIPEFLAG_ISPARENT) {
-                if (c->pipes[0].st != PIPE_CLOSED) {
-                    wsz = write (c->pipes[0].fdwrite, PIPEMSG_FREE, 1);
-                    dprintf ("Sending PIPEMSG_FREE: %zu\n", wsz);
-                }
+        if (c->pipes[0].flags & PIPEFLAG_ISPARENT) {
+            if (c->pipes[0].st != PIPE_CLOSED) {
+                wsz = write (c->pipes[0].fdwrite, PIPEMSG_FREE, 1);
             }
+        }
+        while (! c->firstmsg) {
             if (! channel_handle (c, false)) {
                 return NULL;
             }
@@ -211,7 +204,6 @@ struct channelmsg *channel_receive (struct channel *c) {
     
     if (c->pipes[0].flags & PIPEFLAG_ISPARENT) {
         if (c->pipes[0].st != PIPE_CLOSED) {
-                dprintf ("Sending PIPEMSG_BUSY\n");
             write (c->pipes[0].fdwrite, PIPEMSG_BUSY, 1);
         }
     }
@@ -259,30 +251,28 @@ int channel_handle (struct channel *c, bool nonblock) {
         if (c->pipes[i].st != PIPE_CLOSED) {
             found++;
             FD_SET (c->pipes[i].fdread, &fds);
-            dprintf ("Add %i to select\n", c->pipes[i].fdread);
             if (c->pipes[i].fdread > max) max = c->pipes[i].fdread;
         }
     }
     if (! found) return 0;
     
-    tv.tv_sec = nonblock?0:10;
+    tv.tv_sec = 0;
     tv.tv_usec = 0;
     
-    if (select (max+1, &fds, NULL, NULL, &tv) > 0) {
-        dprintf ("Select had things\n");
+    if (select (max+1, &fds, NULL, NULL, nonblock?&tv:0) > 0) {
         for (i=0; i<c->alloc; ++i) {
             if (c->pipes[i].st == PIPE_CLOSED) continue;
             if (FD_ISSET (c->pipes[i].fdread, &fds)) {
-                dprintf ("Activity on fd %i\n", c->pipes[i].fdread);
                 char msgtype = 0;
                 sz = read (c->pipes[i].fdread, &msgtype, 1);
                 if (sz == 0) msgtype = MSGID_EXIT;
-                dprintf ("MSGTYPE: %i\n", msgtype);
                 switch (msgtype) {
                     case MSGID_BUSY:
+                        printf ("%d BUSY\n", c->pipes[i].pid);
                         c->pipes[i].st = PIPE_BUSY; break;
                     
                     case MSGID_FREE:
+                        printf ("%d FREE\n", c->pipes[i].pid);
                         c->pipes[i].st = PIPE_LISTENING; break;
                         
                     case MSGID_EXIT:
@@ -296,15 +286,15 @@ int channel_handle (struct channel *c, bool nonblock) {
                         if (sz) {
                             msg = msg_create (msgsz);
                             msg->from = c->pipes[i].pid;
-                            sz = read (c->pipes[i].fdread, &msg->data, msgsz);
+                            sz = read (c->pipes[i].fdread, msg->data, msgsz);
                         }
-                        if ((!msgsz) || sz) {
+                        if (sz != 0) {
                             msg->nextmsg = c->firstmsg;
                             c->firstmsg = msg;
                             msg = NULL;
                         }
                         if (msg) {
-                            free (msg);
+                            msg_free (msg);
                             msg = NULL;
                         }
                 }
@@ -330,49 +320,81 @@ void channel_exit (struct channel *c) {
     }
 }
 
-void worker (struct channel *c) {
-    struct channelmsg *m;
-    char *outstr;
-    
-    m = channel_receive (c);
-    if (! m) return;
-    outstr = malloc (strlen (m->data) + 16);
-    sprintf (outstr, "Hello, %s", m->data);
-    channel_send (c, outstr);
-}
-
-int main (int argc, const char *argv[]) {
+pid_t channel_fork (struct channel *c) {
     int togopipe[2];
     int fromgopipe[2];
     pid_t parentpid = getpid();
     pid_t pid;
+    int i;
     
-    struct channel *c = channel_create();
-    struct channelmsg *msg;
     pipe (togopipe);
     pipe (fromgopipe);
     
     switch ((pid = fork())) {
         case 0:
-            close (togopipe[1]);
-            close (fromgopipe[0]);
+            for (i=0; i<1023; ++i) {
+                if ((i!=togopipe[0])&&(i!=fromgopipe[1])) close (i);
+                open ("/dev/null",O_RDONLY);
+                open ("/dev/null",O_WRONLY);
+                open ("/dev/null",O_WRONLY);
+            }
             channel_fork_pipe (c, parentpid, togopipe[0], fromgopipe[1]);
-            worker (c);
-            exit (0);
+            return 0;
             
         case -1:
-            exit (1);
+            return -1;
+            
+        default:
+            close (togopipe[0]);
+            close (fromgopipe[1]);
+            channel_add_pipe (c, pid, fromgopipe[0], togopipe[1]);
+            return pid;
     }
-    close (togopipe[0]);
-    close (fromgopipe[1]);
-    channel_add_pipe (c, pid, togopipe[1], fromgopipe[0]);
-    
+}
+
+void worker (struct channel *c) {
+    struct channelmsg *m;
+    char *outstr;
+
+    while (true) {
+        m = channel_receive (c);
+        sleep (1);
+        if (! m) break;
+        outstr = malloc (strlen (m->data) + 16);
+        sprintf (outstr, "Hello, %s", m->data);
+        channel_send (c, outstr);
+        free (outstr);
+        msg_free (m);
+    }
+}
+
+int main (int argc, const char *argv[]) {
+    pid_t pid;
+    struct channel *c = channel_create();
+    struct channelmsg *msg;
+
+    pid = channel_fork (c);
+    if (pid == 0) {
+        worker (c);
+        exit (0);
+    }
+
+    pid = channel_fork (c);
+    if (pid == 0) {
+        worker (c);
+        exit (0);
+    }
+
     if (! channel_send (c, "Pim")) {
         fprintf (stderr, "Error sending\n");
         return 1;
     }
     
-    dprintf ("receiving\n");
+    if (! channel_send (c, "Steve")) {
+        fprintf (stderr, "Error sending\n");
+        return 1;
+    }
+    
     msg = channel_receive (c);
     if (! msg) {
         fprintf (stderr, "Error receiving\n");
@@ -381,6 +403,16 @@ int main (int argc, const char *argv[]) {
     
     printf ("%d %s\n", msg->from, msg->data);
     msg_free (msg);
+
+    msg = channel_receive (c);
+    if (! msg) {
+        fprintf (stderr, "Error receiving\n");
+        return 1;
+    }
+    
+    printf ("%d %s\n", msg->from, msg->data);
+    msg_free (msg);
+
     channel_exit(c);
     while (channel_handle (c, false));
     return 0;

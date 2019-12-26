@@ -13,12 +13,12 @@ enum pipestatus {
 };
 
 #define PIPEMSG_BUSY "B"
-#define PIPEMSG_FREE "\n"
+#define PIPEMSG_FREE "F"
 #define PIPEMSG_DATA "D"
 #define PIPEMSG_EXIT "X"
 
 #define MSGID_BUSY 'B'
-#define MSGID_FREE '\n'
+#define MSGID_FREE 'F'
 #define MSGID_DATA 'D'
 #define MSGID_EXIT 'X'
 
