@@ -7,7 +7,7 @@
 
 struct channel *channel_create (void) {
     struct channel *res;
-    res = malloc (sizeof (struct channelpipe));
+    res = malloc (2 * sizeof (struct channelpipe));
     res->alloc = 1;
     res->firstmsg = NULL;
     res->pipes = malloc (sizeof (struct channelpipe));
@@ -42,7 +42,7 @@ void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     if (c->alloc < 256) newalloc = c->alloc * 2;
     else newalloc = c->alloc + 128;
     
-    c->pipes = realloc (c->pipes, newalloc * sizeof (struct channelpipe));
+    c->pipes = realloc (c->pipes, (newalloc+1) * sizeof (struct channelpipe));
     if (! c->pipes) {
         exit (666);
     }
@@ -74,7 +74,7 @@ void channel_fork_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
         }
     }
     free (c->pipes);
-    c->pipes = malloc (sizeof (struct channelpipe));
+    c->pipes = malloc (2*sizeof (struct channelpipe));
     c->pipes[0].st = PIPE_LISTENING;
     c->pipes[0].flags = PIPEFLAG_ISPARENT;
     c->pipes[0].fdread = fdread;
