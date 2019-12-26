@@ -126,7 +126,7 @@ var setapi = function(arg1,arg2) {
             if (def.arg) {
                 if (args[def.arg] == undefined) {
                     if (def.def) args[def.arg] = def.def;
-                    else {
+                    else if (! def.optional) {
                         printerr ("Missing argument: "+def.arg);
                         return null;
                     }
@@ -175,7 +175,7 @@ var setapi = function(arg1,arg2) {
                 res = res.substr (0,res.length-1);
             }
         }
-        if (processf) res = processf (res);
+        if (processf) res = processf (res, args);
         return res;
     }
     obj.unixcmd = function() {

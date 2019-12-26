@@ -3,6 +3,7 @@ var strescape = function(str) {
     for (var i=0; i<str.length; ++i) {
         var c = str[i];
         if (c == '\n') res += "\\n";
+        else if (c == '\r') res += "\\r";
         else if (c.charCodeAt(0) < 32) {
             res += "\\" + c.charCodeAt(0).toString(16) + "x";
         }
