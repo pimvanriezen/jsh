@@ -161,7 +161,6 @@ var setapi = function(arg1,arg2) {
             var cmd = argv.splice (0,1);
             if (cmd) cmd = cmd[0];
             if (cmd) cmd = which(cmd);
-            dump ({cmd:cmd,argv:argv});
             if (useconsole) {
                 res = sys.runconsole (cmd, argv);
                 if (res === true) res = undefined;
