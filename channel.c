@@ -47,10 +47,11 @@ void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
         exit (666);
     }
 
-    for (crsr = c->alloc + 1; crsr<newalloc; ++crsr) {
+    for (crsr = c->alloc + 1; crsr<=newalloc; ++crsr) {
         c->pipes[crsr].st = PIPE_CLOSED;
         c->pipes[crsr].fdread = 0;
         c->pipes[crsr].fdwrite = 0;
+        c->pipes[crsr].flags = 0;
     }
     
     c->pipes[c->alloc].st = PIPE_BUSY;
