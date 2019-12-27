@@ -1,3 +1,6 @@
+// ============================================================================
+// sys.cd
+// ============================================================================
 sys.cd.help = function() {
     setapi.helptext ({
         name:"sys.cd",
@@ -10,6 +13,9 @@ sys.cd.help = function() {
 
 setapi (sys.cd, "sys.cd");
 
+// ============================================================================
+// sys.cwd
+// ============================================================================
 sys.cwd.help = function() {
     setapi.helptext ({
         name:"sys.cwd",
@@ -19,6 +25,9 @@ sys.cwd.help = function() {
 
 setapi (sys.cwd, "sys.cwd");
 
+// ============================================================================
+// sys.dir
+// ============================================================================
 sys.dir.help = function() {
     setapi.helptext ({
         name:"sys.dir",
@@ -37,6 +46,9 @@ sys.dir.help = function() {
 
 setapi (sys.dir, "sys.dir");
 
+// ============================================================================
+// sys.eval
+// ============================================================================
 sys.eval.help = function() {
     setapi.helptext ({
         name:"sys.eval",
@@ -56,6 +68,9 @@ sys.eval.help = function() {
 
 setapi (sys.eval, "sys.eval");
 
+// ============================================================================
+// sys.parse
+// ============================================================================
 sys.parse.help = function() {
     setapi.helptext ({
         name:"sys.parse",
@@ -74,6 +89,9 @@ sys.parse.help = function() {
 
 setapi (sys.parse, "sys.parse");
 
+// ============================================================================
+// sys.glob
+// ============================================================================
 sys.glob.help = function() {
     setapi.helptext ({
         name:"sys.glob",
@@ -91,6 +109,9 @@ sys.glob.help = function() {
 
 setapi (sys.glob, "sys.glob");
 
+// ============================================================================
+// sys.getenv
+// ============================================================================
 sys.getenv.help = function() {
     setapi.helptext ({
         name:"sys.getenv",
@@ -106,6 +127,9 @@ sys.getenv.help = function() {
 
 setapi (sys.getenv, "sys.getenv");
 
+// ============================================================================
+// sys.setenv
+// ============================================================================
 sys.setenv.help = function() {
     setapi.helptext ({
         name:"sys.setenv",
@@ -122,6 +146,9 @@ sys.setenv.help = function() {
 
 setapi (sys.setenv, "sys.setenv");
 
+// ============================================================================
+// sys.print
+// ============================================================================
 sys.print.help = function() {
     setapi.helptext ({
         name:"sys.print",
@@ -136,6 +163,9 @@ sys.print.help = function() {
 
 setapi (sys.print, "sys.print");
 
+// ============================================================================
+// sys.read
+// ============================================================================
 sys.read.help = function() {
     setapi.helptext ({
         name:"sys.read",
@@ -156,6 +186,9 @@ sys.read.help = function() {
 
 setapi (sys.read, "sys.read");
 
+// ============================================================================
+// sys.write
+// ============================================================================
 sys.write.help = function() {
     setapi.helptext ({
         name:"sys.write",
@@ -171,6 +204,9 @@ sys.write.help = function() {
 
 setapi (sys.write, "sys.write");
 
+// ============================================================================
+// sys.run
+// ============================================================================
 sys.run.help = function() {
     setapi.helptext ({
         name:"sys.run",
@@ -191,6 +227,9 @@ sys.run.help = function() {
 
 setapi (sys.run, "sys.run");
 
+// ============================================================================
+// sys.runconsole
+// ============================================================================
 sys.runconsole.help = function() {
     setapi.helptext ({
         name:"sys.runconsole",
@@ -209,6 +248,9 @@ sys.runconsole.help = function() {
 
 setapi (sys.runconsole, "sys.runconsole");
 
+// ============================================================================
+// sys.mkdir
+// ============================================================================
 sys.mkdir.help = function() {
     setapi.helptext ({
         name:"sys.mkdir",
@@ -224,6 +266,9 @@ sys.mkdir.help = function() {
 
 setapi (sys.mkdir, "sys.mkdir");
 
+// ============================================================================
+// sys.chmod
+// ============================================================================
 sys.chmod.help = function() {
     setapi.helptext ({
         name:"sys.chmod",
@@ -239,6 +284,9 @@ sys.chmod.help = function() {
 
 setapi (sys.chmod, "sys.chmod");
 
+// ============================================================================
+// sys.chown
+// ============================================================================
 sys.chown.help = function() {
     setapi.helptext ({
         name:"sys.chown",
@@ -255,6 +303,9 @@ sys.chown.help = function() {
 
 setapi (sys.chown, "sys.chown");
 
+// ============================================================================
+// sys.getpwnam
+// ============================================================================
 sys.getpwnam.help = function() {
     setapi.helptext ({
         name:"sys.getpwnam",
@@ -269,6 +320,9 @@ sys.getpwnam.help = function() {
 
 setapi (sys.getpwnam, "sys.getpwnam");
 
+// ============================================================================
+// sys.getpwuid
+// ============================================================================
 sys.getpwuid.help = function() {
     setapi.helptext ({
         name:"sys.getpwuid",
@@ -283,6 +337,9 @@ sys.getpwuid.help = function() {
 
 setapi (sys.getpwuid, "sys.getpwuid");
 
+// ============================================================================
+// sys.hostname
+// ============================================================================
 sys.hostname.help = function() {
     setapi.helptext ({
         name:"sys.hostname",
@@ -297,6 +354,9 @@ sys.hostname.help = function() {
 
 setapi (sys.hostname, "sys.hostname");
 
+// ============================================================================
+// sys.winsize
+// ============================================================================
 sys.winsize.help = function() {
     setapi.helptext ({
         name:"sys.winsize",
@@ -308,6 +368,9 @@ sys.winsize.help = function() {
 
 setapi (sys.winsize, "sys.winsize");
 
+// ============================================================================
+// sys.stat
+// ============================================================================
 sys.stat.help = function() {
     setapi.helptext ({
         name:"sys.stat",
@@ -322,6 +385,9 @@ sys.stat.help = function() {
 
 setapi (sys.stat, "sys.stat");
 
+// ============================================================================
+// sys.getuid
+// ============================================================================
 sys.getuid.help = function() {
     setapi.helptext ({
         name:"sys.getuid",
@@ -333,6 +399,9 @@ sys.getuid.help = function() {
 
 setapi (sys.getuid, "sys.getuid");
 
+// ============================================================================
+// sys.getgid
+// ============================================================================
 sys.getgid.help = function() {
     setapi.helptext ({
         name:"sys.getgid",
@@ -344,6 +413,9 @@ sys.getgid.help = function() {
 
 setapi (sys.getgid, "sys.getgid");
 
+// ============================================================================
+// sys.getpid
+// ============================================================================
 sys.getpid.help = function() {
     setapi.helptext ({
         name:"sys.getpid",
@@ -355,6 +427,9 @@ sys.getpid.help = function() {
 
 setapi (sys.getuid, "sys.getpid");
 
+// ============================================================================
+// sys.uname
+// ============================================================================
 sys.uname.help = function() {
     setapi.helptext ({
         name:"sys.uname",
@@ -367,6 +442,9 @@ sys.uname.help = function() {
 
 setapi (sys.uname, "sys.uname");
 
+// ============================================================================
+// sys.channel.open
+// ============================================================================
 sys.channel.open.help = function() {
     setapi.helptext ({
         name:"sys.channel.open",
@@ -379,6 +457,9 @@ sys.channel.open.help = function() {
 
 setapi (sys.channel.open, "sys.channel.open");
 
+// ============================================================================
+// sys.channel.send
+// ============================================================================
 sys.channel.send.help = function() {
     setapi.helptext ({
         name:"sys.channel.send",
@@ -395,6 +476,9 @@ sys.channel.send.help = function() {
 
 setapi (sys.channel.send, "sys.channel.send");
 
+// ============================================================================
+// sys.channel.recv
+// ============================================================================
 sys.channel.recv.help = function() {
     setapi.helptext ({
         name:"sys.channel.recv",
@@ -411,6 +495,9 @@ sys.channel.recv.help = function() {
 
 setapi (sys.channel.recv, "sys.channel.recv");
 
+// ============================================================================
+// sys.channel.exit
+// ============================================================================
 sys.channel.exit.help = function() {
     setapi.helptext ({
         name:"sys.channel.exit",
@@ -427,6 +514,9 @@ sys.channel.exit.help = function() {
 
 setapi (sys.channel.exit, "sys.channel.exit");
 
+// ============================================================================
+// sys.channel.close
+// ============================================================================
 sys.channel.close.help = function() {
     setapi.helptext ({
         name:"sys.channel.close",
@@ -443,6 +533,9 @@ sys.channel.close.help = function() {
 
 setapi (sys.channel.close, "sys.channel.close");
 
+// ============================================================================
+// sys.channel.senderror
+// ============================================================================
 sys.channel.senderror.help = function() {
     setapi.helptext ({
         name:"sys.channel.senderror",
@@ -460,6 +553,9 @@ sys.channel.senderror.help = function() {
 
 setapi (sys.channel.senderror, "sys.channel.senderror");
 
+// ============================================================================
+// sys.channel.error
+// ============================================================================
 sys.channel.error.help = function() {
     setapi.helptext ({
         name:"sys.channel.error",
@@ -476,6 +572,9 @@ sys.channel.error.help = function() {
 
 setapi (sys.channel.error, "sys.channel.error");
 
+// ============================================================================
+// sys.go
+// ============================================================================
 sys.go.help = function() {
     setapi.helptext ({
         name:"sys.go",
