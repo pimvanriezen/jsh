@@ -48,6 +48,33 @@ Object.defineProperty (Array.prototype, 'sum', {
     }
 });
 
+Object.defineProperty (Array.prototype, 'cut', {
+    value: function(field,sep) {
+        var res = [];
+        for (var i=0; i<this.length; ++i) {
+            res.push (""+this[i]).cut (field,sep);
+        }
+        return res;
+    }
+});
+
+Object.defineProperty (Array.prototype, 'grep', {
+    value: function(re,srch,repl) {
+        if (typeof (re) == "string") re = new RegExp (re);
+        if (typeof (srch) == "string") srch = new RegExp (srch, 'g');
+        var res = [];
+        for (var i=0; i<this.length; ++i) {
+            var ln = this[i];
+            if (typeof(ln) != "string") ln = ""+ln;
+            if (ln.match (re)) {
+                if (! srch) this.push (ln);
+                else res.push (ln (srch, repl?repl:""));
+            }
+        }
+        return res;
+    }
+});
+
 String.prototype.summarize = function(sz) {
     if (this.length <= sz) return this.toString();
     if (sz < 11) return this.toString();
@@ -61,17 +88,7 @@ String.prototype.summarize = function(sz) {
 }
 
 String.prototype.grep = function(re,srch,repl) {
-    if (typeof (re) == "string") re = new RegExp (re);
-    if (typeof (srch) == "string") srch = new RegExp (srch, 'g');
-    var res = [];
-    var lines = this.split('\n');
-    for (var i in lines) {
-        if (lines[i].match (re)) {
-            if (! srch) res.push (lines[i]);
-            else res.push (lines[i].replace (srch, repl?repl:""));
-        }
-    }
-    return res;
+    return this.split('\n').grep (re,srch,repl);
 }
 
 String.prototype.wrap = function (cols) {
