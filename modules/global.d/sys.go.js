@@ -33,6 +33,9 @@ channel.help = function() {
                          the channel.
         c.exit()         Tells any other parties on the channel that this
                          process will stop using it.
+        c.close()        Completely closes the channel. If there were still
+                         active coroutines spawned from it, they will be
+                         killed.
     >>>, 2).indent(4).boldColumn(0).format());
 }
 
