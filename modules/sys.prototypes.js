@@ -40,6 +40,14 @@ Object.defineProperty (Array.prototype, 'remove', {
     }
 });
 
+Object.defineProperty (Array.prototype, 'sum', {
+    value: function() {
+        var res = 0;
+        for (var i=0; i<this.length; ++i) res += parseFloat(this[i]);
+        return res;
+    }
+});
+
 String.prototype.summarize = function(sz) {
     if (this.length <= sz) return this.toString();
     if (sz < 11) return this.toString();
