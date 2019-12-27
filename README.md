@@ -151,7 +151,7 @@ var myNumberSummer = function (c) {
         if (! msg) return;
         var sum = 0;
         for (var i in msg) sum += msg[i];
-        if (! c.send (sum)) return;
+        c.send (sum);
     }
 }
 

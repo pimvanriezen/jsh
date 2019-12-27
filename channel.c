@@ -11,6 +11,7 @@
 struct channel *channel_create (void) {
     struct channel *res;
     res = malloc (2 * sizeof (struct channelpipe));
+    res->error = NULL;
     res->alloc = 1;
     res->firstmsg = NULL;
     res->pipes = malloc (sizeof (struct channelpipe));
@@ -111,6 +112,7 @@ int channel_send (struct channel *c, const char *msg) {
     size_t szsz = sizeof (size_t);
     size_t wsz;
     while (1) {
+        found = 0;
         for (i=0; i<c->alloc; ++i) {
             if (c->pipes[i].st != PIPE_CLOSED) {
                 found++;
@@ -137,6 +139,35 @@ int channel_send (struct channel *c, const char *msg) {
         if (! found) return 0;
         channel_handle (c, false);
     }
+}
+
+void channel_senderror (struct channel *c, const char *msg) {
+    size_t msgsz = strlen (msg)+1; /* include nul-byte */
+    size_t szsz = sizeof (size_t);
+    size_t wsz;
+    
+    if (c->pipes[0].st == PIPE_CLOSED) return;
+    if ((c->pipes[0].flags & PIPEFLAG_ISPARENT) == 0) return;
+    wsz = write (c->pipes[0].fdwrite, PIPEMSG_ERROR, 1);
+    if (wsz) wsz = write (c->pipes[0].fdwrite, &msgsz, szsz);
+    if (wsz) wsz = write (c->pipes[0].fdwrite, msg, msgsz);
+    if (wsz == 0) {
+        c->pipes[0].st = PIPE_CLOSED;
+        close (c->pipes[0].fdread);
+        close (c->pipes[0].fdwrite);
+    }
+}
+
+bool channel_hasdata (struct channel *c) {
+    channel_handle (c, true);
+    return (c->firstmsg ? 1 : 0);
+}
+
+bool channel_empty (struct channel *c) {
+    for (int i=0; i<c->alloc; ++i) {
+        if (c->pipes[i].st != PIPE_CLOSED) return 1;
+    }
+    return 0;
 }
 
 /* This one is a bit tricky. Channel pipes can be busy, and we have to hand-
@@ -253,6 +284,7 @@ int channel_handle (struct channel *c, bool nonblock) {
     int i=0;
     int max=0;
     struct channelmsg *msg = NULL;
+    char *errstr = NULL;
     
     FD_ZERO (&fds);
     for (i=0; i<c->alloc; ++i) {
@@ -304,6 +336,17 @@ int channel_handle (struct channel *c, bool nonblock) {
                             msg_free (msg);
                             msg = NULL;
                         }
+                        break;
+                        
+                    case MSGID_ERROR:
+                        sz = read (c->pipes[i].fdread, &msgsz, szsz);
+                        if (sz) {
+                            errstr = malloc (msgsz);
+                            sz = read (c->pipes[i].fdread, errstr, msgsz);
+                            if (sz) channel_seterror (c, errstr);
+                            else free ((void*) errstr);
+                        }
+                        break;
                 }
             }
         }
@@ -381,7 +424,14 @@ void channel_destroy (struct channel *c) {
         msg = nextmsg;
     }
     
+    if (c->error) free ((void*) c->error);
+    
     free (c);
+}
+
+void channel_seterror (struct channel *c, const char *err) {
+    if (c->error) free ((void *) c->error);
+    c->error = err;
 }
 
 struct clist *clist_create (void) {

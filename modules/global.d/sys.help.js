@@ -367,9 +367,9 @@ sys.uname.help = function() {
 
 setapi (sys.uname, "sys.uname");
 
-sys.openchannel.help = function() {
+sys.channel.open.help = function() {
     setapi.helptext ({
-        name:"sys.openchannel",
+        name:"sys.channel.open",
         text:<<<
             Opens a new channel object. Returns a number representing
             the channel id.
@@ -377,11 +377,11 @@ sys.openchannel.help = function() {
     })
 }
 
-setapi (sys.openchannel, "sys.openchannel");
+setapi (sys.channel.open, "sys.channel.open");
 
-sys.sendchannel.help = function() {
+sys.channel.send.help = function() {
     setapi.helptext ({
-        name:"sys.sendchannel",
+        name:"sys.channel.send",
         args:[
             {name:"id",text:"The channel id"},
             {name:"data",text:"The data to send (string)"}
@@ -393,11 +393,11 @@ sys.sendchannel.help = function() {
     });
 }
 
-setapi (sys.sendchannel, "sys.sendchannel");
+setapi (sys.channel.send, "sys.channel.send");
 
-sys.recvchannel.help = function() {
+sys.channel.recv.help = function() {
     setapi.helptext ({
-        name:"sys.recvchannel",
+        name:"sys.channel.recv",
         args:[
             {name:"id",text:"The channel id"}
         ],
@@ -409,11 +409,11 @@ sys.recvchannel.help = function() {
     });
 }
 
-setapi (sys.recvchannel, "sys.recvchannel");
+setapi (sys.channel.recv, "sys.channel.recv");
 
-sys.exitchannel.help = function() {
+sys.channel.exit.help = function() {
     setapi.helptext ({
-        name:"sys.exitchannel",
+        name:"sys.channel.exit",
         args:[
             {name:"id",text:"The channel id"}
         ],
@@ -425,11 +425,11 @@ sys.exitchannel.help = function() {
     });
 }
 
-setapi (sys.exitchannel, "sys.exitchannel");
+setapi (sys.channel.exit, "sys.channel.exit");
 
-sys.closechannel.help = function() {
+sys.channel.close.help = function() {
     setapi.helptext ({
-        name:"sys.closechannel",
+        name:"sys.channel.close",
         args:[
             {name:"id",text:"The channel id"}
         ],
@@ -441,7 +441,7 @@ sys.closechannel.help = function() {
     });
 }
 
-setapi (sys.closechannel, "sys.closechannel");
+setapi (sys.channel.close, "sys.channel.close");
 
 sys.go.help = function() {
     setapi.helptext ({

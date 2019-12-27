@@ -10,7 +10,7 @@ OBJS_DUKTAPE = \
 OBJS_CLI = sysobject.o cli.o quoting.o textbuffer.o channel.o
 
 CC = gcc
-CCOPTS = -std=c99 -Wall
+CCOPTS = -g -std=c99 -Wall
 CCOPTS += -D_GNU_SOURCE -I./duktape   # duktape.h and duk_config.h must be in include path
 CCLIBS = -lm
 

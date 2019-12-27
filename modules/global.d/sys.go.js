@@ -1,8 +1,8 @@
 channel = function() {
-    this.ch = sys.openchannel();
+    this.ch = sys.channel.open();
     Duktape.fin (this, function (x) {
         if (this.ch !== null) {
-            sys.closechannel (this.ch);
+            sys.channel.close (this.ch);
             this.ch = null;
         }
     });
@@ -35,24 +35,39 @@ channel.help = function() {
 setapi (channel, "channel");
 
 channel.prototype.send = function (data) {
-    return sys.sendchannel (this.ch, JSON.stringify (data));
+    if (sys.channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.channel.error (this.ch));
+    }
+    return sys.channel.send (this.ch, JSON.stringify (data));
+}
+
+channel.prototype.senderror = function (data) {
+    sys.channel.senderror (this.ch, ""+data);
 }
 
 channel.prototype.recv = function() {
-    var res = sys.recvchannel (this.ch);
+    if (sys.channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.channel.error (this.ch));
+    }
+    var res = sys.channel.recv (this.ch);
     if (res === false) return null;
     else return JSON.parse (res);
 }
 
 channel.prototype.exit = function() {
-    sys.exitchannel (this.ch);
+    sys.channel.exit (this.ch);
 }
 
 go = function(chan, func) {
     return sys.go (chan.ch, function() {
-        var res = func();
-        if (res !== undefined) {
-            chan.send (res);
+        try {
+            var res = func();
+            if (res !== undefined) {
+                chan.send (res);
+            }
+        }
+        catch (e) {
+            chan.senderror (e);
         }
     });
 }
