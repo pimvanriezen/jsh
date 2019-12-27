@@ -4,7 +4,7 @@
 
 var $apidb = {};
 var $textformat = function(x,width) {
-    if (! width) width = sys.winsize();
+    if (! width) width = sys.winsize()-1;
     return texttable.colorize (x.rewrap(width));
 }
 
