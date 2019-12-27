@@ -4,8 +4,8 @@
 defaults({
     JSH_MODULE_PATH:[
         env.HOME+"/.jsh/modules",
-        "/usr/local/etc/jsh/modules",
-        "/etc/jsh/modules"
+        "/usr/local/lib/jsh/modules",
+        "/usr/lib/jsh/modules"
     ],
     PATH:["/sbin","/usr/sbin","/bin","/usr/sbin"],
     EDITOR:"vi"

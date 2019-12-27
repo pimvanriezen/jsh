@@ -6,6 +6,14 @@ var basedir="/usr/local";
 if (argv.length>1) {
     basedir = argv[1];
 }
+else if (env.PREFIX) basedir = env.PREFIX;
+if (basedir == "/") {
+    etcdir = "/etc";
+    basedir = "/usr";
+}
+else {
+    etcdir = basedir + "/etc";
+}
 
 // ============================================================================
 // Some functions for copying files, and keeping track of what we did.
@@ -84,10 +92,10 @@ var f = function(n) { return basedir + '/' + n; }
 // ============================================================================
 banner ("Creating filesystem structure");
 var dirs = [
-    "etc/jsh",
-    "etc/jsh/modules",
-    "etc/jsh/modules/global.d",
-    "etc/jsh/modules/app"
+    "lib/jsh",
+    "lib/jsh/modules",
+    "lib/jsh/modules/global.d",
+    "lib/jsh/modules/app"
 ];
 
 for (var i in dirs) {
@@ -100,7 +108,7 @@ dirmode = false;
 
 // ----------------------------------------------------------------------------
 banner ("Copying base files");
-mycp ("jshrc",f("etc/jsh/jshrc"));
+mycp ("jshrc",f("lib/jsh/jshrc"));
 mycp ("bin/jsh",f("bin/jsh"));
 dumpcopied();
 
@@ -108,7 +116,7 @@ dumpcopied();
 banner("Copying base modules");
 $("modules/*.js").each (function (file) {
     if (! file.isDir) {
-        mycp (file, f("etc/jsh/"+file));
+        mycp (file, f("lib/jsh/"+file));
     }
 });
 dumpcopied();
@@ -116,13 +124,13 @@ dumpcopied();
 // ----------------------------------------------------------------------------
 banner ("Copying global includes");
 $("modules/global.d/*.js").each (function (file) {
-    mycp (file, f("etc/jsh/"+file));
+    mycp (file, f("lib/jsh/"+file));
 });
 dumpcopied();
 
 // ----------------------------------------------------------------------------
 banner("Removing outdated global includes");
-$(f("etc/jsh/modules/global.d/*.js")).each (function (file) {
+$(f("lib/jsh/modules/global.d/*.js")).each (function (file) {
     fnam = file.replace (/.*\//, "");
     if (! exists ("modules/global.d/"+fnam)) {
         rm (file);
@@ -135,6 +143,6 @@ dumpcopied();
 // ----------------------------------------------------------------------------
 banner ("Copying apps");
 $("modules/app/*.app.js").each (function (app) {
-    mycp (app, f("etc/jsh/"+app));
+    mycp (app, f("lib/jsh/"+app));
 });
 dumpcopied();

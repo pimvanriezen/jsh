@@ -197,11 +197,11 @@ defaults.help = function() {
 if (env.JSHRC) {
     sys.parse (env.JSHRC, "bootstrap", "__sysrc__");
 }
-else if (sys.stat ("/etc/jsh/jshrc")) {
-    sys.parse ("/etc/jsh/jshrc", "bootstrap", "__sysrc__");
+else if (sys.stat ("/usr/lib/jsh/jshrc")) {
+    sys.parse ("/usr/lib/jsh/jshrc", "bootstrap", "__sysrc__");
 }
-else if (sys.stat ("/usr/local/etc/jsh/jshrc")) {
-    sys.parse ("/usr/local/etc/jsh/jshrc", "bootstrap", "__sysrc__");
+else if (sys.stat ("/usr/local/lib/jsh/jshrc")) {
+    sys.parse ("/usr/local/lib/jsh/jshrc", "bootstrap", "__sysrc__");
 }
 
 if (sys.stat (env.HOME + "/.jshrc")) {

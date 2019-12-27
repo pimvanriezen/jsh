@@ -1134,10 +1134,10 @@ void sys_init (duk_context *ctx) {
     osglobal = getenv("JSH_GLOBAL");
     if (osglobal) t = textbuffer_load (osglobal);
     else {
-        osglobal = "/etc/jsh/modules/global.js";
+        osglobal = "/usr/lib/jsh/modules/global.js";
         t = textbuffer_load (osglobal);
         if (! t) {
-            osglobal = "/usr/local/etc/jsh/modules/global.js";
+            osglobal = "/usr/local/lib/jsh/modules/global.js";
             t = textbuffer_load (osglobal);
         }
     }
