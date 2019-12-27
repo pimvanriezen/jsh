@@ -51,8 +51,10 @@ Object.defineProperty (Array.prototype, 'sum', {
 Object.defineProperty (Array.prototype, 'cut', {
     value: function(field,sep) {
         var res = [];
-        for (var i=0; i<this.length; ++i) {
-            res.push (""+this[i]).cut (field,sep);
+        for (var i in this) {
+            var ln = this[i];
+            if (typeof(ln)!="string") ln = ""+ln;
+            res.push (ln.cut (field,sep));
         }
         return res;
     }
