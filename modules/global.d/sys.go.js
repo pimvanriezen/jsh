@@ -1,8 +1,8 @@
 Channel = function() {
-    this.ch = sys.Channel.open();
+    this.ch = sys.channel.open();
     Duktape.fin (this, function (x) {
         if (this.ch !== null) {
-            sys.Channel.close (this.ch);
+            sys.channel.close (this.ch);
             this.ch = null;
         }
     });
@@ -43,40 +43,40 @@ setapi (Channel, "Channel");
 
 Channel.prototype.send = function (data) {
     if (this.ch === null) return false;
-    if (sys.Channel.error (this.ch)) {
-        printerr ("Channel error: "+sys.Channel.error (this.ch));
+    if (sys.channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.channel.error (this.ch));
     }
-    return sys.Channel.send (this.ch, JSON.stringify (data));
+    return sys.channel.send (this.ch, JSON.stringify (data));
 }
 
 Channel.prototype.senderror = function (data) {
     if (this.ch === null) return;
-    sys.Channel.senderror (this.ch, ""+data);
+    sys.channel.senderror (this.ch, ""+data);
 }
 
 Channel.prototype.isempty = function (data) {
     if (this.ch === null) return true;
-    return sys.Channel.isempty (this.ch);
+    return sys.channel.isempty (this.ch);
 }
 
 Channel.prototype.recv = function() {
     if (this.ch === null) return null;
-    if (sys.Channel.error (this.ch)) {
-        printerr ("Channel error: "+sys.Channel.error (this.ch));
+    if (sys.channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.channel.error (this.ch));
     }
-    var res = sys.Channel.recv (this.ch);
+    var res = sys.channel.recv (this.ch);
     if (res === false) return null;
     else return JSON.parse (res);
 }
 
 Channel.prototype.exit = function() {
     if (this.ch === null) return;
-    sys.Channel.exit (this.ch);
+    sys.channel.exit (this.ch);
 }
 
 Channel.prototype.close = function() {
     if (this.ch === null) return;
-    sys.Channel.close (this.ch);
+    sys.channel.close (this.ch);
 }
 
 go = function(chan, func) {
