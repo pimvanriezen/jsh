@@ -406,11 +406,14 @@ void channel_destroy (struct channel *c) {
     if (! c) return;
     struct channelmsg *msg, *nextmsg;
     int i;
+    int st;
     
     for (i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) {
             if ((c->pipes[i].flags & PIPEFLAG_ISPARENT) == 0) {
-                kill (c->pipes[i].pid, SIGKILL);
+                if (kill (c->pipes[i].pid, SIGKILL) == 0) {
+                    waitpid (c->pipes[i].pid, &st, 0);
+                }
             }
             close (c->pipes[i].fdread);
             close (c->pipes[i].fdwrite);
@@ -464,6 +467,7 @@ int clist_open (struct clist *c) {
 
 void clist_close (struct clist *c, int idx) {
     if (idx >= c->alloc) return;
+    if (! c->list[idx]) return;
     channel_destroy (c->list[idx]);
     c->list[idx] = NULL;
 }

@@ -39,6 +39,7 @@ channel.help = function() {
 setapi (channel, "channel");
 
 channel.prototype.send = function (data) {
+    if (this.ch === null) return false;
     if (sys.channel.error (this.ch)) {
         printerr ("Channel error: "+sys.channel.error (this.ch));
     }
@@ -46,14 +47,17 @@ channel.prototype.send = function (data) {
 }
 
 channel.prototype.senderror = function (data) {
+    if (this.ch === null) return;
     sys.channel.senderror (this.ch, ""+data);
 }
 
 channel.prototype.isempty = function (data) {
+    if (this.ch === null) return true;
     return sys.channel.isempty (this.ch);
 }
 
 channel.prototype.recv = function() {
+    if (this.ch === null) return null;
     if (sys.channel.error (this.ch)) {
         printerr ("Channel error: "+sys.channel.error (this.ch));
     }
@@ -63,7 +67,13 @@ channel.prototype.recv = function() {
 }
 
 channel.prototype.exit = function() {
+    if (this.ch === null) return;
     sys.channel.exit (this.ch);
+}
+
+channel.prototype.close = function() {
+    if (this.ch === null) return;
+    sys.channel.close (this.ch);
 }
 
 go = function(chan, func) {
