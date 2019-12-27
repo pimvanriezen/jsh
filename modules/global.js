@@ -48,7 +48,7 @@ include.help = function() {
 }
 
 // ============================================================================
-// Printing
+// Printing errors
 // ============================================================================
 printerr = function(e) {
     console.log ("% " + e);
@@ -64,6 +64,9 @@ printerr.help = function() {
     });
 }
 
+// ============================================================================
+// regular print
+// ============================================================================
 print = function(x) {
     if (typeof (x) == "string") return sys.print (x);
     if (typeof (x) == "object") return sys.print (JSON.stringify (x));
@@ -80,6 +83,9 @@ print.help = function() {
     });
 }
 
+// ============================================================================
+// Print with newline
+// ============================================================================
 echo = console.log;
 
 echo.help = function() {
@@ -170,6 +176,9 @@ setenv.help = function() {
     });
 }
 
+// ============================================================================
+// Environment defaults
+// ============================================================================
 defaults = function(def) {
     for (var k in def) {
         if (def[k].length != undefined && typeof(def[k])!="string") {
