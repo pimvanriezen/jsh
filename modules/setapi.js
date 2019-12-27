@@ -8,6 +8,10 @@ var $textformat = function(x,width) {
     return texttable.colorize (x.rewrap(width));
 }
 
+sys.help = function() {
+    help(1);
+}
+
 help = function(helpfor) {
     var helplevel = 0;
     if (typeof (helpfor) != "number") {
@@ -25,11 +29,11 @@ help = function(helpfor) {
     
     var helpstr = <<<
         These are the user level functions. You can
-        call help(1) to show a list of documented system commands.
+        call help(sys) to show a list of documented system functions.
     >>>;
     if (helplevel) helpstr = <<<
-        These are the system level functions. You can call help()
-        to show user level functions instead.
+        These are the system level functions. Many of them will have been
+        wrapped in a more elegant API at the user level.
     >>>;
     
     print ($textformat(<<<
