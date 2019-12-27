@@ -357,8 +357,8 @@ int channel_handle (struct channel *c, bool nonblock) {
 }
 
 void channel_exit (struct channel *c) {
-    /* Send a PIPEMSG_EXIT to all open pipes, then close them and mark
-       them as PIPE_CLOSED */
+    if (! c) return;
+    /* Send a PIPEMSG_EXIT to all open pipes */
     int i=0;
     for (i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) {
@@ -403,6 +403,7 @@ pid_t channel_fork (struct channel *c) {
 }
 
 void channel_destroy (struct channel *c) {
+    if (! c) return;
     struct channelmsg *msg, *nextmsg;
     int i;
     
@@ -430,6 +431,7 @@ void channel_destroy (struct channel *c) {
 }
 
 void channel_seterror (struct channel *c, const char *err) {
+    if (! c) return;
     if (c->error) free ((void *) c->error);
     c->error = err;
 }

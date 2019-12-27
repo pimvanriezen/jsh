@@ -37,8 +37,8 @@ extern void sys_init (duk_context *);
 #define  MEM_LIMIT_HIGH     (2047*1024*1024)  /* ~2 GB */
 #define  LINEBUF_SIZE       65536
 
-static int main_argc = 0;
-static char **main_argv = NULL;
+int main_argc = 0;
+char **main_argv = NULL;
 static int interactive_mode = 0;
 static int allow_bytecode = 0;
 static int no_auto_complete = 0;

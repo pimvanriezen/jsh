@@ -20,6 +20,8 @@
 #include "quoting.h"
 #include "channel.h"
 
+extern char **main_argv;
+
 char *mystrdup (const char *orig) {
     size_t len = strlen (orig);
     char *res = (char *) malloc (len+1);
@@ -931,16 +933,32 @@ duk_ret_t sys_chan_info (duk_context *ctx) {
             pindex = 0;
             for (j=0; j<ch->alloc; ++j) {
                 pipe = &ch->pipes[j];
-                if (pipe->st != PIPE_CLOSED) {
-                    pipe_idx = duk_push_object (ctx);
-                    duk_push_number (ctx, pipe->pid);
-                    duk_put_prop_string (ctx, pipe_idx, "pid");
-                    duk_push_number (ctx, pipe->msgsent);
-                    duk_put_prop_string (ctx, pipe_idx, "msgsent");
-                    duk_push_number (ctx, pipe->msgrecv);
-                    duk_put_prop_string (ctx, pipe_idx, "msgrecv");
-                    duk_put_prop_index (ctx, pipes_idx, pindex++);
+                pipe_idx = duk_push_object (ctx);
+                duk_push_number (ctx, pipe->pid);
+                duk_put_prop_string (ctx, pipe_idx, "pid");
+                switch (pipe->st) {
+                    case PIPE_CLOSED:
+                        duk_push_string (ctx, "closed");
+                        break;
+                    
+                    case PIPE_LISTENING:
+                        duk_push_string (ctx, "listening");
+                        break;
+                    
+                    case PIPE_BUSY:
+                        duk_push_string (ctx, "busy");
+                        break;
+                        
+                    default:
+                        duk_push_string (ctx, "unknown");
+                        break;
                 }
+                duk_put_prop_string (ctx, pipe_idx, "st");       
+                duk_push_number (ctx, pipe->msgsent);
+                duk_put_prop_string (ctx, pipe_idx, "sent");
+                duk_push_number (ctx, pipe->msgrecv);
+                duk_put_prop_string (ctx, pipe_idx, "recv");
+                duk_put_prop_index (ctx, pipes_idx, pindex++);
             }
             duk_put_prop_string (ctx, ch_idx, "pipes");
             duk_put_prop_index (ctx, arr_idx, cindex++);
@@ -1016,6 +1034,7 @@ duk_ret_t sys_go (duk_context *ctx) {
     
     switch (pid = channel_fork (c)) {
         case 0:
+            strcpy (main_argv[0], "jsh-coroutine");
             duk_call (ctx, 0);
             exit (0);
         
