@@ -160,14 +160,14 @@ void channel_senderror (struct channel *c, const char *msg) {
 
 bool channel_hasdata (struct channel *c) {
     channel_handle (c, true);
-    return (c->firstmsg ? 1 : 0);
+    return (c->firstmsg ? true : false);
 }
 
 bool channel_empty (struct channel *c) {
     for (int i=0; i<c->alloc; ++i) {
-        if (c->pipes[i].st != PIPE_CLOSED) return 1;
+        if (c->pipes[i].st != PIPE_CLOSED) return false;
     }
-    return 0;
+    return true;
 }
 
 /* This one is a bit tricky. Channel pipes can be busy, and we have to hand-

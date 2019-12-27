@@ -22,8 +22,15 @@ channel.help = function() {
                          the channel is empty (except for us). Data sent
                          is serialized as JSON, so you shouldn't have
                          to worry about the type.
-        c.recv()         Receives data from the channel, also returns
-                         false if the channel is empty.
+        c.recv()         Receives data from the channel, returns null
+                         if the channel is empty. Received data
+                         is always deserialized back from JSON, and
+                         should end up with the original type.
+        c.senderror(txt) From a coroutine, set channel to an error state.
+        c.error()        Returns error string, or false if the channel
+                         had no errors.
+        c.isempty()      Returns true if there are no listeners left on
+                         the channel.
         c.exit()         Tells any other parties on the channel that this
                          process will stop using it.
     >>>, 2);
@@ -45,6 +52,10 @@ channel.prototype.senderror = function (data) {
     sys.channel.senderror (this.ch, ""+data);
 }
 
+channel.prototype.isempty = function (data) {
+    return sys.channel.isempty (this.ch);
+}
+
 channel.prototype.recv = function() {
     if (sys.channel.error (this.ch)) {
         printerr ("Channel error: "+sys.channel.error (this.ch));
@@ -59,9 +70,13 @@ channel.prototype.exit = function() {
 }
 
 go = function(chan, func) {
+    var argv = [chan];
+    for (var i=2; i<arguments.length; ++i) {
+        argv.push (arguments[i]);
+    }
     return sys.go (chan.ch, function() {
         try {
-            var res = func(chan);
+            var res = func.apply("channel",argv);
             if (res !== undefined) {
                 chan.send (res);
             }
@@ -81,11 +96,10 @@ go.help = function() {
                 with the coroutine.
             >>>},
             {name:"func",text:<<<
-                The function to spawn. This function gets no arguments, but
-                its return value, if it has one, will be sent to the
-                channel. If you want to more explicitly deal with the
-                channel from inside the coroutine, pass it to the
-                function by using a closure for this argument.
+                The function to spawn. The function will always get, as its
+                first argument, a reference to the channel object. Any
+                extra arguments after the function passed to go() will
+                be passed to the function as well (after the channel).
             >>>}
         ],
         text:<<<
@@ -94,6 +108,9 @@ go.help = function() {
             inside the routine has no access to the console, or any of the
             currently open files. It can, however, use the channel to
             communicate with the parent process.
+            
+            See help(channel) for information on how to interact with a
+            channel.
         >>>
     })
 }

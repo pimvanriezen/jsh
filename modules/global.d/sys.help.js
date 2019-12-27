@@ -443,6 +443,39 @@ sys.channel.close.help = function() {
 
 setapi (sys.channel.close, "sys.channel.close");
 
+sys.channel.senderror.help = function() {
+    setapi.helptext ({
+        name:"sys.channel.senderror",
+        args:[
+            {name:"id",text:"The channel id"},
+            {name:"errstr",text:"The error string"}
+        ],
+        text:<<<
+            From the perspective of a co-routine, this sets the
+            channel on the other end into an error state that
+            can be picked up through sys.channel.error().
+        >>>
+    });
+}
+
+setapi (sys.channel.senderror, "sys.channel.senderror");
+
+sys.channel.error.help = function() {
+    setapi.helptext ({
+        name:"sys.channel.error",
+        args:[
+            {name:"id",text:"The channel id"},
+        ],
+        text:<<<
+            If any coroutines pushed an error through, the error
+            string will be returned. If there were no errors on
+            the channel, false is returned.
+        >>>
+    });
+}
+
+setapi (sys.channel.error, "sys.channel.error");
+
 sys.go.help = function() {
     setapi.helptext ({
         name:"sys.go",
