@@ -24,7 +24,7 @@ printf.help = function() {
         >>>
     });
     echo ("");
-    echo (texttable.auto(<<<
+    echo (TextTable.auto(<<<
         %s      String data
         %S      Also string data, but if a width is provided, the string
                 get summarized to that width

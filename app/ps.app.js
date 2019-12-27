@@ -9,7 +9,7 @@ var ps = setapi ([
     >>>},
     {f:function(args) {
         var listing = sys.ps(args);
-        var t = new texttable(8);
+        var t = new TextTable(8);
         for (var i in listing) {
             var p = listing[i];
             p.user = p.user.padEnd(8);

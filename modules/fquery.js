@@ -73,7 +73,7 @@ query.help = function() {
         >>>
     });
     echo ("");
-    echo (texttable.auto (<<<
+    echo (TextTable.auto (<<<
         write(data)     Overwrites matching objects with data
         run(...)        Executes the matching files, with arguments provided
                         in the argument list

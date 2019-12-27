@@ -123,7 +123,7 @@ var myNumberSummer = function (numbers) {
     return sum;
 }
 
-var c = new channel();
+var c = new Channel();
 var numbers = [1,3,7,23,15,88,11,93,12,-4,2,15,11,25];
 while (numbers.length) {
     var set = numbers.splice (0,4);
@@ -156,7 +156,7 @@ var numberSumWorker = function (c) {
     }
 }
 
-var c = new channel();
+var c = new Channel();
 var numbers = [441,755,387,504,154,244,732,245,620,451,58,811,170,878,71,975,
                589,32,86,192,288,36,974,500,878,675,881,657,893,98,472,325];
 

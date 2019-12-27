@@ -102,7 +102,7 @@ sys.app.scan.help = function() {
 }
 
 sys.app.list = function() {
-    var t = new texttable(5);
+    var t = new TextTable(5);
     t.boldColumn(0);
     t.marginRight(0);
     t.rightAlignColumn(1);

@@ -5,7 +5,7 @@
 var $apidb = {};
 var $textformat = function(x,width) {
     if (! width) width = sys.winsize()-1;
-    return texttable.colorize (x.rewrap(width));
+    return TextTable.colorize (x.rewrap(width));
 }
 
 sys.help = function() {
@@ -44,18 +44,22 @@ help = function(helpfor) {
     >>>));
         
     var list = [];
+    var classlist = [];
     var row = 0;
     for (var k in $apidb) {
         if ((!helplevel) && k.startsWith("sys.")) continue;
         else if (helplevel && (! k.startsWith("sys."))) continue;
-        list.push(k);
+        if ((k[0] != '$') && k[0] == k[0].toUpperCase()) classlist.push(k);
+        else list.push(k);
     }
     list.sort();
 
-    var a = new autotable();
-    a.setData (list);
-    a.indent (4);
-    print (a.format());
+    echo (new AutoColumn().setData(list).indent(4).format());
+    if (classlist.length) {
+        classlist.sort();
+        echo ("Available classes:");
+        print (new AutoColumn().setData(classlist).indent(4).format());
+    }
 }
 
 var setapi = function(arg1,arg2) {
@@ -193,7 +197,7 @@ var setapi = function(arg1,arg2) {
         return null;
     }
     obj.help = function() {
-        var t = new texttable(4);
+        var t = new TextTable(4);
         var argi = {}
         t.boldColumn(2);
         var cmd = "command";
@@ -278,7 +282,7 @@ var setapi = function(arg1,arg2) {
 setapi.textformat = $textformat;
 
 setapi.helptext = function(def) {
-    var t = new texttable(4);
+    var t = new TextTable(4);
     t.boldColumn (2);
     var arglist = [];
     for (var ai in def.args) arglist.push (def.args[ai].name);

@@ -14,7 +14,7 @@ stat.help = function() {
         >>>
     });
     echo ("");
-    echo (texttable.auto(<<<
+    echo (TextTable.auto(<<<
         mode         number  The unix filesystem mode
         modestring   string  The mode expressed as text, like ls() output.
         uid          number  Userid of the owner

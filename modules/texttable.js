@@ -1,4 +1,4 @@
-var texttable = function(cols) {
+var TextTable = function(cols) {
     this.columns = cols;
     this._stretchcolumn = cols-1;
     this._boldcolumn = -1;
@@ -17,22 +17,22 @@ var texttable = function(cols) {
     }
 }
 
-texttable.prototype.stretchColumn = function(c) {
+TextTable.prototype.stretchColumn = function(c) {
     if (c < this.columns) this._stretchcolumn = c;
     return this;
 }
 
-texttable.prototype.noWrap = function() {
+TextTable.prototype.noWrap = function() {
     this._nowrap = true;
     return this;
 }
 
-texttable.prototype.marginRight = function(i) {
+TextTable.prototype.marginRight = function(i) {
     this._marginright = i;
     return this;
 }
 
-texttable.prototype.boldColumn = function(c) {
+TextTable.prototype.boldColumn = function(c) {
     if (c < this.columns) {
         this._colprefix[c] = '\033[1m';
         this._colsuffix[c] = '\033[0m';
@@ -40,7 +40,7 @@ texttable.prototype.boldColumn = function(c) {
     return this;
 }
 
-texttable.prototype.colorColumn = function(c,color) {
+TextTable.prototype.colorColumn = function(c,color) {
     if (c < this.columns) {
         this._colprefix[c] = '\033[' + (30 + parseInt(color)) + 'm';
         this._colsuffix[c] = '\033[0m';
@@ -48,27 +48,27 @@ texttable.prototype.colorColumn = function(c,color) {
     return this;
 }
 
-texttable.prototype.rightAlignColumn = function (c) {
+TextTable.prototype.rightAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = true;
     return this;
 }
 
-texttable.prototype.leftAlignColumn = function (c) {
+TextTable.prototype.leftAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = false;
     return this;
 }
 
-texttable.prototype.padding = function(p) {
+TextTable.prototype.padding = function(p) {
     this._padding = p;
     return this;
 }
 
-texttable.prototype.indent = function(i) {
+TextTable.prototype.indent = function(i) {
     this._indent = i;
     return this;
 }
 
-texttable.prototype.addRow = function() {
+TextTable.prototype.addRow = function() {
     var row = [];
     var args = typeof(arguments[0]) == 'object' ? arguments[0] : arguments;
     
@@ -79,7 +79,7 @@ texttable.prototype.addRow = function() {
     this.rows.push (row);
 }
 
-texttable.colorize = function(str) {
+TextTable.colorize = function(str) {
     var matches = {
         "[.a-zA-Z_]+\\([._a-zA-Z0-9]*\\)":1,
         "[.a-zA-Z_]+\\[['\"._a-zA-Z0-9]*\\]":1,
@@ -94,8 +94,8 @@ texttable.colorize = function(str) {
     return x;
 }
 
-texttable.auto = function (inputstr, cols) {
-    var t = new texttable(cols);
+TextTable.auto = function (inputstr, cols) {
+    var t = new TextTable(cols);
     var cutw = [];
     var cutp = [0];
     var pos = 0;
@@ -137,7 +137,7 @@ texttable.auto = function (inputstr, cols) {
     return t;
 }
 
-texttable.prototype.format = function() {
+TextTable.prototype.format = function() {
     var res = "";
     var maxw = sys.winsize() - this._marginright - this._indent -
                ((this.columns-1) * this._padding);
@@ -178,7 +178,7 @@ texttable.prototype.format = function() {
                 }
                 else {
                     var wrapped = (""+this.rows[ri][i]).rewrap(widths[i]);
-                    wrapped = texttable.colorize(wrapped);
+                    wrapped = TextTable.colorize(wrapped);
                     wrapped = wrapped.split('\n');
                     var l = wrapped.length;
                     if (l) {
@@ -232,4 +232,4 @@ texttable.prototype.format = function() {
     return res;
 }
 
-module.exports = texttable;
+module.exports = TextTable;

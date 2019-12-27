@@ -1,82 +1,82 @@
-channel = function() {
-    this.ch = sys.channel.open();
+Channel = function() {
+    this.ch = sys.Channel.open();
     Duktape.fin (this, function (x) {
         if (this.ch !== null) {
-            sys.channel.close (this.ch);
+            sys.Channel.close (this.ch);
             this.ch = null;
         }
     });
 }
 
-channel.help = function() {
+Channel.help = function() {
     setapi.helptext({
-        name:"c = new channel",
+        name:"c = new Channel",
         text:<<<
-            Create a channel object to communicate with co-routines.
+            Create a Channel object to communicate with co-routines.
             The returned object has the following functions available:
         >>>
     });
     echo("");
-    print (texttable.auto(<<<
-        c.send(data)     Sends data to the channel, returns false if
-                         the channel is empty (except for us). Data sent
+    print (TextTable.auto(<<<
+        c.send(data)     Sends data to the Channel, returns false if
+                         the Channel is empty (except for us). Data sent
                          is serialized as JSON, so you shouldn't have
                          to worry about the type.
-        c.recv()         Receives data from the channel, returns null
-                         if the channel is empty. Received data
+        c.recv()         Receives data from the Channel, returns null
+                         if the Channel is empty. Received data
                          is always deserialized back from JSON, and
                          should end up with the original type.
-        c.senderror(txt) From a coroutine, set channel to an error state.
-        c.error()        Returns error string, or false if the channel
+        c.senderror(txt) From a coroutine, set Channel to an error state.
+        c.error()        Returns error string, or false if the Channel
                          had no errors.
         c.isempty()      Returns true if there are no listeners left on
-                         the channel.
-        c.exit()         Tells any other parties on the channel that this
+                         the Channel.
+        c.exit()         Tells any other parties on the Channel that this
                          process will stop using it.
-        c.close()        Completely closes the channel. If there were still
+        c.close()        Completely closes the Channel. If there were still
                          active coroutines spawned from it, they will be
                          killed.
     >>>, 2).indent(4).boldColumn(0).format());
 }
 
-setapi (channel, "channel");
+setapi (Channel, "Channel");
 
-channel.prototype.send = function (data) {
+Channel.prototype.send = function (data) {
     if (this.ch === null) return false;
-    if (sys.channel.error (this.ch)) {
-        printerr ("Channel error: "+sys.channel.error (this.ch));
+    if (sys.Channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.Channel.error (this.ch));
     }
-    return sys.channel.send (this.ch, JSON.stringify (data));
+    return sys.Channel.send (this.ch, JSON.stringify (data));
 }
 
-channel.prototype.senderror = function (data) {
+Channel.prototype.senderror = function (data) {
     if (this.ch === null) return;
-    sys.channel.senderror (this.ch, ""+data);
+    sys.Channel.senderror (this.ch, ""+data);
 }
 
-channel.prototype.isempty = function (data) {
+Channel.prototype.isempty = function (data) {
     if (this.ch === null) return true;
-    return sys.channel.isempty (this.ch);
+    return sys.Channel.isempty (this.ch);
 }
 
-channel.prototype.recv = function() {
+Channel.prototype.recv = function() {
     if (this.ch === null) return null;
-    if (sys.channel.error (this.ch)) {
-        printerr ("Channel error: "+sys.channel.error (this.ch));
+    if (sys.Channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.Channel.error (this.ch));
     }
-    var res = sys.channel.recv (this.ch);
+    var res = sys.Channel.recv (this.ch);
     if (res === false) return null;
     else return JSON.parse (res);
 }
 
-channel.prototype.exit = function() {
+Channel.prototype.exit = function() {
     if (this.ch === null) return;
-    sys.channel.exit (this.ch);
+    sys.Channel.exit (this.ch);
 }
 
-channel.prototype.close = function() {
+Channel.prototype.close = function() {
     if (this.ch === null) return;
-    sys.channel.close (this.ch);
+    sys.Channel.close (this.ch);
 }
 
 go = function(chan, func) {
@@ -86,7 +86,7 @@ go = function(chan, func) {
     }
     return sys.go (chan.ch, function() {
         try {
-            var res = func.apply("channel",argv);
+            var res = func.apply("Channel",argv);
             if (res !== undefined) {
                 chan.send (res);
             }
@@ -101,26 +101,26 @@ go.help = function() {
     setapi.helptext({
         name:"go",
         args:[
-            {name:"channel",text:<<<
-                A created channel object that will be used for communicating
+            {name:"Channel",text:<<<
+                A created Channel object that will be used for communicating
                 with the coroutine.
             >>>},
             {name:"func",text:<<<
                 The function to spawn. The function will always get, as its
-                first argument, a reference to the channel object. Any
+                first argument, a reference to the Channel object. Any
                 extra arguments after the function passed to go() will
-                be passed to the function as well (after the channel).
+                be passed to the function as well (after the Channel).
             >>>}
         ],
         text:<<<
             Spawns a coroutine, running in its own address space but within
             the same javascript context we already have. The code run
             inside the routine has no access to the console, or any of the
-            currently open files. It can, however, use the channel to
+            currently open files. It can, however, use the Channel to
             communicate with the parent process.
             
-            See help(channel) for information on how to interact with a
-            channel.
+            See help(Channel) for information on how to interact with a
+            Channel.
         >>>
     })
 }

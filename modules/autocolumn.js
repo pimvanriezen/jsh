@@ -1,24 +1,26 @@
-var autotable = function() {
+var AutoColumn = function() {
     this.data = [];
     this._indent = 0;
 }
 
-autotable.prototype.add = function(obj) {
+AutoColumn.prototype.add = function(obj) {
     this.data.push (""+obj);
 }
 
-autotable.prototype.setData = function(obj) {
+AutoColumn.prototype.setData = function(obj) {
     if (!obj) return;
     if (typeof(obj) != "object") return;
     if (obj.constructor != Array) return;
     this.data = obj;
+    return this;
 }
 
-autotable.prototype.indent = function(i) {
+AutoColumn.prototype.indent = function(i) {
     this._indent = parseInt(i);
+    return this;
 }
 
-autotable.prototype.format = function() {
+AutoColumn.prototype.format = function() {
     var arr = this.data;
     var indent = this._indent;
     var res = "";
@@ -44,4 +46,4 @@ autotable.prototype.format = function() {
     return res;
 }
 
-module.exports = autotable;
+module.exports = AutoColumn;

@@ -25,11 +25,12 @@ userdb      = require("userdb");
 proc        = require("proc");
 run         = require("run");
 setapi      = require("setapi");
-texttable   = require("texttable");
-autotable   = require("autotable");
 dump        = require("dump");
 which       = require("which");
 len         = require("len");
+
+TextTable   = require("texttable");
+AutoColumn  = require("autocolumn");
 
 // ============================================================================
 // Set up the result formatter for the interactive shell

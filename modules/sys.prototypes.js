@@ -108,7 +108,7 @@ String.prototype.wrap = function (cols) {
         }
     }
     if (ln.length) res.push (ln);
-    return res;
+    return res.join('\n');
 }
 
 String.prototype.cut = function (field, sep) {
@@ -126,7 +126,7 @@ String.prototype.rewrap = function (cols) {
     var paragraphs = str.split ("\n\n");
     for (var k in paragraphs) {
         var p = (""+paragraphs[k]).split("\n").join(" ");
-        p = p.wrap(cols).join('\n');
+        p = p.wrap(cols);
         paragraphs[k] = p;
     }
     res = paragraphs.join("\n\n") + '\n';

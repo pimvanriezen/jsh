@@ -23,7 +23,7 @@ prompt.help = function() {
         >>>
     });
     echo ("");
-    echo (texttable.auto(<<<
+    echo (TextTable.auto(<<<
         %h The hostname
         %p The current working directory (summarized)
         %i The index in the directory history
