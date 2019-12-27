@@ -12,9 +12,16 @@ if (argv.length>1) {
 var copied = 0;
 var bannersize = 0;
 var copiedfiles = [];
+var dirmode = true;
 
 var dumpcopied = function(nocopies) {
-    var endtag = " "+copied+" file"+(copied==1 ? "":"s");
+    var endtag;
+    if (dirmode) {
+        endtag = " "+copied+" director"+(copied==1 ? "y":"ies");
+    }
+    else {
+        endtag = " "+copied+" file"+(copied==1 ? "":"s");
+    }
     if (nocopies) endtag = "";
     endtag = endtag.padEnd (sys.winsize() - bannersize - 8);
     echo (endtag + " [ \033[1mok\033[0m ]");
@@ -28,14 +35,22 @@ var dumpcopied = function(nocopies) {
 var mycp = function(src,dst,srcid) {
     if (! srcid) srcid = src.replace(/.*\//,"");
     if ((! exists (dst)) || md5sum (src) != md5sum (dst)) {
-        cp (src, dst);
+        if (! cp (src, dst)) {
+            if (! rm (dst, {force:true})) {
+                throw (new Error ("Error copying to "+dst));
+            }
+            if (! cp (src, dst)) {
+                throw (new Error ("Error copying to "+dst));
+            }
+        }
         copied++;
         copiedfiles.push (dst);
     }
 }
 
 var mymkdir = function(name,mode) {
-    echo ("".padEnd(20), " MK ", name);
+    copied++;
+    copiedfiles.push(name);
     mkdir (name, mode);
 }
 
@@ -48,11 +63,16 @@ var banner = function(txt) {
 var f = function(n) { return basedir + '/' + n; }
 
 banner ("Creating directories");
-if (! exists (f("etc/jsh"))) mymkdir ("etc/jsh");
-if (! exists (f("etc/jsh/modules"))) mymkdir ("etc/jsh/modules");
-if (! exists (f("etc/jsh/modules/global.d"))) mymkdir ("etc/jsh/modules/global.d");
-if (! exists (f("etc/jsh/modules/app"))) mymkdir ("etc/jsh/modules/app");
+var dirs = ["etc/jsh","etc/jsh/modules","etc/jsh/modules/global.d",
+            "etc/jsh/modules/app"];
+
+for (var i in dirs) {
+    var dir = dirs[i];
+    if (! exists (f(dir))) mymkdir (f(dir));
+}
+
 dumpcopied(true);
+dirmode = false;
 
 banner ("Copying base files");
 mycp ("jshrc",f("etc/jsh/jshrc"));
