@@ -73,7 +73,7 @@ query.help = function() {
         >>>
     });
     echo ("");
-    var t = new texttable.auto (<<<
+    echo (texttable.auto (<<<
         write(data)     Overwrites matching objects with data
         run(...)        Executes the matching files, with arguments provided
                         in the argument list
@@ -85,10 +85,7 @@ query.help = function() {
         chmod(spec)     Changes permissions on all matching objects. See the
                         help page of the chmod() command for the valid 
                         specification
-    >>>,2);
-    t.boldColumn (0);
-    t.indent (4);
-    echo (t.format(sys.winsize()));    
+    >>>,2).boldColumn(0).indent(4).format());
 }
 
 module.exports = query;

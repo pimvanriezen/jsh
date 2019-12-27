@@ -19,14 +19,17 @@ var texttable = function(cols) {
 
 texttable.prototype.stretchColumn = function(c) {
     if (c < this.columns) this._stretchcolumn = c;
+    return this;
 }
 
 texttable.prototype.noWrap = function() {
     this._nowrap = true;
+    return this;
 }
 
 texttable.prototype.marginRight = function(i) {
     this._marginright = i;
+    return this;
 }
 
 texttable.prototype.boldColumn = function(c) {
@@ -34,6 +37,7 @@ texttable.prototype.boldColumn = function(c) {
         this._colprefix[c] = '\033[1m';
         this._colsuffix[c] = '\033[0m';
     }
+    return this;
 }
 
 texttable.prototype.colorColumn = function(c,color) {
@@ -41,22 +45,27 @@ texttable.prototype.colorColumn = function(c,color) {
         this._colprefix[c] = '\033[' + (30 + parseInt(color)) + 'm';
         this._colsuffix[c] = '\033[0m';
     }
+    return this;
 }
 
 texttable.prototype.rightAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = true;
+    return this;
 }
 
 texttable.prototype.leftAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = false;
+    return this;
 }
 
 texttable.prototype.padding = function(p) {
     this._padding = p;
+    return this;
 }
 
 texttable.prototype.indent = function(i) {
     this._indent = i;
+    return this;
 }
 
 texttable.prototype.addRow = function() {

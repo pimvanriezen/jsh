@@ -14,7 +14,7 @@ stat.help = function() {
         >>>
     });
     echo ("");
-    var t = new texttable.auto(<<<
+    echo (texttable.auto(<<<
         mode         number  The unix filesystem mode
         modestring   string  The mode expressed as text, like ls() output.
         uid          number  Userid of the owner
@@ -30,12 +30,7 @@ stat.help = function() {
         isLink       boolean Set to true, if the object is a link
         isSocket     boolean Set to true, if the object is a socket
         isExecutable boolean Set to true, if the object is executable
-    >>>,3);
-    
-    t.boldColumn (0);
-    t.indent (4);
-    print (t.format());
-    echo ("");
+    >>>,3).boldColumn(0).indent(4).format());
 }
 
 module.version = "1.0.1";

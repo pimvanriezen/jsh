@@ -24,7 +24,7 @@ printf.help = function() {
         >>>
     });
     echo ("");
-    var t = texttable.auto(<<<
+    echo (texttable.auto(<<<
         %s      String data
         %S      Also string data, but if a width is provided, the string
                 get summarized to that width
@@ -33,11 +33,9 @@ printf.help = function() {
         %x      Hexadecimal number
         %j      JSON encoding
         %J      Colorized JSON encoding (for ANSI terminals)
-    >>>,2);
-    t.indent (8);
-    t.padding (4);
-    t.boldColumn (0);
-    echo (t.format());
+        %%      Prints a percentage mark
+    >>>,2).indent(8).padding(4).boldColumn(0).format());
+
     print (setapi.textformat (<<<
         If you want get the formatted string for further processing, rather
         than sending it to the console, call sprintf() with the same

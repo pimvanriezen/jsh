@@ -17,7 +17,7 @@ channel.help = function() {
         >>>
     });
     echo("");
-    var t = texttable.auto(<<<
+    print (texttable.auto(<<<
         c.send(data)     Sends data to the channel, returns false if
                          the channel is empty (except for us). Data sent
                          is serialized as JSON, so you shouldn't have
@@ -33,10 +33,7 @@ channel.help = function() {
                          the channel.
         c.exit()         Tells any other parties on the channel that this
                          process will stop using it.
-    >>>, 2);
-    t.indent (4);
-    t.boldColumn(0);
-    print (t.format());
+    >>>, 2).indent(4).boldColumn(0).format());
 }
 
 setapi (channel, "channel");

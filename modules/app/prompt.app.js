@@ -23,15 +23,12 @@ prompt.help = function() {
         >>>
     });
     echo ("");
-    var t = texttable.auto(<<<
+    echo (texttable.auto(<<<
         %h The hostname
         %p The current working directory (summarized)
         %i The index in the directory history
         %# Prompt character, ":" for users, "#" for root
-    >>>,2);
-    t.boldColumn(0);
-    t.indent(4);
-    echo (t.format());
+    >>>,2).boldColumn(0).indent(4).format());
     print (<<<
         You can also override the function completely to write a custom
         prompt, that gets executed every time the shell displays a new
