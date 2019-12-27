@@ -84,6 +84,15 @@ String.prototype.wrap = function (cols) {
     return res;
 }
 
+String.prototype.cut = function (field, sep) {
+    if (! sep) sep = /[ \t]+/;
+    var splt = this.split (sep);
+    var len = splt.length;
+    if (field<0) field = len+field;
+    if (field<0 || field>=len) return "";
+    return splt[field];
+}
+
 String.prototype.rewrap = function (cols) {
     var res = "";
     var str = ""+this;
