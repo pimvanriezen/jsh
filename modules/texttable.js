@@ -232,4 +232,50 @@ TextTable.prototype.format = function() {
     return res;
 }
 
+TextTable.help = function() {
+    setapi.helptext({
+        name:"t = new TextTable",
+        args:[
+            {name:"columns",text:"Number of columns in the table"}
+        ],
+        text:<<<
+            Utility class for making table-based layouts on a console
+            screen. Once created, the following functions are available
+            on the object:
+        >>>
+    });
+    
+    echo ("");
+    echo (TextTable.auto(<<<
+        t.stretchColumn(c)      Indicates which of the columns is the one that
+                                should grow to the full screenwidth as needed.
+                                Other columns will be sized to whatever is
+                                needed to fit its cells. By default, this is
+                                the last column.
+        t.noWrap()              If text size in the stretchColumn exceeds the
+                                screen width, instead of word-wrapping the cell,
+                                any excess characters are cut off.
+        t.marginRight(m)        Decides the width of whitespace that should be
+                                observed to the right of the table.
+        t.boldColumn(c)         Sets a column in the table to be printed bold.
+        t.colorColumn(c,col)    Sets up an ansi-color for the column. The
+                                color value should be between 0 and 8.
+        t.rightAlignColumn(c)   Sets a column up to be right-aligned.
+        t.leftAlignColumn(c)    Sets a column back to being left-aligned.
+        t.padding(p)            Sets the number of padding spaces that should
+                                be between two columns (default 1).
+        t.indent(i)             Sets the amount of indenting on the left
+                                to be performed for the table.
+        t.addRow(cell,cell,...) Adds a row to the dataset.
+        t.format()              Renders the table and returns it as a text
+                                string.
+    >>>, 2).indent(4).boldColumn(0).format());
+    
+    print (setapi.textformat(<<<
+        All methods except format() allow chaining.
+    >>>));
+}
+
+setapi (TextTable,"TextTable");
+
 module.exports = TextTable;
