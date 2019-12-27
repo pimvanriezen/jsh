@@ -17,7 +17,7 @@ Channel.help = function() {
         >>>
     });
     echo("");
-    print (TextTable.auto(<<<
+    echo (TextTable.auto(<<<
         c.send(data)     Sends data to the Channel, returns false if
                          the Channel is empty (except for us). Data sent
                          is serialized as JSON, so you shouldn't have
@@ -37,6 +37,10 @@ Channel.help = function() {
                          active coroutines spawned from it, they will be
                          killed.
     >>>, 2).indent(4).boldColumn(0).format());
+    print (setapi.textformat(<<<
+        See help(go) for information on how to spawn a coroutine that can
+        communicate through the channel.
+    >>>));
 }
 
 setapi (Channel, "Channel");
