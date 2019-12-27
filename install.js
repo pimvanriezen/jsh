@@ -134,8 +134,7 @@ dumpcopied();
 
 // ----------------------------------------------------------------------------
 banner ("Copying apps");
-$("modules/app/*").each (function (dir) {
-    mkdir (f("etc/jsh/"+dir));
-    mycp (dir + "/app.js", f("etc/jsh/"+dir+"/app.js"),dir);
+$("modules/app/*.app.js").each (function (app) {
+    mycp (app, f("etc/jsh/"+app));
 });
 dumpcopied();
