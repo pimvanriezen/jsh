@@ -53,6 +53,8 @@ The above script uses /usr/bin/md5sum and /usr/bin/cp on a CentOS system,
 like a proper shellscript, but without all the awking, or cutting, or
 regular expression voodoo you'd normally expect to get involved there.
 
+## Well-documented interfaces
+
 To give you an impression of how such a wrapping looks, let's check the
 source for the md5sum shell app:
 
@@ -80,7 +82,10 @@ module.exports = md5sum;
 
 The wrapping leaves an md5sum() function on the global namespace, as well
 as documentation for its arguments, which is available from the jsh
-interactive console by typing help(md5sum).
+interactive console by typing help(md5sum). It's very easy to keep every
+aspect of the environment documented, and explorable.
+
+![Screenshot](doc/img/ss2.png "JSH help system")
 
 ## Some extra sugar
 
