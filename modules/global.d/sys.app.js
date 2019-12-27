@@ -81,8 +81,8 @@ sys.app.load.help = function() {
 }
 
 sys.app.scan = function() {
-    for (var i in env.JSH_MODULE_PATH) {
-        var glob = env.JSH_MODULE_PATH[i] + "/app/*.app.js";
+    for (var i in env.JSH_APP_PATH) {
+        var glob = env.JSH_APP_PATH[i] + "/*.app.js";
         $(glob).each (function (match) {
             var appname = match.substr(0,match.length - ".app.js".length);
             var appname = appname.replace (/.*\//, "");

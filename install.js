@@ -95,7 +95,7 @@ var dirs = [
     "lib/jsh",
     "lib/jsh/modules",
     "lib/jsh/modules/global.d",
-    "lib/jsh/modules/app"
+    "lib/jsh/app"
 ];
 
 for (var i in dirs) {
@@ -142,7 +142,7 @@ dumpcopied();
 
 // ----------------------------------------------------------------------------
 banner ("Copying apps");
-$("modules/app/*.app.js").each (function (app) {
+$("app/*.app.js").each (function (app) {
     mycp (app, f("lib/jsh/"+app));
 });
 dumpcopied();
