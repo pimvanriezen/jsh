@@ -8,11 +8,20 @@
 #include <unistd.h>
 #include "textbuffer.h"
 
+// ============================================================================
+// FUNCTION textbuffer_free
+// ============================================================================
 void textbuffer_free (struct textbuffer *t) {
     if (t->alloc) free (t->alloc);
     free (t);
 }
 
+// ============================================================================
+// FUNCTION textbuffer_load_fd
+// ---------------------------
+// Creates a new textbuffer, and fills it with all the data that could be
+// read from the passed filedescriptor.
+// ============================================================================
 struct textbuffer *textbuffer_load_fd (int filno) {
     char buffer[1024];
     struct textbuffer *t = textbuffer_alloc();
@@ -23,6 +32,11 @@ struct textbuffer *textbuffer_load_fd (int filno) {
     return t;
 }
 
+// ============================================================================
+// FUNCTION textbuffer_load
+// ------------------------
+// Reads a file into a freshly created textbuffer, and return the result.
+// ============================================================================
 struct textbuffer *textbuffer_load (const char *fname) {
     int filno;
     filno = open (fname, O_RDONLY);
@@ -35,6 +49,14 @@ struct textbuffer *textbuffer_load (const char *fname) {
     return t;
 }
 
+// ============================================================================
+// FUNCTION add_c
+// --------------
+// Adds a single character to the textbuffer without a trailing NUL byte.
+// Only call this if you're absolutely sure that more data will follow
+// and you end your streak with any of the other calls that *does* add a NUL
+// byte.
+// ============================================================================
 void textbuffer_add_c (struct textbuffer *t, char c) {
     if ((t->wpos +2) > t->size) {
         size_t newsz = t->size;
@@ -50,11 +72,22 @@ void textbuffer_add_c (struct textbuffer *t, char c) {
     t->alloc[t->wpos++] = c;
 }
 
+// ============================================================================
+// FUNCTION textbuffer_add
+// -----------------------
+// Adds a single character to the textbuffer, and sets the new trailing
+// NUL byte.
+// ============================================================================
 void textbuffer_add (struct textbuffer *t, char c) {
     textbuffer_add_c (t, c);
     t->alloc[t->wpos] = 0;
 }
 
+// ============================================================================
+// FUNCTION textbuffer_add_str
+// ---------------------------
+// Adds a C-string to the buffer.
+// ============================================================================
 void textbuffer_add_str (struct textbuffer *t, const char *dt) {
     const char *p = dt;
     while (*p) {
@@ -64,6 +97,11 @@ void textbuffer_add_str (struct textbuffer *t, const char *dt) {
     t->alloc[t->wpos] = 0;
 }
 
+// ============================================================================
+// FUNCTION textbuffer_add_data
+// ----------------------------
+// Adds an arbitrarily sized bit of data to the buffer.
+// ============================================================================
 void textbuffer_add_data (struct textbuffer *t, const char *dt, size_t sz) {
     size_t origsize = t->size;
     while ((t->wpos + sz + 2) > t->size) {
@@ -82,6 +120,9 @@ void textbuffer_add_data (struct textbuffer *t, const char *dt, size_t sz) {
     t->alloc[t->wpos] = 0;
 }
 
+// ============================================================================
+// FUNCTION textbuffer_alloc
+// ============================================================================
 struct textbuffer *textbuffer_alloc (void) {
     struct textbuffer *t;
     t = (struct textbuffer *) calloc (sizeof(struct textbuffer),1);
@@ -89,4 +130,3 @@ struct textbuffer *textbuffer_alloc (void) {
     t->size = 1024;
     return t;
 }
-
