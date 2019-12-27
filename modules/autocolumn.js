@@ -5,6 +5,7 @@ var AutoColumn = function() {
 
 AutoColumn.prototype.add = function(obj) {
     this.data.push (""+obj);
+    return this;
 }
 
 AutoColumn.prototype.setData = function(obj) {
@@ -45,5 +46,30 @@ AutoColumn.prototype.format = function() {
     if (curcol) res += "\n";
     return res;
 }
+
+AutoColumn.help = function() {
+    setapi.helptext({
+        name:"c = new AutoColumn",
+        text:<<<
+            Utility class for creating a grid-layout of bits of text
+            that should fit the screen efficiently. Once constructed,
+            the following functions are available on the object:
+        >>>
+    });
+    
+    echo ("");
+    echo (TextTable.auto(<<<
+        c.add(cell)         Adds a single text cell to the layout.
+        c.setData(array)    Sets the full array of text nodes for the layout.
+        c.indent(i)         Sets the indent level when displaying.
+        c.format()          Formats the layout and returns it as a string.
+    >>>, 2).indent(4).boldColumn(0).format());
+    
+    print (setapi.textformat(<<<
+        All methods except format() allow chaining.
+    >>>));
+}
+
+setapi (AutoColumn,"AutoColumn");
 
 module.exports = AutoColumn;
