@@ -19,7 +19,6 @@ defaults({
 // ============================================================================
 // Load all core modules
 // ============================================================================
-              require("sys.prototypes");
 $           = require("fquery");
 userdb      = require("userdb");
 proc        = require("proc");
@@ -31,7 +30,6 @@ len         = require("len");
 
 TextTable   = require("texttable");
 AutoColumn  = require("autocolumn");
-
 // ============================================================================
 // Set up the result formatter for the interactive shell
 // ============================================================================
