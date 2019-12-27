@@ -82,7 +82,7 @@ var f = function(n) { return basedir + '/' + n; }
 // ============================================================================
 // The actual install job
 // ============================================================================
-banner ("Creating directories");
+banner ("Creating filesystem structure");
 var dirs = [
     "etc/jsh",
     "etc/jsh/modules",
