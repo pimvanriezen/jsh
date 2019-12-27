@@ -141,18 +141,18 @@ while (true) {
 echo ("Total sum: "+totalsum);
 ```
 
-Instead of writing one-off coroutines, you can also instigate a worker
-system to handle the load, like this:
+For some casual background processing, this would be enough, but sometimes
+you have a job that cannot afford to have a single process running for each
+part of it. So you can also spawn workers and use the channel for two-way
+communication:
 
 ```javascript
 var numberSumWorker = function (c) {
     var msg;
-    while (! c.isempty()) {
-        if (msg = c.recv()) {
-            var sum = 0;
-            for (var i in msg) sum += msg[i];
-            c.send (sum);
-        }
+    while (msg = c.recv()) {
+        var sum = 0;
+        for (var i in msg) sum += msg[i];
+	    c.send (sum);
     }
 }
 
@@ -171,10 +171,10 @@ while (numbers.length) {
 c.exit();
 
 var totalsum = 0;
-while (true) {
-    var m = c.recv();
-    if (m === null) break;
-    dump (m);
+var m;
+
+while (m = c.recv()) {
+    printf ("Received: %J\n", m);
     totalsum += m;
 }
 
