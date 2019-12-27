@@ -60,6 +60,9 @@ char *handle_quoting (const char *src) {
                 if (quoteline || hadcontent) {
                     textbuffer_add_str (t, "\\n\"+\n\"");
                 }
+                else {
+                    textbuffer_add_str (t, "\"+\n\"");
+                }
                 quoteline++;
                 c++;
                 linestart = c;
