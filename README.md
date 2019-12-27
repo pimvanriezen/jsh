@@ -145,7 +145,7 @@ Instead of writing one-off coroutines, you can also instigate a worker
 system to handle the load, like this:
 
 ```javascript
-var myNumberSummer = function (c) {
+var numberSumWorker = function (c) {
     while (true) {
         var msg = c.recv();
         if (! msg) return;
@@ -159,7 +159,7 @@ var c = new channel();
 var numbers = [1,3,7,23,15,88,11,93,12,-4,2,15,11,25];
 
 for (var i=0; i<4; ++i) {
-    go (c, function(){myNumberSummer(c)});
+    go (c, numberSumWorker);
 }
 
 while (numbers.length) {

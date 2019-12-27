@@ -61,7 +61,7 @@ channel.prototype.exit = function() {
 go = function(chan, func) {
     return sys.go (chan.ch, function() {
         try {
-            var res = func();
+            var res = func(chan);
             if (res !== undefined) {
                 chan.send (res);
             }
