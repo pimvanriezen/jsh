@@ -52,6 +52,19 @@ String.prototype.summarize = function(sz) {
     return res;
 }
 
+String.prototype.grep = function(re,srch,repl) {
+    if (typeof (re) == "string") re = new RegExp (re);
+    if (typeof (srch) == "string") srch = new RegExp (srch, 'g');
+    var res = [];
+    var lines = this.split('\n');
+    for (var i in lines) {
+        if (lines[i].match (re)) {
+            if (! srch) res.push (lines[i]);
+            else res.push (lines[i].replace (srch, repl?repl:""));
+        }
+    }
+}
+
 String.prototype.wrap = function (cols) {
     var str = ""+this;
     var words = str.split (' ');
