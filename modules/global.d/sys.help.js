@@ -723,3 +723,54 @@ Array.sum = {help:function() {
 }}
 
 setapi (Array.sum, "Array.sum");
+
+Array.cut = {help:function() {
+    setapi.helptext ({
+        name:"array.cut",
+        args:[
+            {name:"index",text:<<<
+                The field to cut out, indexing starts at 0. If the field
+                provided is negative, it is counted from the right, with
+                -1 being the last field.
+            >>>},
+            {name:"delimiter",text:<<<
+                Character or regular expression pattern to use as a means
+                of splitting up the string. If this argument is left out,
+                it defaults to splitting on arbitrary amounts of white
+                space.
+            >>>}
+        ],
+        text:<<<
+            Cuts a specific field out of each string in the array. Returns
+            an array with the transformation applied.
+        >>>
+    });
+}}
+
+setapi (Array.cut,"Array.cut");
+
+Array.grep = {help:function() {
+    setapi.helptext ({
+        name:"array.grep",
+        args:[
+            {name:"pattern",text:<<<
+                Regular expression pattern to match lines against.
+            >>>},
+            {name:"process",text:<<<
+                [Optional] Regular expression pattern that will
+                be applied to a matchine line, and either deleted
+                or replaced with the third argument.
+            >>>},
+            {name:"replace",text:<<<
+                Replacement string for processing
+            >>>}
+        ],
+        text:<<<
+            Given the array contains a list of strings, a new array
+            is returned with only the strings matching the pattern,
+            with transformation optionally applied.
+        >>>
+    })
+}}
+
+setapi (Array.grep,"Array.grep");
