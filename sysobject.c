@@ -20,8 +20,12 @@
 #include "quoting.h"
 #include "channel.h"
 
+// Reference for setting the process name
 extern char **main_argv;
 
+// ============================================================================
+// FUNCTION mystrdup
+// ============================================================================
 char *mystrdup (const char *orig) {
     size_t len = strlen (orig);
     char *res = (char *) malloc (len+1);
@@ -29,6 +33,9 @@ char *mystrdup (const char *orig) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION sys_cd
+// ============================================================================
 duk_ret_t sys_cd (duk_context *ctx) {
     const char *path;
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
@@ -45,6 +52,9 @@ duk_ret_t sys_cd (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION sys_cwd
+// ============================================================================
 duk_ret_t sys_cwd (duk_context *ctx) {
     char buf[1024];
     
@@ -54,6 +64,9 @@ duk_ret_t sys_cwd (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_dir
+// ============================================================================
 duk_ret_t sys_dir (duk_context *ctx) {
     const char *path;
     DIR *dir;
@@ -80,6 +93,9 @@ duk_ret_t sys_dir (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_glob
+// ============================================================================
 duk_ret_t sys_glob (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     int i = 0;
@@ -97,6 +113,9 @@ duk_ret_t sys_glob (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_setenv
+// ============================================================================
 duk_ret_t sys_setenv (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     const char *key = duk_to_string (ctx, 0);
@@ -106,6 +125,9 @@ duk_ret_t sys_setenv (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION sys_getenv
+// ============================================================================
 duk_ret_t sys_getenv (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     const char *key = duk_to_string (ctx, 0);
@@ -117,6 +139,9 @@ duk_ret_t sys_getenv (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION sys_read
+// ============================================================================
 duk_ret_t sys_read (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     size_t maxsz;
@@ -159,6 +184,9 @@ duk_ret_t sys_read (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_winsize
+// ============================================================================
 duk_ret_t sys_winsize (duk_context *ctx) {
     struct winsize ws;
     if (ioctl (0, TIOCGWINSZ, &ws) == 0) {
@@ -170,24 +198,36 @@ duk_ret_t sys_winsize (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_getuid
+// ============================================================================
 duk_ret_t sys_getuid (duk_context *ctx) {
     uid_t uid = getuid();
     duk_push_number (ctx, uid);
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_getgid
+// ============================================================================
 duk_ret_t sys_getgid (duk_context *ctx) {
     gid_t gid = getgid();
     duk_push_number (ctx, gid);
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_getpid
+// ============================================================================
 duk_ret_t sys_getpid (duk_context *ctx) {
     pid_t pid = getpid();
     duk_push_number (ctx, pid);
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_uname
+// ============================================================================
 duk_ret_t sys_uname (duk_context *ctx) {
     struct utsname name;
     uname (&name);
@@ -205,6 +245,9 @@ duk_ret_t sys_uname (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_write
+// ============================================================================
 duk_ret_t sys_write (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     const char *data = duk_to_string (ctx, 0);
@@ -257,6 +300,9 @@ duk_ret_t sys_write (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_print
+// ============================================================================
 duk_ret_t sys_print (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     const char *data = duk_to_string (ctx, 0);
@@ -264,6 +310,9 @@ duk_ret_t sys_print (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// DATA username/groupname cache for stat data
+// ============================================================================
 struct xidcache {
     unsigned int id;
     char name[64];
@@ -274,6 +323,11 @@ static struct xidcache gidcache[16];
 static int uidcpos;
 static int gidcpos;
 
+// ============================================================================
+// FUNCTION cgetuid
+// ----------------
+// Resolves a uid to a username.
+// ============================================================================
 const char *cgetuid (uid_t uid) {
     struct passwd *pwd;
     char buffer[32];
@@ -300,6 +354,11 @@ const char *cgetuid (uid_t uid) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION cgetgid
+// ----------------
+// Resolves a gid to a groupname.
+// ============================================================================
 const char *cgetgid (gid_t gid) {
     struct group *grp;
     char buffer[32];
@@ -326,6 +385,11 @@ const char *cgetgid (gid_t gid) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION modestring
+// -------------------
+// Converts a filesystem mode to an ls-style listing.
+// ============================================================================
 void modestring (char *into, mode_t mode) {
     char tp = '-';
     if (S_ISFIFO(mode)) tp = 'f';
@@ -348,6 +412,9 @@ void modestring (char *into, mode_t mode) {
     into[10] = 0;
 }
 
+// ============================================================================
+// FUNCTION sys_stat
+// ============================================================================
 duk_ret_t sys_stat (duk_context *ctx) {
     char modestr[16];
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
@@ -424,6 +491,9 @@ duk_ret_t sys_stat (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_mkdir
+// ============================================================================
 duk_ret_t sys_mkdir (duk_context *ctx) {
     int mode = 0755;
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
@@ -440,6 +510,9 @@ duk_ret_t sys_mkdir (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chmod
+// ============================================================================
 duk_ret_t sys_chmod (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     const char *path = duk_to_string (ctx, 0);
@@ -453,6 +526,9 @@ duk_ret_t sys_chmod (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chown
+// ============================================================================
 duk_ret_t sys_chown (duk_context *ctx) {
     if (duk_get_top (ctx) < 3) return DUK_RET_TYPE_ERROR;
     const char *path = duk_to_string (ctx, 0);
@@ -467,6 +543,11 @@ duk_ret_t sys_chown (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION pushpasswd
+// -------------------
+// Pushes an object onto the duktape stack with details from a passwd entry.
+// ============================================================================
 void pushpasswd (duk_context *ctx, struct passwd *pw) {
     duk_idx_t obj_idx = duk_push_object (ctx);
     duk_push_string (ctx, pw->pw_name);
@@ -483,6 +564,9 @@ void pushpasswd (duk_context *ctx, struct passwd *pw) {
     duk_put_prop_string (ctx, obj_idx, "shell");
 }
 
+// ============================================================================
+// FUNCTION sys_getpwnam
+// ============================================================================
 duk_ret_t sys_getpwnam (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     const char *username = duk_to_string (ctx, 0);
@@ -492,6 +576,9 @@ duk_ret_t sys_getpwnam (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_getpwuid
+// ============================================================================
 duk_ret_t sys_getpwuid (duk_context *ctx) {
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     uid_t uid = (uid_t) duk_get_int (ctx, 0);
@@ -501,14 +588,25 @@ duk_ret_t sys_getpwuid (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_modsearch
+// ----------------------
+// Module loader for the duktape 'require' call.
+// ============================================================================
 duk_ret_t sys_modsearch (duk_context *ctx) {
     struct stat st;
     const char *id = duk_to_string (ctx, 0);
     const char *path;
     
+    // Resolve JSH_MODULE_PATH through the virtual env{} object, rather
+    // than directly using getenv, allowing any provided defaults
+    // to trickle into module loading.
     duk_push_global_object (ctx);
     duk_get_prop_string (ctx, -1, "env");
     duk_get_prop_string (ctx, -1, "JSH_MODULE_PATH");
+    
+    // Although the API turns this into a neat array, let's play dumb for
+    // now and get back a regular PATH-style string delimited by colons.
     duk_push_string (ctx, "join");
     duk_push_string (ctx, ":");
     duk_call_prop (ctx, -3, 1);
@@ -517,11 +615,13 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     if (! path) path = "./modules";
     char *paths = strdup(path);
     
+    // Clean up the stack
     duk_pop(ctx);
     duk_pop(ctx);
     duk_pop(ctx);
     duk_pop(ctx);
     
+    // Go through the path, and try it on with our requested module name.
     char *pathp = paths;
     char *p;
     char *end;
@@ -543,6 +643,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
             break;
         }
         else {
+            // first try ${PATH}/${MODULENAME}.js
             end = full + strlen(full);
             strcpy (end, ".js");
             if (! stat (full, &st)) {
@@ -550,6 +651,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
                 break;
             }
             else {
+                // ok no, try ${PATH}/${MODULENAME}/index.js
                 strcpy (end, "/index.js");
                 if (! stat (full, &st)) {
                     p = NULL;
@@ -564,18 +666,23 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
 
     free (paths);
 
+    // If nothing was found, bitch and complain
     if (! full) {
         fprintf (stderr, "%% Could not load module %s\n", id);
         duk_push_boolean (ctx, 0);
         return 1;
     }
 
+    // Load the source code
     struct textbuffer *t = textbuffer_load(full);
     if (! t) return 0;
 
+    // Translate inline quoting, and push the result to the stack.
     char *translated = handle_quoting (t->alloc);
     duk_push_string (ctx, translated);
     free (translated);
+    
+    // Update sys._modules
     duk_get_global_string (ctx, "sys");
     duk_get_prop_string (ctx, -1, "_modules");
     duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
@@ -594,6 +701,14 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_run
+// ----------------
+// Spawns a process running a unix command. Its standard in- and outputs
+// are redirected to a pipe, which is used to receive the command's output
+// into a buffer that get ultimately turned into a javascript string, and
+// optionally to send data to the child process stdin.
+// ============================================================================
 duk_ret_t sys_run (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int tocmdpipe[2];
@@ -606,11 +721,17 @@ duk_ret_t sys_run (duk_context *ctx) {
     char **args = NULL;
     const char *command = duk_to_string (ctx, 0);
     const char *senddata = NULL;
+    
+    // Get the array length of arguments[0]
     duk_get_prop_string(ctx,1,"length");
     numarg = duk_get_int(ctx,-1);
     duk_pop(ctx);
     
+    // We need two extra arguments, one for the command name,
+    // and one for the terminating NULL that execvp wants.
     args = (char **) calloc (sizeof(char*),numarg+2);
+    
+    // Copy the arguments from the array
     args[0] = mystrdup (command);
     for (i=0; i<numarg; ++i) {
         duk_get_prop_index(ctx,1,i);
@@ -619,11 +740,15 @@ duk_ret_t sys_run (duk_context *ctx) {
     }
     args[i+1] = NULL;
     
+    // If we have a second argument, it means there's data to be sent
+    // into the child process stdin.
     if (duk_get_top (ctx) > 2) senddata = duk_to_string (ctx, 2);
     
+    // Set up unix pipes
     pipe (tocmdpipe);
     pipe (fromcmdpipe);
     
+    // Spawn
     switch (pid = fork()) {
         case -1:
             close (tocmdpipe[0]);
@@ -635,6 +760,7 @@ duk_ret_t sys_run (duk_context *ctx) {
             return 0;
             
         case 0:
+            // We're the new process here.
             close (0);
             close (1);
             close (2);
@@ -647,14 +773,18 @@ duk_ret_t sys_run (duk_context *ctx) {
             exit (0);
     }
     
+    // Close the ends of the pipe that aren't ours.
     close (fromcmdpipe[1]);
     close (tocmdpipe[0]);
     
+    // For clarity
     fdout = tocmdpipe[1];
     fdin = fromcmdpipe[0];
     
+    // Send any data that needs to be sent.
     if (senddata) {
         if (write (fdout, senddata, strlen(senddata)) != strlen(senddata)) {
+            // write error, bail out.
             close (fdout);
             close (fdin);
             for (i=0; i<(numarg+1);++i) free (args[i]);
@@ -664,10 +794,14 @@ duk_ret_t sys_run (duk_context *ctx) {
         }
     }
     
+    // We're done with sending anything out
     close (fdout);
     
+    // Free stuff we no longer need
     for (i=0; i<(numarg+1);++i) free (args[i]);
     free (args);
+    
+    // Now let's process the output
     int retstatus;
     size_t rdsz;
     size_t bufsz = 1024;
@@ -688,8 +822,11 @@ duk_ret_t sys_run (duk_context *ctx) {
         buf[bufpos] = 0;
     }
     close (fdin);
+    
+    // Clean up the process.
     waitpid (pid, &retstatus, 0);
 
+    // Check if it failed on us
     if (WEXITSTATUS(retstatus) != 0) {
         duk_push_boolean (ctx, 0);
     }
@@ -705,6 +842,12 @@ duk_ret_t sys_run (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_runconsole
+// -----------------------
+// Like sys_run, this spawns a child process, but its in- and output stay
+// connected to the foreground console, making this a much simpler job.
+// ============================================================================
 duk_ret_t sys_runconsole (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int i;
@@ -752,6 +895,9 @@ duk_ret_t sys_runconsole (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_hostname
+// ============================================================================
 duk_ret_t sys_hostname (duk_context *ctx) {
     char nm[256];
     if (duk_get_top (ctx) == 0) {
@@ -770,6 +916,9 @@ duk_ret_t sys_hostname (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_eval
+// ============================================================================
 duk_ret_t sys_eval (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     const char *src;
@@ -789,6 +938,9 @@ duk_ret_t sys_eval (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_parse
+// ============================================================================
 duk_ret_t sys_parse (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     const char *ctxnam = "parse";
@@ -836,14 +988,23 @@ duk_ret_t sys_parse (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// GLOBAL list of channels
+// ============================================================================
 struct clist *CHANNELS;
 
+// ============================================================================
+// FUNCTION sys_chan_open
+// ============================================================================
 duk_ret_t sys_chan_open (duk_context *ctx) {
     int cid = clist_open (CHANNELS);
     duk_push_int (ctx, cid);
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_send
+// ============================================================================
 duk_ret_t sys_chan_send (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -863,6 +1024,9 @@ duk_ret_t sys_chan_send (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_recv
+// ============================================================================
 duk_ret_t sys_chan_recv (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -884,6 +1048,9 @@ duk_ret_t sys_chan_recv (duk_context *ctx) {
     return 1;    
 }
 
+// ============================================================================
+// FUNCTION sys_chan_exit
+// ============================================================================
 duk_ret_t sys_chan_exit (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -898,6 +1065,9 @@ duk_ret_t sys_chan_exit (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_close
+// ============================================================================
 duk_ret_t sys_chan_close (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -906,6 +1076,9 @@ duk_ret_t sys_chan_close (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_info
+// ============================================================================
 duk_ret_t sys_chan_info (duk_context *ctx) {
     int i,j,pindex,cindex;
     struct channel *ch;
@@ -967,6 +1140,9 @@ duk_ret_t sys_chan_info (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_available
+// ============================================================================
 duk_ret_t sys_chan_available (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -980,6 +1156,9 @@ duk_ret_t sys_chan_available (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_isempty
+// ============================================================================
 duk_ret_t sys_chan_isempty (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -993,6 +1172,9 @@ duk_ret_t sys_chan_isempty (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_senderror
+// ============================================================================
 duk_ret_t sys_chan_senderror (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -1005,6 +1187,9 @@ duk_ret_t sys_chan_senderror (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION sys_chan_error
+// ============================================================================
 duk_ret_t sys_chan_error (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
@@ -1021,6 +1206,9 @@ duk_ret_t sys_chan_error (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_go
+// ============================================================================
 duk_ret_t sys_go (duk_context *ctx) {
     pid_t pid;
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
@@ -1047,6 +1235,14 @@ duk_ret_t sys_go (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_init
+// -----------------
+// Initializes all global data, and hooks into the Duktape heap with all
+// the system functions.
+//
+// Finally, the path to global.js is resolved to bootstrap the system.
+// ============================================================================
 void sys_init (duk_context *ctx) {
     const char *osglobal;
 
