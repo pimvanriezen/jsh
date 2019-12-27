@@ -63,11 +63,11 @@ Object.defineProperty (Array.prototype, 'grep', {
         if (typeof (re) == "string") re = new RegExp (re);
         if (typeof (srch) == "string") srch = new RegExp (srch, 'g');
         var res = [];
-        for (var i=0; i<this.length; ++i) {
+        for (var i in this) {
             var ln = this[i];
             if (typeof(ln) != "string") ln = ""+ln;
             if (ln.match (re)) {
-                if (! srch) this.push (ln);
+                if (! srch) res.push (ln);
                 else res.push (ln (srch, repl?repl:""));
             }
         }
