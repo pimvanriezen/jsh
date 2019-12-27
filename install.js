@@ -1,19 +1,23 @@
+// ============================================================================
+// JSH Installer
+// ============================================================================
 var basedir="/usr/local";
 
 if (argv.length>1) {
     basedir = argv[1];
 }
 
-/*var mycp = function(a,b) {
-    echo (a + " -> " + b);
-    cp (a,b);
-}*/
-
+// ============================================================================
+// Some functions for copying files, and keeping track of what we did.
+// ============================================================================
 var copied = 0;
 var bannersize = 0;
 var copiedfiles = [];
 var dirmode = true;
 
+// ----------------------------------------------------------------------------
+// Prints out how many files we copies or directories we created
+// ----------------------------------------------------------------------------
 var dumpcopied = function(nocopies) {
     var endtag;
     if (dirmode) {
@@ -32,6 +36,10 @@ var dumpcopied = function(nocopies) {
     copiedfiles = [];
 }
 
+// ----------------------------------------------------------------------------
+// Copies a file, provided the destination file doesn't exist, or has an
+// MD5 checksum different than the source.
+// ----------------------------------------------------------------------------
 var mycp = function(src,dst,srcid) {
     if (! srcid) srcid = src.replace(/.*\//,"");
     if ((! exists (dst)) || md5sum (src) != md5sum (dst)) {
@@ -48,37 +56,55 @@ var mycp = function(src,dst,srcid) {
     }
 }
 
+// ----------------------------------------------------------------------------
+// Creates a direcotry
+// ----------------------------------------------------------------------------
 var mymkdir = function(name,mode) {
     copied++;
     copiedfiles.push(name);
     mkdir (name, mode);
 }
 
+// ----------------------------------------------------------------------------
+// Announces the next action we will take
+// ----------------------------------------------------------------------------
 var banner = function(txt) {
     var bannerstr = "* "+txt+"...";
     bannersize = bannerstr.length;
     print (bannerstr);
 }
 
+// ----------------------------------------------------------------------------
+// Turns a relative filename into a destination path
+// ----------------------------------------------------------------------------
 var f = function(n) { return basedir + '/' + n; }
 
+// ============================================================================
+// The actual install job
+// ============================================================================
 banner ("Creating directories");
-var dirs = ["etc/jsh","etc/jsh/modules","etc/jsh/modules/global.d",
-            "etc/jsh/modules/app"];
+var dirs = [
+    "etc/jsh",
+    "etc/jsh/modules",
+    "etc/jsh/modules/global.d",
+    "etc/jsh/modules/app"
+];
 
 for (var i in dirs) {
-    var dir = dirs[i];
-    if (! exists (f(dir))) mymkdir (f(dir));
+    var d = dirs[i];
+    if (! exists (f(d))) mymkdir (f(d));
 }
 
 dumpcopied();
 dirmode = false;
 
+// ----------------------------------------------------------------------------
 banner ("Copying base files");
 mycp ("jshrc",f("etc/jsh/jshrc"));
 mycp ("bin/jsh",f("bin/jsh"));
 dumpcopied();
 
+// ----------------------------------------------------------------------------
 banner("Copying base modules");
 $("modules/*.js").each (function (file) {
     if (! file.isDir) {
@@ -87,12 +113,14 @@ $("modules/*.js").each (function (file) {
 });
 dumpcopied();
 
+// ----------------------------------------------------------------------------
 banner ("Copying global includes");
 $("modules/global.d/*.js").each (function (file) {
     mycp (file, f("etc/jsh/"+file));
 });
 dumpcopied();
 
+// ----------------------------------------------------------------------------
 banner("Removing outdated global includes");
 $(f("etc/jsh/modules/global.d/*.js")).each (function (file) {
     fnam = file.replace (/.*\//, "");
@@ -104,6 +132,7 @@ $(f("etc/jsh/modules/global.d/*.js")).each (function (file) {
 });
 dumpcopied();
 
+// ----------------------------------------------------------------------------
 banner ("Copying apps");
 $("modules/app/*").each (function (dir) {
     mkdir (f("etc/jsh/"+dir));
