@@ -63,6 +63,7 @@ String.prototype.grep = function(re,srch,repl) {
             else res.push (lines[i].replace (srch, repl?repl:""));
         }
     }
+    return res;
 }
 
 String.prototype.wrap = function (cols) {
