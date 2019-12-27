@@ -219,12 +219,11 @@ struct channelmsg *channel_receive (struct channel *c) {
        If the channel has no open pipes, return NULL.
     */
     struct channelmsg *msg;
-    size_t wsz = 0;
     
     if (! c->firstmsg) {
         if (c->pipes[0].flags & PIPEFLAG_ISPARENT) {
             if (c->pipes[0].st != PIPE_CLOSED) {
-                wsz = write (c->pipes[0].fdwrite, PIPEMSG_FREE, 1);
+                write (c->pipes[0].fdwrite, PIPEMSG_FREE, 1);
             }
         }
         while (! c->firstmsg) {
