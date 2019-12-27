@@ -29,6 +29,8 @@ printf.help = function() {
         %i/%d   Integer data
         %f      Floating point
         %x      Hexadecimal number
+        %j      JSON encoding
+        %J      Colorized JSON encoding (for ANSI terminals)
     >>>,2);
     t.indent (8);
     t.padding (4);
@@ -62,7 +64,7 @@ var sprintf = function(fmt)
 	    '([1-9]\\d*)?',			/* width (optional) */
 	    '(\\.([1-9]\\d*))?',		/* precision (optional) */
 	    '[lhjztL]*?',			/* length mods (ignored) */
-	    '([diouxXfFeEgGaAcCsSp%jr])'	/* conversion */
+	    '([diouxXfFeEgGaAcCsSp%jJr])'	/* conversion */
 	].join('');
 
 	var re = new RegExp(regex);
@@ -71,6 +73,7 @@ var sprintf = function(fmt)
 	var left, pad, sign, arg, match;
 	var ret = '';
 	var argn = 1;
+	var fn = {};
 
     if (typeof (fmt) != "string") return "";
 
@@ -85,6 +88,7 @@ var sprintf = function(fmt)
 		left = false;
 		sign = false;
 		pad = ' ';
+		fn = function(x){return x.toString();}
 
 		if (conversion == '%') {
 			ret += '%';
@@ -101,9 +105,13 @@ var sprintf = function(fmt)
 			throw (new Error(
 			    'unsupported flags: ' + flags));
 
-		if (precision.length > 0)
-			throw (new Error(
-			    'non-zero precision not supported'));
+		if (precision.length > 0) {
+		    if (precision[0] == '.') precision = precision.substr(1);
+		    precision = parseInt (precision);
+			fn = function(x) {
+			    return parseFloat(x).toFixed(precision);
+			}
+		}
 
 		if (flags.match(/-/))
 			left = true;
@@ -129,11 +137,19 @@ var sprintf = function(fmt)
                 /*jsl:fallthru*/
             case 'f':
                 sign = sign && arg > 0 ? '+' : '';
-                ret += sign + doPad(pad, width, left, arg.toString());
+                ret += sign + doPad(pad, width, left, fn(arg));
                 break;
 
             case 'x':
                 ret += doPad(pad, width, left, arg.toString(16));
+                break;
+                
+            case 'j':
+                ret += JSON.stringify(arg);
+                break;
+            
+            case 'J':
+                ret += dump.dumper(arg);
                 break;
 
             default:
