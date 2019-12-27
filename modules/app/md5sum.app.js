@@ -7,8 +7,8 @@ var md5sum = setapi ([
     {literal:md5cmd},
     {arg:"path",helptext:"File to checksum"},
     {process:function(dat) {
-        if (dat === true) {
-            throw new Error ("md5sum did jack on "+path);
+        if (dat === true || dat === false) {
+            return null;
         }
         dat = dat.replace('\n','');
         if (md5cmd == "md5sum") return dat.split(' ')[0];
