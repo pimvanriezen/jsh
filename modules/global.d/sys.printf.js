@@ -26,6 +26,8 @@ printf.help = function() {
     echo ("");
     var t = texttable.auto(<<<
         %s      String data
+        %S      Also string data, but if a width is provided, the string
+                get summarized to that width
         %i/%d   Integer data
         %f      Floating point
         %x      Hexadecimal number
@@ -123,11 +125,13 @@ var sprintf = function(fmt)
 			sign = true;
 
 		switch (conversion) {
+		    case 'S':
+		        if (width>8) {
+		            arg = arg.toString().summarize(width);
+		        }
+		        /*jsl:fallthru*/
             case 's':
-                if (arg === undefined || arg === null)
-                    throw (new Error('argument ' + argn +
-                        ': attempted to print undefined or null ' +
-                        'as a string'));
+                if (arg === undefined || arg === null) arg = "<null>";
                 ret += doPad(pad, width, left, arg.toString());
                 break;
 
@@ -149,7 +153,7 @@ var sprintf = function(fmt)
                 break;
             
             case 'J':
-                ret += dump.dumper(arg);
+                ret += dump.dumper(arg,true);
                 break;
 
             default:

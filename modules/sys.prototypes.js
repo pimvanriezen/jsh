@@ -41,12 +41,14 @@ Object.defineProperty (Array.prototype, 'remove', {
 });
 
 String.prototype.summarize = function(sz) {
-    if (this.length <= sz) return this;
+    if (this.length <= sz) return this.toString();
+    if (sz < 11) return this.toString();
     var res = "";
     var dsz = sz - "...".length;
-    var halfsz = dsz/2;
+    var halfsz = Math.floor(dsz/2);
+    var restsz = dsz-halfsz;
     res = this.substr(0,halfsz) + "..." +
-          this.substr(this.length-halfsz);
+          this.substr(this.length-restsz);
     return res;
 }
 

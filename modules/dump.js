@@ -142,15 +142,19 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
             for (var i=0; i<x.length; ++i) {
                 res += comma;
                 if (! isshort) {
-                    if (!mkshort) res += "\n";
-                    res += "".padEnd(realindent+2);
+                    if (!mkshort) {
+                        res += "\n";
+                        res += "".padEnd(realindent+2);
+                    }
                 }
                 comma = ",";
                 res += dump.dumper (x[i],mkshort||isshort,0,realindent+2);
             }
             if (!isshort) {
-                if (!mkshort) res += "\n";
-                res+= "".padEnd(realindent);
+                if (!mkshort) {
+                    res += "\n";
+                    res+= "".padEnd(realindent);
+                }
             }
             res += "]";
             break;
@@ -164,8 +168,10 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
             for (var i in x) {
                 res += comma;
                 if (! isshort) {
-                    if (!mkshort) res += "\n";
-                    res +="".padEnd(realindent+2);
+                    if (!mkshort) {
+                        res += "\n";
+                        res +="".padEnd(realindent+2);
+                    }
                 }
                 comma = ",";
                 res += "\"" + codes["key"];
@@ -180,8 +186,10 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
                                     realindent+2+esc.length+3);
             }
             if (! isshort) {
-                if (!mkshort) res += "\n";
-                res += "".padEnd (realindent);
+                if (!mkshort) {
+                    res += "\n";
+                    res += "".padEnd (realindent);
+                }
             }
             res += "}";
             break;
