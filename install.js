@@ -71,7 +71,7 @@ for (var i in dirs) {
     if (! exists (f(dir))) mymkdir (f(dir));
 }
 
-dumpcopied(true);
+dumpcopied();
 dirmode = false;
 
 banner ("Copying base files");
