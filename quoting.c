@@ -136,6 +136,10 @@ char *handle_quoting (const char *src) {
             currentquote = *c;
             c++;
         }
+        else if (!currentquote && c-src && (c[0] == ':') && (c[1] == ':')) {
+            textbuffer_add_str (t, ".prototype.");
+            c+=2;
+        }
         else {
             textbuffer_add (t, *c);
             c++;

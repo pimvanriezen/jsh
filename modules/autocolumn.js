@@ -3,12 +3,12 @@ var AutoColumn = function() {
     this._indent = 0;
 }
 
-AutoColumn.prototype.add = function(obj) {
+AutoColumn::add = function(obj) {
     this.data.push (""+obj);
     return this;
 }
 
-AutoColumn.prototype.setData = function(obj) {
+AutoColumn::setData = function(obj) {
     if (!obj) return;
     if (typeof(obj) != "object") return;
     if (obj.constructor != Array) return;
@@ -16,12 +16,12 @@ AutoColumn.prototype.setData = function(obj) {
     return this;
 }
 
-AutoColumn.prototype.indent = function(i) {
+AutoColumn::indent = function(i) {
     this._indent = parseInt(i);
     return this;
 }
 
-AutoColumn.prototype.format = function() {
+AutoColumn::format = function() {
     var arr = this.data;
     var indent = this._indent;
     var res = "";

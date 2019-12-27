@@ -17,22 +17,22 @@ var TextTable = function(cols) {
     }
 }
 
-TextTable.prototype.stretchColumn = function(c) {
+TextTable::stretchColumn = function(c) {
     if (c < this.columns) this._stretchcolumn = c;
     return this;
 }
 
-TextTable.prototype.noWrap = function() {
+TextTable::noWrap = function() {
     this._nowrap = true;
     return this;
 }
 
-TextTable.prototype.marginRight = function(i) {
+TextTable::marginRight = function(i) {
     this._marginright = i;
     return this;
 }
 
-TextTable.prototype.boldColumn = function(c) {
+TextTable::boldColumn = function(c) {
     if (c < this.columns) {
         this._colprefix[c] = '\033[1m';
         this._colsuffix[c] = '\033[0m';
@@ -40,7 +40,7 @@ TextTable.prototype.boldColumn = function(c) {
     return this;
 }
 
-TextTable.prototype.colorColumn = function(c,color) {
+TextTable::colorColumn = function(c,color) {
     if (c < this.columns) {
         this._colprefix[c] = '\033[' + (30 + parseInt(color)) + 'm';
         this._colsuffix[c] = '\033[0m';
@@ -48,27 +48,27 @@ TextTable.prototype.colorColumn = function(c,color) {
     return this;
 }
 
-TextTable.prototype.rightAlignColumn = function (c) {
+TextTable::rightAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = true;
     return this;
 }
 
-TextTable.prototype.leftAlignColumn = function (c) {
+TextTable::leftAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = false;
     return this;
 }
 
-TextTable.prototype.padding = function(p) {
+TextTable::padding = function(p) {
     this._padding = p;
     return this;
 }
 
-TextTable.prototype.indent = function(i) {
+TextTable::indent = function(i) {
     this._indent = i;
     return this;
 }
 
-TextTable.prototype.addRow = function() {
+TextTable::addRow = function() {
     var row = [];
     var args = typeof(arguments[0]) == 'object' ? arguments[0] : arguments;
     
@@ -137,7 +137,7 @@ TextTable.auto = function (inputstr, cols) {
     return t;
 }
 
-TextTable.prototype.format = function() {
+TextTable::format = function() {
     var res = "";
     var maxw = sys.winsize() - this._marginright - this._indent -
                ((this.columns-1) * this._padding);

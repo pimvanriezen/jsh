@@ -23,7 +23,7 @@ setapi (String, "String");
 // ============================================================================
 // String::padStart
 // ============================================================================
-String.prototype.padStart = function(len,c) {
+String::padStart = function(len,c) {
     if (c === undefined) c = " ";
     var res = this.slice(0,len);
     if (res.length > len) res.splice (len, res.length-len);
@@ -52,7 +52,7 @@ setapi (String.padStart, "String.padStart");
 // ============================================================================
 // String::padEnd
 // ============================================================================
-String.prototype.padEnd = function(len,c) {
+String::padEnd = function(len,c) {
     if (c === undefined) c = " ";
     var res = this.slice(0,len);
     if (res.length > len) res.splice (len, res.length-len);
@@ -81,7 +81,7 @@ setapi (String.padEnd, "String.padEnd");
 // ============================================================================
 // String::save
 // ============================================================================
-String.prototype.save = function(path) {
+String::save = function(path) {
     sys.write (""+this, ""+path);
 }
 
@@ -102,7 +102,7 @@ setapi (String.save, "String.save");
 // ============================================================================
 // String::summarize
 // ============================================================================
-String.prototype.summarize = function(sz) {
+String::summarize = function(sz) {
     if (this.length <= sz) return this.toString();
     if (sz < 11) return this.toString();
     var res = "";
@@ -133,7 +133,7 @@ setapi (String.summarize, "String.summarize");
 // ============================================================================
 // String::grep
 // ============================================================================
-String.prototype.grep = function(re,srch,repl) {
+String::grep = function(re,srch,repl) {
     return this.split('\n').grep (re,srch,repl);
 }
 
@@ -166,7 +166,7 @@ setapi (String.grep, "String.grep");
 // ============================================================================
 // String::wrap
 // ============================================================================
-String.prototype.wrap = function (cols) {
+String::wrap = function (cols) {
     var str = ""+this;
     var words = str.split (' ');
     var ln = "";
@@ -202,7 +202,7 @@ setapi (String.wrap, "String.wrap");
 // ============================================================================
 // String::cut
 // ============================================================================
-String.prototype.cut = function (field, sep) {
+String::cut = function (field, sep) {
     if (! sep) sep = /[ \t]+/;
     var splt = this.split (sep);
     var len = splt.length;
@@ -239,7 +239,7 @@ setapi (String.cut, "String.cut");
 // ============================================================================
 // String::rewrap
 // ============================================================================
-String.prototype.rewrap = function (cols) {
+String::rewrap = function (cols) {
     var res = "";
     var str = ""+this;
     var paragraphs = str.split ("\n\n");
@@ -275,7 +275,7 @@ setapi (String.rewrap, "String.rewrap");
 // ============================================================================
 // String::colorMatch
 // ============================================================================
-String.prototype.colorMatch = function (expr, code) {
+String::colorMatch = function (expr, code) {
     var ansi = code;
     var re = expr;
     if (typeof (re) == "string") {

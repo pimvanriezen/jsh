@@ -5,14 +5,14 @@ var fquery = function(q) {
     this.query = q;
 }
 
-fquery.prototype.write = function(data) {
+fquery::write = function(data) {
     var matches = sys.glob (this.query);
     for (var k in matches) {
         sys.write (data, matches[k]);
     }
 }
 
-fquery.prototype.run = function() {
+fquery::run = function() {
     var matches = sys.glob (this.query);
     var res = true;
     for (var k in matches) {
@@ -20,30 +20,30 @@ fquery.prototype.run = function() {
     } 
 }
 
-fquery.prototype.count = function() {
+fquery::count = function() {
     var matches = sys.glob (this.query);
     return matches.length;
 }
 
-fquery.prototype.each = function(f) {
+fquery::each = function(f) {
     var matches = sys.glob (this.query);
     for (var i=0; i<matches.length; ++i) {
         f (matches[i]);
     }
 }
 
-fquery.prototype.line = function (i) {
+fquery::line = function (i) {
     return this.cat().split('\n')[i];
 }
 
-fquery.prototype.chmod = function (mode) {
+fquery::chmod = function (mode) {
     var matches = sys.glob (this.query);
     for (var k in matches) {
         chmod (matches[k], mode);
     }
 }    
 
-fquery.prototype.cat = function() {
+fquery::cat = function() {
     var res = "";
     var matches = sys.glob (this.query);
     for (var i=0; i<matches.length; ++i) {
