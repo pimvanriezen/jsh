@@ -91,9 +91,9 @@ static void set_sigint_handler(void) {
 
 static void cmdline_fatal_handler(void *udata, const char *msg) {
     (void) udata;
-    fprintf(stderr, "*** FATAL ERROR: %s\n", msg ? msg : "no message");
+    fprintf(stderr, "%% Fatal error: %s\n", msg ? msg : "no message");
     fflush(stderr);
-    abort();
+    exit (1);
 }
 
 /* Print error to stderr and pop error. */

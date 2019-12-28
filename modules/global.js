@@ -47,6 +47,17 @@ include.help = function() {
     });
 }
 
+sys.require = require;
+require = function(modname) {
+    try {
+        return sys.require (modname);
+    }
+    catch (e) {
+        printerr ("Error loading module '"+modname+"': "+e);
+        throw (new Error ("Module load error"));
+    }
+}
+
 // ============================================================================
 // Printing errors
 // ============================================================================

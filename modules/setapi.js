@@ -54,7 +54,7 @@ help = function(helpfor) {
         Call help(command) with a function from this list to check for its
         syntax. ${helpstr}
         
-        Available commands:
+        Documented functions:
     >>>));
         
     var list = [];
@@ -68,10 +68,11 @@ help = function(helpfor) {
     }
     list.sort();
 
-    echo (new AutoColumn().setData(list).indent(4).format());
+    print (new AutoColumn().setData(list).indent(4).format());
     if (classlist.length) {
         classlist.sort();
-        echo ("Available classes:");
+        echo ("");
+        echo ("Documented classes:");
         print (new AutoColumn().setData(classlist).indent(4).format());
     }
 }
