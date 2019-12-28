@@ -168,6 +168,7 @@ duk_ret_t sys_loadavg (duk_context *ctx) {
         duk_push_number (ctx, la);
         duk_put_prop_index (ctx, aridx, i);
     }
+    return 1;
 #else
     // This was only tested on macOS
     uint32_t avg[6];
