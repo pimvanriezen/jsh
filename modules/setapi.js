@@ -244,7 +244,7 @@ var setapi = function(arg1,arg2) {
                 arglist.push (def.setarg);
                 argi[def.setarg] = argc++;
             }
-            else if (def.opt || def.flag) {
+            else if (def.silentopt | def.opt || def.flag) {
                 optcount++;
             }
         }
@@ -283,6 +283,12 @@ var setapi = function(arg1,arg2) {
                     t.addRow (printhdr,"",oi,txt);
                     printhdr = "";
                 }
+            }
+            else if (def.silentopt) {
+                var txt = def.helptext;
+                if (!txt) txt = "Option";
+                t.addRow (printhdr,"",def.silentopt,txt);
+                printhdr = "";
             }
             else if (def.flag) {
                 for (var fi in def.flag) {

@@ -5,13 +5,12 @@ var http = setapi ([
     {setarg:"data"},
     {literal:"curl"},
     {literal:"-i"},
-    {literal:"-L"},
     {literal:"-s"},
     {literal:"-X"},
     {arg:"method",helptext:"Request method (e.g., POST)"},
     {literal:function(args) {
         var ret = [];
-        if (args.headers) for (var i in args.headers) {
+        if (args.headers) for (var i in args.outheaders) {
             ret.push ("-H");
             ret.push (i + ": "+args.headers[i]);
         }
@@ -25,6 +24,11 @@ var http = setapi ([
     {arg:"url",helptext:"Request URL"},
     {opt:{"timeout":"--connect-timeout"},helptext:"Connection timeout"},
     {flag:{"insecure":"-k"},helptext:"Ignore certificate errors"},
+    {silentopt:"outheaders",helptext:"Headers to send (dictionary object)"},
+    {silentopt:"inheaders",helptext:<<<
+        Return headers will be stashed into the object provided here,
+        if it is supplied.
+    >>>},
     {process:function(dt,args) {
         if (args.save) return dt;
         var hdrend = (""+dt).indexOf('\r\n\r\n');
@@ -32,29 +36,22 @@ var http = setapi ([
         
         var body = dt.substr(hdrend+4);
         var hdrlines = dt.substr(0,hdrend).split('\r\n');
-        if (hdrlines[0].split(' ')[1] == "301") {
-            hdrend = (""+body).indexOf('\r\n\r\n');
-            hdrlines = body.substr(0,hdrend).split('\r\n');
-            body = body.substr(hdrend+4);
-        }
         var status = parseInt (hdrlines[0].split(' ')[1]);
         hdrlines.splice(0,1);
-        if (typeof (args.returnheaders) == "object") {
-            args.returnheaders["HTTP_STATUS"] = status;
+        if (typeof (args.inheaders) == "object") {
+            args.inheaders["HTTP_STATUS"] = status;
             for (var i in hdrlines) {
                 var ln = hdrlines[i];
                 var clpos = (""+ln).indexOf(': ');
                 if (clpos<0) continue;
                 var hdrname = ln.substr (0,clpos);
                 var hdrval = ln.substr (clpos+2);
-                args.returnheaders[hdrname] = hdrval;
+                args.inheaders[hdrname] = hdrval;
             }
         }
         
-        var res;
-        
         try {
-            res = JSON.parse (body);
+            var res = JSON.parse (body);
             return res;
         }
         catch (e) {
@@ -63,14 +60,13 @@ var http = setapi ([
         return null;
     }},
     {helptext:<<<
-        Performs a HTTP request. Output headers and return headers are
-        in option fields called "headers" and "returnheaders"
-        respectively.
+        Performs a HTTP request. The output body is returned from the
+        function, parsed as JSON if possible.
      >>>}
 ]);
 
 http.get = function (url, outheaders, inheaders) {
-    return http("GET",url,{headers:outheaders,returnheaders:inheaders});
+    return http("GET",url,{outheaders:outheaders,inheaders:inheaders});
 }
 
 http.get.help = function() {
@@ -99,7 +95,7 @@ http.get.help = function() {
 
 http.save = function (url, filename, outheaders) {
     if (! filename) filename = url.replace(/\?.*/,"").replace(/.*\//,"");
-    return http("GET",url,{save:filename,headers:outheaders});
+    return http("GET",url,{save:filename,outheaders:outheaders});
 }
 
 http.save.help = function() {
@@ -125,7 +121,7 @@ http.save.help = function() {
 }
 
 http.delete = function (url, outheaders, inheaders) {
-    return http("DELETE",url,{headers:outheaders,returnheaders:inheaders});
+    return http("DELETE",url,{outheaders:outheaders,inheaders:inheaders});
 }
 
 http.delete.help = function() {
@@ -169,7 +165,7 @@ http.post = function (url, data, outheaders, inheaders) {
             outhdr["Content-type"] = "text/plain";
         }
     }
-    return http("POST",url,data,{headers:outhdr,returnheaders:inheaders});
+    return http("POST",url,data,{outheaders:outhdr,inheaders:inheaders});
 }
 
 http.post.help = function() {
@@ -219,7 +215,7 @@ http.put = function (url, data, outheaders, inheaders) {
             outhdr["Content-type"] = "text/plain";
         }
     }
-    return http("PUT",url,data,{headers:outhdr,returnheaders:inheaders});
+    return http("PUT",url,data,{outheaders:outhdr,inheaders:inheaders});
 }
 
 http.put.help = function() {
