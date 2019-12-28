@@ -164,7 +164,7 @@ duk_ret_t sys_loadavg (duk_context *ctx) {
     double la;
     
     for (int i=0; i<3; ++i) {
-        la = (info.loads[0] >> 16) + ((info.loads[0] & 0xffff) / 65536.0);
+        la = (info.loads[i] >> 16) + ((info.loads[i] & 0xffff) / 65536.0);
         duk_push_number (ctx, la);
         duk_put_prop_index (ctx, aridx, i);
     }
