@@ -164,6 +164,10 @@ http.post = function (url, data, outheaders, inheaders) {
     }
     else {
         outbody = ""+data;
+        if (! outhdr) outhdr = {};
+        if (! outhdr["Content-type"]) {
+            outhdr["Content-type"] = "text/plain";
+        }
     }
     return http("POST",url,data,{headers:outhdr,returnheaders:inheaders});
 }
@@ -210,6 +214,10 @@ http.put = function (url, data, outheaders, inheaders) {
     }
     else {
         outbody = ""+data;
+        if (! outhdr) outhdr = {};
+        if (! outhdr["Content-type"]) {
+            outhdr["Content-type"] = "text/plain";
+        }
     }
     return http("PUT",url,data,{headers:outhdr,returnheaders:inheaders});
 }
