@@ -123,7 +123,7 @@ TextTable.colorize = function(str) {
         "(\\b(null))":31,
         "\"[^\"]+\"":32
     }
-    x = str;
+    var x = str;
     for (var k in matches) {
         x = x.colorMatch (k, matches[k]);
     }

@@ -3,9 +3,10 @@
 // ============================================================================
 
 var $apidb = {};
-var $textformat = function(x,width) {
+var $textformat = function(txt,width) {
+    if (! txt) return "";
     if (! width) width = sys.winsize()-1;
-    return TextTable.colorize (x.rewrap(width));
+    return TextTable.colorize (txt.rewrap(width));
 }
 
 sys.help = function() {
