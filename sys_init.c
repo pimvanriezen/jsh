@@ -140,9 +140,6 @@ void sys_init (duk_context *ctx) {
 
     if (t) {
         char *tbuffer = handle_quoting (t->alloc);
-        duk_push_string (ctx, tbuffer);
-        duk_eval_noresult (ctx);
-
         duk_get_global_string (ctx, "sys");
         duk_get_prop_string (ctx, -1, "_modules");
         duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
@@ -152,9 +149,15 @@ void sys_init (duk_context *ctx) {
         duk_put_prop_string (ctx, obj_idx, "size");
         duk_push_string (ctx, "bootstrap");
         duk_put_prop_string (ctx, obj_idx, "type");
+        duk_eval_string(ctx, "Date");
+        duk_pnew (ctx,0);
+        duk_put_prop_string (ctx, obj_idx, "loadtime");
         duk_put_prop_string (ctx, -2, "__global__");
         duk_pop(ctx);
         duk_pop(ctx);
+
+        duk_push_string (ctx, tbuffer);
+        duk_eval_noresult (ctx);
 
         free (tbuffer);
         textbuffer_free (t);

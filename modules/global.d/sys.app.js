@@ -66,8 +66,9 @@ sys.app.load = function(appname, apppath) {
     sys._modules[appname] = {
         fileName:apppath,
         size:src.length,
-        type:"app"
-    }    
+        type:"app",
+        loadtime:new Date()
+    }
 }
 
 // ============================================================================

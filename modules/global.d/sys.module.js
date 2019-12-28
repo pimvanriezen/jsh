@@ -9,10 +9,24 @@ sys.module.list = function() {
     t.marginRight(0);
     t.rightAlignColumn(1);
     t.noWrap();
-    for (var k in sys._modules) {
-        var mod = sys._modules[k];
+    t.summarize();
+    var rows = [].intern(sys._modules);
+    rows.sort (function(a,b) { 
+        if (a.type == "bootstrap" && b.type != "bootstrap") return -1;
+        if (a.type != "bootstrap" && b.type == "bootstrap") return 1;
+        if (a.loadtime > b.loadtime) return 1;
+        if (a.loadtime < b.loadtime) return -1;
+        return 0;
+    });
+    for (var k in rows) {
+        var mod = rows[k];
         if (mod.type!="app") {
-            t.addRow (k, humanSize(mod.size), mod.type, mod.fileName);
+            t.addRow (
+                mod.id,
+                humanSize(mod.size),
+                mod.type,
+                mod.fileName
+            );
         }
     }
     print (t.format (sys.winsize()));

@@ -124,6 +124,9 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     duk_put_prop_string (ctx, obj_idx, "size");
     duk_push_string (ctx, "require");
     duk_put_prop_string (ctx, obj_idx, "type");
+    duk_eval_string(ctx, "Date");
+    duk_pnew (ctx,0);
+    duk_put_prop_string (ctx, obj_idx, "loadtime");
     duk_put_prop_string (ctx, -2, id);
     duk_pop(ctx);
     duk_pop(ctx);
@@ -184,8 +187,6 @@ duk_ret_t sys_parse (duk_context *ctx) {
             duk_push_boolean (ctx, 0);
         }
         else {
-            duk_call (ctx, 0);
-            duk_push_boolean (ctx, 1);
             duk_get_global_string (ctx, "sys");
             duk_get_prop_string (ctx, -1, "_modules");
             duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
@@ -195,9 +196,14 @@ duk_ret_t sys_parse (duk_context *ctx) {
             duk_put_prop_string (ctx, obj_idx, "size");
             duk_push_string (ctx, ctxnam);
             duk_put_prop_string (ctx, obj_idx, "type");
+            duk_eval_string(ctx, "Date");
+            duk_pnew (ctx,0);
+            duk_put_prop_string (ctx, obj_idx, "loadtime");
             duk_put_prop_string (ctx, -2, modnam);
             duk_pop(ctx);
             duk_pop(ctx);
+            duk_call (ctx, 0);
+            duk_push_boolean (ctx, 1);
         }
         free (translated);
         textbuffer_free (t);

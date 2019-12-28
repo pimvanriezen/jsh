@@ -166,7 +166,7 @@ setapi (sys.print, "sys.print");
 // ============================================================================
 // sys.uptime
 // ============================================================================
-sys.print.help = function() {
+sys.uptime.help = function() {
     setapi.helptext ({
         name:"sys.uptime",
         text:<<<
@@ -175,12 +175,12 @@ sys.print.help = function() {
     });
 }
 
-setapi (sys.print, "sys.uptime");
+setapi (sys.uptime, "sys.uptime");
 
 // ============================================================================
 // sys.uptime
 // ============================================================================
-sys.print.help = function() {
+sys.loadavg.help = function() {
     setapi.helptext ({
         name:"sys.loadavg",
         text:<<<
@@ -189,7 +189,7 @@ sys.print.help = function() {
     });
 }
 
-setapi (sys.print, "sys.loadavg");
+setapi (sys.loadavg, "sys.loadavg");
 
 // ============================================================================
 // sys.kill
