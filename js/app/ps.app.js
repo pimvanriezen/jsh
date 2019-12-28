@@ -13,8 +13,8 @@ var ps = setapi ([
         for (var i in listing) {
             var p = listing[i];
             p.user = p.user.padEnd(8);
-            p.vsz = humanSize (p.vsz);
-            p.rss = humanSize (p.rss);
+            p.vsz = p.vsz.toSize();
+            p.rss = p.rss.toSize();
             p.command = p.command.replace (/^\/[\/_.0-9a-zA-Z]*\//,"");
             t.addRow(p.user, p.pid, p.pcpu, p.pmem, p.vsz,
                      p.rss, p.time, p.command);
@@ -32,5 +32,5 @@ var ps = setapi ([
     }}
 ]);
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = ps;

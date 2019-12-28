@@ -125,7 +125,7 @@ sys.app.list = function() {
     t.boldColumn(0);
     t.marginRight(0);
     t.rightAlignColumn(1);
-    t.rightAlignColumn(3);
+    t.rightAlignColumn(2);
     t.noWrap();
     var mods = [].intern (sys._modules);
     mods.sort (function (a,b) {
@@ -139,8 +139,8 @@ sys.app.list = function() {
             var vers;
             if (globalThis[mod.id].app) vers = globalThis[mod.id].app.version;
             if (! vers) vers = "n/a";
-            t.addRow (mod.id, humanSize(mod.size),
-                      mod.type, vers, mod.fileName);
+            t.addRow (mod.id, mod.size.toSize(),
+                      "v"+vers, mod.fileName);
         }
     }
     print (t.format (sys.winsize()));

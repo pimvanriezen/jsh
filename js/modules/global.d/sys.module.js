@@ -23,7 +23,7 @@ sys.module.list = function() {
         if (mod.type!="app") {
             t.addRow (
                 mod.id,
-                humanSize(mod.size),
+                mod.size.toSize(),
                 mod.type,
                 mod.fileName
             );

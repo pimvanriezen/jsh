@@ -55,7 +55,7 @@ var ls = function (path) {
     for (var k in objs) { maxlen(objs[k].group); }
     var glen = maxlen();
     maxlen(2);
-    for (var k in objs) { maxlen(""+humanSize(objs[k].size)); }
+    for (var k in objs) { maxlen(""+objs[k].size.toSize()); }
     var szlen = maxlen();
     
     for (var name in objs) {
@@ -94,7 +94,7 @@ var ls = function (path) {
             var outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+
                          " : "+ o.user.padEnd(ulen) + "/" +
                          o.group.padEnd(glen+1) +
-                         (""+humanSize(o.size)).padStart(szlen+1) + " " +
+                         (""+o.size.toSize()).padStart(szlen+1) + " " +
                          fnstart + name + fnend + suffix + '\n';
             sys.print (outstr);
         }
@@ -114,5 +114,5 @@ ls.help = function() {
     });
 }
 
-module.version = "1.0.0";
+module.version = "1.0.1";
 module.exports = ls;
