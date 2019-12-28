@@ -26,7 +26,7 @@ var http = setapi ([
     {opt:{"timeout":"--connect-timeout"},helptext:"Connection timeout"},
     {flag:{"insecure":"-k"},helptext:"Ignore certificate errors"},
     {process:function(dt,args) {
-        if (args.save!="") return dt;
+        if (args.save) return dt;
         var hdrend = (""+dt).indexOf('\r\n\r\n');
         if (hdrend<0) return false;
         
@@ -170,7 +170,7 @@ http.post = function (url, data, outheaders, inheaders) {
 
 http.post.help = function() {
     setapi.helptext({
-        name:"http.get",
+        name:"http.post",
         args:[
             {name:"url",text:"The URL to call"},
             {name:"data",text:<<<
@@ -244,5 +244,5 @@ http.put.help = function() {
     });
 }
 
-module.version = "1.0.3";
+module.version = "1.0.4";
 module.exports = http;
