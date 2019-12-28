@@ -121,6 +121,12 @@ run.js.help = function() {
             what we get back, instead of its standard output. Any extra
             arguments passed to the function will be available through
             argv[] inside the script.
+            
+            Scripts that want to operate through run.js as well as on the
+            regular shell through its hashbang can check for the value
+            of JSAPI. If this is set to true, the script has been called
+            through this mechanism and it can return a value, rather than
+            do everything through stdout.
         >>>
     });
 }
