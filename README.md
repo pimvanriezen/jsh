@@ -136,10 +136,10 @@ while (numbers.length) {
 }
 
 var totalsum = 0;
-while (true) {
-    var m = c.recv();
-    if (m === null) break;
-    dump (m);
+var m;
+
+while (m = c.recv()) {
+    echo ("Received:", m);
     totalsum += m;
 }
 
@@ -179,7 +179,7 @@ var totalsum = 0;
 var m;
 
 while (m = c.recv()) {
-    printf ("Received: %J\n", m);
+    echo ("Received:", m);
     totalsum += m;
 }
 
