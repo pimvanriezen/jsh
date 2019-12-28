@@ -129,6 +129,12 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
     switch (type) {
         case "string":
             if (indent) res += "".padEnd(indent);
+            if (x.length > 1024) {
+                res += codes["null"];
+                res += "<string: "+x.length+" bytes>"
+                res += codes.end;
+                break;
+            }
             res += "\"" + codes["string"];
             res += strescape (x);
             res += codes.end + "\"";
