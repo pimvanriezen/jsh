@@ -127,13 +127,20 @@ sys.app.list = function() {
     t.rightAlignColumn(1);
     t.rightAlignColumn(3);
     t.noWrap();
-    for (var k in sys._modules) {
-        var mod = sys._modules[k];
+    var mods = [].intern (sys._modules);
+    mods.sort (function (a,b) {
+        if (a.id < b.id) return -1
+        if (a.id > b.id) return 1;
+        return 0;
+    });
+    for (var k in mods) {
+        var mod = mods[k];
         if (mod.type=="app") {
             var vers;
-            if (globalThis[k].app) vers = globalThis[k].app.version;
+            if (globalThis[mod.id].app) vers = globalThis[mod.id].app.version;
             if (! vers) vers = "n/a";
-            t.addRow (k, humanSize(mod.size), mod.type, vers, mod.fileName);
+            t.addRow (mod.id, humanSize(mod.size),
+                      mod.type, vers, mod.fileName);
         }
     }
     print (t.format (sys.winsize()));
