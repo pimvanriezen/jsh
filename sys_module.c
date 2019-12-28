@@ -101,10 +101,8 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
 
     // If nothing was found, bitch and complain
     if (! full) {
-        fprintf (stderr, "%% Error loading module '%s': Could not resolve "
-                         "path\n", id);
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_string (ctx, "Could not resolve path");
+        return duk_throw (ctx);
     }
 
     // Load the source code

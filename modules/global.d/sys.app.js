@@ -59,7 +59,7 @@ sys.app.load = function(appname, apppath) {
         }
     }
     catch (e) {
-        printerr ("Error loading "+appname+": "+e);
+        printerr ("Error loading shell app '"+appname+"': "+e.message);
         return false;
     }
     
