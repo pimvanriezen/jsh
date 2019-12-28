@@ -164,6 +164,28 @@ sys.print.help = function() {
 setapi (sys.print, "sys.print");
 
 // ============================================================================
+// sys.kill
+// ============================================================================
+sys.kill.help = function() {
+    setapi.helptext ({
+        name:"sys.kill",
+        args:[
+            {name:"pid",text:"The pid to signal"},
+            {name:"signal",text:<<<
+                Either a number (0 to check if a process exists), or
+                a signal string in libc terms, e.g., "SIGABRT", "SIGTERM",
+                "SIGKILL".
+            >>>}
+        ],
+        text:<<<
+            Sends a signal to a process.
+        >>>
+    });
+}
+
+setapi (sys.kill, "sys.kill");
+
+// ============================================================================
 // sys.read
 // ============================================================================
 sys.read.help = function() {

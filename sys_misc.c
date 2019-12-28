@@ -16,6 +16,7 @@
 #include <strings.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
+#include <signal.h>
 #include "duktape.h"
 #include "sys_misc.h"
 #include "textbuffer.h"
@@ -108,6 +109,63 @@ duk_ret_t sys_uname (duk_context *ctx) {
 }
 
 // ============================================================================
+// FUNCTION sys_print
+// ============================================================================
+duk_ret_t sys_print (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    const char *data = duk_to_string (ctx, 0);
+    write (1, data, strlen(data));
+    return 0;
+}
+
+struct sigtable {
+    const char *name;
+    int sig;
+};
+
+static struct sigtable signals[] = {
+    {"SIGABRT",SIGABRT},
+    {"SIGALRM",SIGALRM},
+    {"SIGCHLD",SIGCHLD},
+    {"SIGCONT",SIGCONT},
+    {"SIGHUP",SIGHUP},
+    {"SIGINT",SIGINT},
+    {"SIGKILL",SIGKILL},
+    {"SIGPIPE",SIGPIPE},
+    {"SIGSTOP",SIGSTOP},
+    {"SIGTERM",SIGTERM},
+    {"SIGUSR1",SIGUSR1},
+    {"SIGUSR2",SIGUSR2},
+    {"SIGTRAP",SIGTRAP},
+    {NULL,0}
+};
+
+// ============================================================================
+// FUNCTION sys_kill
+// ============================================================================
+duk_ret_t sys_kill (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    pid_t pid = duk_get_int (ctx, 0);
+    const char *signame = duk_to_string (ctx, 1);
+    int sigid = atoi (signame);
+    if (signame[0] != '0' && (! sigid)) {
+        for (int i=0; signals[i].name; ++i) {
+            if (strcmp (signame, signals[i].name) == 0) {
+                sigid = signals[i].sig;
+                break;
+            }
+        }
+        if (! sigid) {
+            duk_push_boolean (ctx, 0);
+            return 1;
+        }
+    }
+    if (kill (pid,sigid) == 0) duk_push_boolean (ctx, 1);
+    else duk_push_boolean (ctx, 0);
+    return 1;
+}
+
+// ============================================================================
 // DATA username/groupname cache for stat data
 // ============================================================================
 struct xidcache {
@@ -119,16 +177,6 @@ static struct xidcache uidcache[16];
 static struct xidcache gidcache[16];
 static int uidcpos;
 static int gidcpos;
-
-// ============================================================================
-// FUNCTION sys_print
-// ============================================================================
-duk_ret_t sys_print (duk_context *ctx) {
-    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
-    const char *data = duk_to_string (ctx, 0);
-    write (1, data, strlen(data));
-    return 0;
-}
 
 // ============================================================================
 // FUNCTION pushpasswd
