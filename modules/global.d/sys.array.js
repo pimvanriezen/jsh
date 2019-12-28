@@ -185,3 +185,65 @@ Array.grep = {help:function() {
 }}
 
 setapi (Array.grep,"Array.grep");
+
+// ============================================================================
+// Array::intern
+// ============================================================================
+Object.defineProperty (Array.prototype, 'intern', {
+    value: function(obj) {
+        if (obj === null || typeof(obj) != "object") {
+            this.push(obj);
+            return this;
+        }
+        if (Array.isArray (obj)) {
+            for (var i=0; i<obj.length; ++i) this.push (obj[i]);
+            return this;
+        }
+        for (var k in obj) {
+            var nelm = {id:k};
+            if (obj[k] === null || typeof(obj[k]) != "object") {
+                nelm.value = obj[k];
+                this.push (nelm);
+                continue;
+            }
+            for (var subk in obj[k]) {
+                var o = obj[k][subk];
+                if (subk == "id") {
+                    if (o != k) {
+                        if (! obj[k].orig_id) nelm.orig_id = o;
+                        else if (! obj[k]._id) nelm._id = o;
+                        else throw new Error ("could not stash id");
+                    }
+                    continue ;
+                }
+                nelm[subk] = o;
+            }
+            this.push (nelm);
+        }
+        return this;
+    }
+});
+
+Array.intern = {help:function() {
+    setapi.helptext ({
+        name:"array.intern",
+        args:[
+            {name:"obj",text:<<<
+                The object to intern. If it's a primitive, it will
+                just be pushed into the array. If it is an array,
+                all its elements will be added as new elements in
+                the target array. If it's an object, each of its
+                keys will be added as a row with an object. If their
+                value is an object, its members will be merged into
+                that row, otherwise they will be stashed in
+                row[n].value.
+            >>>},
+        ],
+        text:<<<
+            Interns a given argument into an already created array.
+            Returns a reference to the array itself (not a new copy).
+        >>>
+    })
+}}
+
+setapi (Array.intern,"Array.intern");
