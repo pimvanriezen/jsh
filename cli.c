@@ -575,15 +575,18 @@ static int handle_interactive(duk_context *ctx) {
         if (buffer && buffer[0] != (char) 0) {
             linenoiseHistoryAdd(buffer);
         }
+        
+        char *translated = handle_quoting (buffer);
 
-        duk_push_pointer(ctx, (void *) buffer);
-        duk_push_uint(ctx, (duk_uint_t) strlen(buffer));
+        duk_push_pointer(ctx, (void *) translated);
+        duk_push_uint(ctx, (duk_uint_t) strlen(translated));
         duk_push_string(ctx, "input");
 
         interactive_mode = 1;  /* global */
 
         rc = duk_safe_call(ctx, wrapped_compile_execute, NULL, 3, 1);
-
+        
+        free (translated);
         if (buffer) {
             linenoiseFree(buffer);
             buffer = NULL;
