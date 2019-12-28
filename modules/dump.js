@@ -1,3 +1,9 @@
+// ============================================================================
+// FUNCTION strescape
+// ------------------
+// Escapes a string to make it safe for within double quotes in the context
+// of parsed javascript.
+// ============================================================================
 var strescape = function(str) {
     var res = "";
     for (var i=0; i<str.length; ++i) {
@@ -15,6 +21,12 @@ var strescape = function(str) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION isShortArray
+// ---------------------
+// Determines whether an array would fit on one line on the screen, if
+// encoded as JSON.
+// ============================================================================
 var isShortArray = function(arr,indent) {
     if (arr.length > 12) return false;
     var totalWidth = 2;
@@ -37,6 +49,12 @@ var isShortArray = function(arr,indent) {
     return false;
 }
 
+// ============================================================================
+// FUNCTION isShortObject
+// ---------------------
+// Determines whether an object would fit on one line on the screen, if
+// encoded as JSON.
+// ============================================================================
 var isShortObject = function(obj,indent) {
     var k = Object.keys(obj).length;
     if (k > 3) return false;
@@ -59,10 +77,21 @@ var isShortObject = function(obj,indent) {
     return false;
 }
 
+// ============================================================================
+// FUNCTION dump
+// -------------
+// Dumps the passed argument as colorized JSON.
+// ============================================================================
 var dump = function(x,mkshort,indent,realindent,realpos) {
     echo (dump.dumper (x,mkshort,indent,realindent,realpos));
 }
 
+// ============================================================================
+// FUNCTION dump.dumper
+// --------------------
+// Actual implementation, dumps the JSON into a string. Needed for the
+// cli.
+// ============================================================================
 dump.dumper = function(x,mkshort,indent,realindent,realpos) {
     var codes = {
         "number":"\033[34m",
@@ -197,6 +226,9 @@ dump.dumper = function(x,mkshort,indent,realindent,realpos) {
     return res;
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 dump.help = function() {
     setapi.helptext ({
         name:"dump",
@@ -208,4 +240,3 @@ dump.help = function() {
 }
 
 module.exports = dump;
-

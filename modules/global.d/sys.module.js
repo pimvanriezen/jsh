@@ -1,5 +1,8 @@
 sys.module = {}
 
+// ============================================================================
+// FUNCTION sys.module.list
+// ============================================================================
 sys.module.list = function() {
     var t = new TextTable(4);
     t.boldColumn(0);
@@ -15,6 +18,9 @@ sys.module.list = function() {
     print (t.format (sys.winsize()));
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 sys.module.list.help = function() {
     setapi.helptext ({
         name:"sys.module.list",

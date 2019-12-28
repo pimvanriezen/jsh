@@ -1,13 +1,22 @@
+// ============================================================================
+// CONSTRUCTOR AutoColumn
+// ============================================================================
 var AutoColumn = function() {
     this.data = [];
     this._indent = 0;
 }
 
+// ============================================================================
+// METHOD AutoColumn::add
+// ============================================================================
 AutoColumn::add = function(obj) {
     this.data.push (""+obj);
     return this;
 }
 
+// ============================================================================
+// METHOD AutoColumn::setData
+// ============================================================================
 AutoColumn::setData = function(obj) {
     if (!obj) return;
     if (typeof(obj) != "object") return;
@@ -16,11 +25,17 @@ AutoColumn::setData = function(obj) {
     return this;
 }
 
+// ============================================================================
+// METHOD AutoColumn::indent
+// ============================================================================
 AutoColumn::indent = function(i) {
     this._indent = parseInt(i);
     return this;
 }
 
+// ============================================================================
+// METHOD AutoColumn::format
+// ============================================================================
 AutoColumn::format = function() {
     var arr = this.data;
     var indent = this._indent;
@@ -47,6 +62,9 @@ AutoColumn::format = function() {
     return res;
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 AutoColumn.help = function() {
     setapi.helptext({
         name:"c = new AutoColumn",

@@ -1,3 +1,9 @@
+// ============================================================================
+// FUNCTION sys.ps
+// ---------------
+// Currently uses the system ps command. Something a bit more nifty might
+// be needed at some point.
+// ============================================================================
 sys.ps = function(matchopt) {
     var fields = [
         "user",

@@ -1,11 +1,13 @@
-/*
- * Adapted from extsprintf.js: extended POSIX-style sprintf
- */
-
+// ============================================================================
+// FUNCTION printf
+// ============================================================================
 var printf = function() {
     print (sprintf.apply (null, arguments));
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 printf.help = function() {
     setapi.helptext ({
         name:"printf",
@@ -45,6 +47,9 @@ printf.help = function() {
 
 setapi (printf, "printf");
 
+// ============================================================================
+// FUNCTION sprintf
+// ============================================================================
 var sprintf = function(fmt)
 {
     var doPad = function(chr, width, left, str)

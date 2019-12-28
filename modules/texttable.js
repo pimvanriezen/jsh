@@ -1,3 +1,6 @@
+// ============================================================================
+// CONSTRUCTOR TextTable
+// ============================================================================
 var TextTable = function(cols) {
     this.columns = cols;
     this._stretchcolumn = cols-1;
@@ -17,21 +20,33 @@ var TextTable = function(cols) {
     }
 }
 
+// ============================================================================
+// METHOD TextTable::stretchColumn
+// ============================================================================
 TextTable::stretchColumn = function(c) {
     if (c < this.columns) this._stretchcolumn = c;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::noWrap
+// ============================================================================
 TextTable::noWrap = function() {
     this._nowrap = true;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::marginRight
+// ============================================================================
 TextTable::marginRight = function(i) {
     this._marginright = i;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::boldColumn
+// ============================================================================
 TextTable::boldColumn = function(c) {
     if (c < this.columns) {
         this._colprefix[c] = '\033[1m';
@@ -40,6 +55,9 @@ TextTable::boldColumn = function(c) {
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::colorColumn
+// ============================================================================
 TextTable::colorColumn = function(c,color) {
     if (c < this.columns) {
         this._colprefix[c] = '\033[' + (30 + parseInt(color)) + 'm';
@@ -48,26 +66,41 @@ TextTable::colorColumn = function(c,color) {
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::rightAlignColumn
+// ============================================================================
 TextTable::rightAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = true;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::leftAlignColumn
+// ============================================================================
 TextTable::leftAlignColumn = function (c) {
     if (c<this.columns) this._colralign[c] = false;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::padding
+// ============================================================================
 TextTable::padding = function(p) {
     this._padding = p;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::indent
+// ============================================================================
 TextTable::indent = function(i) {
     this._indent = i;
     return this;
 }
 
+// ============================================================================
+// METHOD TextTable::addRow
+// ============================================================================
 TextTable::addRow = function() {
     var row = [];
     var args = typeof(arguments[0]) == 'object' ? arguments[0] : arguments;
@@ -79,6 +112,9 @@ TextTable::addRow = function() {
     this.rows.push (row);
 }
 
+// ============================================================================
+// FUNCTION TextTable.colorize
+// ============================================================================
 TextTable.colorize = function(str) {
     var matches = {
         "[.a-zA-Z_]+\\([._a-zA-Z0-9]*\\)":1,
@@ -94,6 +130,9 @@ TextTable.colorize = function(str) {
     return x;
 }
 
+// ============================================================================
+// FUNCTION TextTable.auto
+// ============================================================================
 TextTable.auto = function (inputstr, cols) {
     var t = new TextTable(cols);
     var cutw = [];
@@ -137,6 +176,9 @@ TextTable.auto = function (inputstr, cols) {
     return t;
 }
 
+// ============================================================================
+// METHOD TextTable::format
+// ============================================================================
 TextTable::format = function() {
     var res = "";
     var maxw = sys.winsize() - this._marginright - this._indent -
@@ -232,6 +274,9 @@ TextTable::format = function() {
     return res;
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 TextTable.help = function() {
     setapi.helptext({
         name:"t = new TextTable",

@@ -1,5 +1,11 @@
 sys.app = {}
 
+// ============================================================================
+// FUNCTION sys.app.load
+// ---------------------
+// Loads a file like a module, and parses its exports into the global
+// namespace. 
+// ============================================================================
 sys.app.load = function(appname, apppath) {
     var src = sys.read (apppath);
     var module = {
@@ -64,6 +70,9 @@ sys.app.load = function(appname, apppath) {
     }    
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 sys.app.load.help = function() {
     setapi.helptext ({
         name:"sys.app.load",
@@ -80,6 +89,9 @@ sys.app.load.help = function() {
     });
 }
 
+// ============================================================================
+// FUNCTION sys.app.scan
+// ============================================================================
 sys.app.scan = function() {
     for (var i in env.JSH_APP_PATH) {
         var glob = env.JSH_APP_PATH[i] + "/*.app.js";
@@ -91,6 +103,9 @@ sys.app.scan = function() {
     }
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 sys.app.scan.help = function() {
     setapi.helptext ({
         name:"sys.app.scan",
@@ -101,6 +116,9 @@ sys.app.scan.help = function() {
     })
 }
 
+// ============================================================================
+// FUNCTION sys.app.list
+// ============================================================================
 sys.app.list = function() {
     var t = new TextTable(5);
     t.boldColumn(0);
@@ -120,6 +138,9 @@ sys.app.list = function() {
     print (t.format (sys.winsize()));
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 sys.app.list.help = function() {
     setapi.helptext ({
         name:"sys.app.list",

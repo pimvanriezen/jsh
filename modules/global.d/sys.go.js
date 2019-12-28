@@ -1,3 +1,6 @@
+// ============================================================================
+// CONSTRUCTOR
+// ============================================================================
 Channel = function() {
     this.ch = sys.channel.open();
     Duktape.fin (this, function (x) {
@@ -8,6 +11,65 @@ Channel = function() {
     });
 }
 
+// ============================================================================
+// METHOD Channel::send
+// ============================================================================
+Channel::send = function (data) {
+    if (this.ch === null) return false;
+    if (sys.channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.channel.error (this.ch));
+    }
+    return sys.channel.send (this.ch, JSON.stringify (data));
+}
+
+// ============================================================================
+// METHOD Channel::senderror
+// ============================================================================
+Channel::senderror = function (data) {
+    if (this.ch === null) return;
+    sys.channel.senderror (this.ch, ""+data);
+}
+
+// ============================================================================
+// METHOD Channel::isempty
+// ============================================================================
+Channel::isempty = function (data) {
+    if (this.ch === null) return true;
+    return sys.channel.isempty (this.ch);
+}
+
+// ============================================================================
+// METHOD Channel::recv
+// ============================================================================
+Channel::recv = function() {
+    if (this.ch === null) return null;
+    if (sys.channel.error (this.ch)) {
+        printerr ("Channel error: "+sys.channel.error (this.ch));
+    }
+    var res = sys.channel.recv (this.ch);
+    if (res === false) return null;
+    else return JSON.parse (res);
+}
+
+// ============================================================================
+// METHOD Channel::exit
+// ============================================================================
+Channel::exit = function() {
+    if (this.ch === null) return;
+    sys.channel.exit (this.ch);
+}
+
+// ============================================================================
+// METHOD Channel::close
+// ============================================================================
+Channel::close = function() {
+    if (this.ch === null) return;
+    sys.channel.close (this.ch);
+}
+
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 Channel.help = function() {
     setapi.helptext({
         name:"c = new Channel",
@@ -45,44 +107,9 @@ Channel.help = function() {
 
 setapi (Channel, "Channel");
 
-Channel::send = function (data) {
-    if (this.ch === null) return false;
-    if (sys.channel.error (this.ch)) {
-        printerr ("Channel error: "+sys.channel.error (this.ch));
-    }
-    return sys.channel.send (this.ch, JSON.stringify (data));
-}
-
-Channel::senderror = function (data) {
-    if (this.ch === null) return;
-    sys.channel.senderror (this.ch, ""+data);
-}
-
-Channel::isempty = function (data) {
-    if (this.ch === null) return true;
-    return sys.channel.isempty (this.ch);
-}
-
-Channel::recv = function() {
-    if (this.ch === null) return null;
-    if (sys.channel.error (this.ch)) {
-        printerr ("Channel error: "+sys.channel.error (this.ch));
-    }
-    var res = sys.channel.recv (this.ch);
-    if (res === false) return null;
-    else return JSON.parse (res);
-}
-
-Channel::exit = function() {
-    if (this.ch === null) return;
-    sys.channel.exit (this.ch);
-}
-
-Channel::close = function() {
-    if (this.ch === null) return;
-    sys.channel.close (this.ch);
-}
-
+// ============================================================================
+// FUNCTION go
+// ============================================================================
 go = function(chan, func) {
     var argv = [chan];
     for (var i=2; i<arguments.length; ++i) {
@@ -101,6 +128,9 @@ go = function(chan, func) {
     });
 }
 
+// ============================================================================
+// DOCUMENTATION
+// ============================================================================
 go.help = function() {
     setapi.helptext({
         name:"go",
