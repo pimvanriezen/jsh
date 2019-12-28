@@ -68,12 +68,13 @@ help = function(helpfor) {
     }
     list.sort();
 
-    print (new AutoColumn().setData(list).indent(4).format());
+    print (new AutoColumn().setData(list).indent(4).minWidth(16).format());
     if (classlist.length) {
         classlist.sort();
         echo ("");
         echo ("Documented classes:");
-        print (new AutoColumn().setData(classlist).indent(4).format());
+        print (new AutoColumn().setData(classlist).
+                                indent(4).minWidth(16).format());
     }
 }
 

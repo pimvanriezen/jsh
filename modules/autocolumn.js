@@ -4,6 +4,7 @@
 var AutoColumn = function() {
     this.data = [];
     this._indent = 0;
+    this._minwidth = 4;
 }
 
 // ============================================================================
@@ -11,6 +12,14 @@ var AutoColumn = function() {
 // ============================================================================
 AutoColumn::add = function(obj) {
     this.data.push (""+obj);
+    return this;
+}
+
+// ============================================================================
+// METHOD AutoColumn::minWidth
+// ============================================================================
+AutoColumn::minWidth = function(w) {
+    this._minwidth = w;
     return this;
 }
 
@@ -44,6 +53,7 @@ AutoColumn::format = function() {
     for (var i in arr) {
         if (arr[i].length > maxsz) maxsz = arr[i].length;
     }
+    if (maxsz < this._minwidth) maxsz = this._minwidth;
     var ncol = (((sys.winsize() - indent) / (maxsz+2))-0.5).toFixed(0);
     ncol = parseInt (ncol);
     var curcol = 0;
@@ -80,6 +90,7 @@ AutoColumn.help = function() {
         c.add(cell)         Adds a single text cell to the layout.
         c.setData(array)    Sets the full array of text nodes for the layout.
         c.indent(i)         Sets the indent level when displaying.
+        c.minWidth(i)       The minimal width cells should get
         c.format()          Formats the layout and returns it as a string.
     >>>, 2).indent(4).boldColumn(0).format());
     
