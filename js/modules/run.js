@@ -1,5 +1,5 @@
 // ============================================================================
-// Unix execution
+// FUNCTION run
 // ============================================================================
 var run = function() {
     var args = [];
@@ -41,6 +41,9 @@ run.help = function() {
     });
 }
 
+// ============================================================================
+// FUNCTION run.console
+// ============================================================================
 run.console = function() {
     var args = [];
     var res;
@@ -71,6 +74,53 @@ run.console.help = function() {
             Behaves like run(), but executes connected to the shell's
             console, instead of exchanging data with the javascript
             layer.
+        >>>
+    });
+}
+
+// ============================================================================
+// FUNCTION run.js
+// ============================================================================
+run.js = function(file) {
+    if (! exists (file)) return false;
+    var argv = arguments;
+    var src = load (file);
+    if (src.startsWith ("#!")) {
+        var nextl = src.indexOf('\n');
+        if (nextl<0) return false;
+        src = src.substr (nextl);
+    }
+    
+    // Decorate the source
+    src = "(function(argv,JSAPI){"+src+"})";
+    
+    // Set up a channel and a coroutine to run the script
+    var c = new Channel();
+    var runf = function(c,argv) {
+        return sys.eval(src)(argv,true);
+    }
+    
+    // Spawn the coroutine, and get back the return data
+    go (c, runf, argv);
+    var res = c.recv();
+    
+    // Close the channel and return the result
+    c.close();
+    return res;
+}
+
+run.js.help = function() {
+    setapi.helptext({
+        name:"run.js",
+        args:[
+            {name:"file",text:"Location of the script file"}
+        ],
+        text:<<<
+            Loads and runs a javascript file, in its own sub-process so it
+            cannot stink up the global heap, but its return value is
+            what we get back, instead of its standard output. Any extra
+            arguments passed to the function will be available through
+            argv[] inside the script.
         >>>
     });
 }

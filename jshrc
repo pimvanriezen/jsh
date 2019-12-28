@@ -42,6 +42,7 @@ setapi (which, "which");
 setapi (dump, "dump");
 setapi (run, "run");
 setapi (run.console, "run.console");
+setapi (run.js, "run.js");
 setapi ($, "$");
 
 // ============================================================================
