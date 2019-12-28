@@ -113,6 +113,8 @@ mycp ("bin/jsh",f("bin/jsh"));
 dumpcopied();
 
 // ----------------------------------------------------------------------------
+
+cd("js");
 banner("Copying base modules");
 $("modules/*.js").each (function (file) {
     if (! file.isDir) {
@@ -146,3 +148,5 @@ $("app/*.app.js").each (function (app) {
     mycp (app, f("lib/jsh/"+app));
 });
 dumpcopied();
+
+cd(-1);

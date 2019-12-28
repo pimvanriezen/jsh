@@ -8,11 +8,12 @@ OBJS_DUKTAPE = \
 	duktape/duk_module_duktape.o duktape/linenoise.o
 
 OBJS_CLI = \
-	cli.o quoting.o textbuffer.o channel.o sys_init.o sys_channel.o \
-	sys_fs.o sys_run.o sys_misc.o sys_module.o
+	src/cli.o src/quoting.o src/textbuffer.o src/channel.o src/sys_init.o \
+	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
+	src/sys_module.o
 
 CC = gcc
-CCOPTS += -std=c99 -Wall
+CCOPTS += -std=c99 -Wall -I./include
 CCOPTS += -D_GNU_SOURCE -I./duktape   # duktape.h and duk_config.h must be in include path
 CCLIBS = -lm
 
@@ -22,8 +23,8 @@ bin:
 	mkdir bin
 
 install: all
-	@JSHRC=./jshrc JSH_GLOBAL=./modules/global.js \
-	 JSH_APP_PATH=./app JSH_MODULE_PATH=./modules bin/jsh ./install.js
+	@JSHRC=./jshrc JSH_GLOBAL=./js/modules/global.js \
+	 JSH_APP_PATH=./js/app JSH_MODULE_PATH=./js/modules bin/jsh ./install.js
 
 clean:
 	rm -f $(OBJS_DUKTAPE) $(OBJS_CLI) bin/jsh
