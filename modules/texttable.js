@@ -37,6 +37,14 @@ TextTable::noWrap = function() {
 }
 
 // ============================================================================
+// METHOD TextTable::summarize
+// ============================================================================
+TextTable::summarize = function() {
+    this._summarize = true;
+    return this;
+}
+
+// ============================================================================
 // METHOD TextTable::marginRight
 // ============================================================================
 TextTable::marginRight = function(i) {
@@ -216,7 +224,12 @@ TextTable::format = function() {
         for (var i=0; i<this.columns; ++i) {
             if (i == this._stretchcolumn) {
                 if (this._nowrap) {
-                    out[i] = [(""+this.rows[ri][i]).substr(0,widths[i])];
+                    if (this._summarize) {
+                        out[i] = [(""+this.rows[ri][i]).summarize(widths[i])];
+                    }
+                    else {
+                        out[i] = [(""+this.rows[ri][i]).substr(0,widths[i])];
+                    }
                 }
                 else {
                     var wrapped = (""+this.rows[ri][i]).rewrap(widths[i]);
@@ -300,6 +313,7 @@ TextTable.help = function() {
         t.noWrap()              If text size in the stretchColumn exceeds the
                                 screen width, instead of word-wrapping the cell,
                                 any excess characters are cut off.
+        t.summarize()           Uses string summarize on a noWrap cell.
         t.marginRight(m)        Decides the width of whitespace that should be
                                 observed to the right of the table.
         t.boldColumn(c)         Sets a column in the table to be printed bold.
