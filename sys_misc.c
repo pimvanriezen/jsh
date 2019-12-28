@@ -21,6 +21,12 @@
 #include "sys_misc.h"
 #include "textbuffer.h"
 
+#ifdef __linux__
+#include <sys/sysinfo.h>
+#else
+#include <sys/sysctl.h>
+#endif
+
 // ============================================================================
 // FUNCTION sys_setenv
 // ============================================================================
@@ -118,6 +124,73 @@ duk_ret_t sys_print (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION sys_uptime
+// ============================================================================
+duk_ret_t sys_uptime (duk_context *ctx) {
+#ifdef __linux__
+    struct sysinfo info;
+    if (sysinfo (&info) < 0) {
+        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not read "
+                               "sysinfo");
+        return duk_throw (ctx);
+    }
+    duk_push_number (ctx, info.uptime);
+    return 1;
+#else
+    struct timespec ts;
+    if (clock_gettime (CLOCK_MONOTONIC, &ts) < 0) {
+        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not read "
+                               "monotonic clock");
+        return duk_throw (ctx);
+    }
+    duk_push_number (ctx, ts.tv_sec);
+    return 1;
+#endif
+}
+
+// ============================================================================
+// FUNCTION sys_loadavg
+// ============================================================================
+duk_ret_t sys_loadavg (duk_context *ctx) {
+#ifdef __linux__
+    struct sysinfo info;
+    if (sysinfo (&info) < 0) {
+        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not read "
+                               "sysinfo");
+        return duk_throw (ctx);
+    }
+    duk_idx_t aridx = duk_push_array (ctx);
+    double la;
+    
+    for (int i=0; i<3; ++i) {
+        la = (info.loads[0] >> 16) + ((info.loads[0] & 0xffff) / 65536.0);
+        duk_push_number (ctx, la);
+        duk_put_prop_index (ctx, aridx, i);
+    }
+#else
+    // This was only tested on macOS
+    uint32_t avg[6];
+    size_t sz = sizeof(avg);
+    if (sysctlbyname ("vm.loadavg", &avg, &sz, NULL, 0)) {
+        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not get "
+                               "sysctl (vm.loadavg)");
+        return duk_throw (ctx);
+    }
+
+    duk_idx_t aridx = duk_push_array (ctx);
+
+    for (int i=0; i<3; ++i) {
+        duk_push_number (ctx, avg[i] / 2048.0);
+        duk_put_prop_index (ctx, aridx, i);
+    }
+    return 1;
+#endif
+}
+
+// ============================================================================
+// DATA text table for signal names
+// ============================================================================
 struct sigtable {
     const char *name;
     int sig;

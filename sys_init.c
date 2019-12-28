@@ -81,6 +81,8 @@ void sys_init (duk_context *ctx) {
     defcall (getenv, 1);
     defcall (setenv, 2);
     defcall (print, DUK_VARARGS);
+    defcall (uptime, 0);
+    defcall (loadavg, 0);
     defcall (kill, 2);
     defcall (read, DUK_VARARGS);
     defcall (write, 2);

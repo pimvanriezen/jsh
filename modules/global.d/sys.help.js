@@ -164,6 +164,34 @@ sys.print.help = function() {
 setapi (sys.print, "sys.print");
 
 // ============================================================================
+// sys.uptime
+// ============================================================================
+sys.print.help = function() {
+    setapi.helptext ({
+        name:"sys.uptime",
+        text:<<<
+            Returns the system uptime in seconds.
+        >>>
+    });
+}
+
+setapi (sys.print, "sys.uptime");
+
+// ============================================================================
+// sys.uptime
+// ============================================================================
+sys.print.help = function() {
+    setapi.helptext ({
+        name:"sys.loadavg",
+        text:<<<
+            Returns the system load average as an array of three numbers.
+        >>>
+    });
+}
+
+setapi (sys.print, "sys.loadavg");
+
+// ============================================================================
 // sys.kill
 // ============================================================================
 sys.kill.help = function() {
