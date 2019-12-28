@@ -112,6 +112,27 @@ char *handle_quoting (const char *src) {
                 currentquote = 0;
             }
         }
+        else if (!currentquote && c[0] == '/' && c[1] == '/') {
+            while (*c && (*c != '\n')) {
+                textbuffer_add_c (t, *c);
+                c++;
+            }
+            if (*c) {
+                textbuffer_add (t, *c);
+                c++;
+            }
+        }
+        else if (!currentquote && c[0] == '/' && c[1] == '*') {
+            while (*c && (c[0] != '*' && c[1] != '/')) {
+                textbuffer_add_c (t, *c);
+                c++;
+            }
+            if (*c) {
+                textbuffer_add_c (t, c[0]);
+                textbuffer_add_c (t, c[1]);
+                c+=2;
+            }
+        }
         else if (!currentquote && c[0] == '<' && c[1] == '<' && c[2] == '<') {
             c += 3;
             currentquote = '<';
