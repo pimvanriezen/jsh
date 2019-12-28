@@ -86,16 +86,24 @@ help = function(helpfor) {
 // a generated help() function describing the possible arguments.
 // ============================================================================
 var setapi = function(arg1,arg2) {
+    // Divert if called for just adding a function to the document
+    // database
     if (typeof (arg1) == "function") {
         if (typeof (arg1.help) == "function") {
             $apidb[arg2] = true;
             return;
         }
     }
+    
+    // Regular call, with an array containing the function definition
     var defarr = arg1;
     var apitype="unix";
     var f = null;
     var processf = null;
+    
+    // Go over the definition once, and fish out the function name to
+    // register, as well as an execution function (f) or a result-
+    // processing function (process).
     for (var k in defarr) {
         if (defarr[k].name) {
             $apidb[defarr[k].name] = true;
@@ -104,12 +112,18 @@ var setapi = function(arg1,arg2) {
         if (defarr[k].f) f=defarr[k].f;
     }
 
+    // The actual function that will be returned
     var obj = function() {
         var useconsole = false;
         var stdin = null;
         var argp = 0;
         var args = {};
         var lastp = arguments.length;
+        
+        // If we got any arguments, and the last one contains an
+        // object, this is taken to contain the optional
+        // arguments. We will parse the rest of the arguments
+        // into this as needed.
         if (lastp) {
             var last = arguments[lastp-1];
             if (typeof (last) == "object") {
@@ -117,17 +131,30 @@ var setapi = function(arg1,arg2) {
                 lastp--;
             }
         }
+        
+        // This will contain the argument list as it is sent to the child
         var argv = [];
+        
+        // Go over the definition
         for (var ai in defarr) {
             var def = defarr[ai];
+            
+            // Set console option
             if (def.console) {
                 useconsole = true;
             }
+            
+            // {setarg:"foo"} takes the next regular argument
+            // provided and stashes it into args.foo
             if (def.setarg) {
                 if (argp < lastp) {
                     args[def.setarg] = arguments[argp++];
                 }
             }
+            
+            // {literal:"bar"} adds a literal argument to argv[].
+            // {literal:function(){...}} uses the result of the
+            // function.
             if (def.literal) {
                 if (typeof (def.literal) == "function") {
                     var dt = def.literal(args);
@@ -139,6 +166,9 @@ var setapi = function(arg1,arg2) {
                 else argv.push (def.literal);
                 continue;
             }
+            
+            // {opt:{"wibble":"-f"}} adds ["-f",argv.wibble] to argv[]
+            // The flag value can be an array.
             if (def.opt) {
                 for (var k in args) {
                     if (def.opt[k]) {
@@ -154,6 +184,11 @@ var setapi = function(arg1,arg2) {
                 }
                 continue;
             }
+            
+            // {arg:"foo"} adds args.foo to argv[]. If args.foo is
+            // not set, this will lead to complaints, unless if the
+            // optional flag is set, e.g.,
+            // {arg:"foo",optional:true}
             if (def.arg) {
                 if (args[def.arg] == undefined) {
                     if (def.def) args[def.arg] = def.def;
@@ -175,6 +210,9 @@ var setapi = function(arg1,arg2) {
                 else argv.push (""+args[def.arg]);
                 continue;
             }
+            
+            // {flag:{"dofoo","-d"}} will add ["-d"] to argv[] if
+            // args.dofoo is true.
             if (def.flag) {
                 for (var ak in args) {
                     if (def.flag[ak]) {
@@ -209,6 +247,8 @@ var setapi = function(arg1,arg2) {
         if (processf) res = processf (res, args);
         return res;
     }
+    
+    // Hidden sub-function, derives the unix command being spawned, if any.
     obj.unixcmd = function() {
         for (var ii in defarr) {
             var lit = defarr[ii].literal;
@@ -219,6 +259,8 @@ var setapi = function(arg1,arg2) {
         }
         return null;
     }
+    
+    // Hidden sub-function, prints out the help page for the function.
     obj.help = function() {
         var t = new TextTable(4);
         var argi = {}
