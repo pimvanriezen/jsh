@@ -30,18 +30,18 @@ File.help = function() {
 setapi (File, "File");
 
 // ============================================================================
-// METHOD File::openread
+// METHOD File::openRead
 // ============================================================================
-File::openread = function(fnam) {
+File::openRead = function(fnam) {
     var fd = sys.io.open (fnam, "r");
     if (! fd) return false;
     this.fd = fd;
     return true;
 }
 
-File.openread = {help:function() {
+File.openRead = {help:function() {
     setapi.helptext ({
-        name:"f.openread",
+        name:"f.openRead",
         args:[
             {name:"filename",text:"The file to open"}
         ],
@@ -52,12 +52,12 @@ File.openread = {help:function() {
     });
 }}
 
-setapi (File.openread, "File.openread");
+setapi (File.openRead, "File.openRead");
 
 // ============================================================================
-// METHOD File::openwrite
+// METHOD File::openWrite
 // ============================================================================
-File::openwrite = function(fnam,perm) {
+File::openWrite = function(fnam,perm) {
     if (! perm) perm = 0644;
     var fd = sys.io.open (fnam, "wt");
     if (! fd) return false;
@@ -66,9 +66,9 @@ File::openwrite = function(fnam,perm) {
     return true;
 }
 
-File.openwrite = {help:function() {
+File.openWrite = {help:function() {
     setapi.helptext ({
-        name:"f.openwrite",
+        name:"f.openWrite",
         args:[
             {name:"filename",text:"The file to open"}
         ],
@@ -79,12 +79,12 @@ File.openwrite = {help:function() {
     });
 }}
 
-setapi (File.openwrite, "File.openwrite");
+setapi (File.openWrite, "File.openWrite");
 
 // ============================================================================
-// METHOD File::openappend
+// METHOD File::openAppend
 // ============================================================================
-File::openappend = function(fnam,perm) {
+File::openAppend = function(fnam,perm) {
     if (! perm) perm = 0644;
     if (exists (fnam)) perm = 0;
     var fd = sys.io.open (fnam, "a");
@@ -94,9 +94,9 @@ File::openappend = function(fnam,perm) {
     return true;
 }
 
-File.openappend = {help:function() {
+File.openAppend = {help:function() {
     setapi.helptext ({
-        name:"f.openappend",
+        name:"f.openAppend",
         args:[
             {name:"filename",text:"The file to open"}
         ],
@@ -108,7 +108,7 @@ File.openappend = {help:function() {
     });
 }}
 
-setapi (File.openappend, "File.openappend");
+setapi (File.openAppend, "File.openAppend");
 
 // ============================================================================
 // METHOD File::close
@@ -171,9 +171,9 @@ File.read = {help:function() {
 setapi (File.read, "File.read");
 
 // ============================================================================
-// METHOD File::readln
+// METHOD File::readLine
 // ============================================================================
-File::readln = function() {
+File::readLine = function() {
     if (! this.fd) return null;
     var nl = this.rdbuf.indexOf ('\n');
     while (nl<0) {
@@ -196,9 +196,9 @@ File::readln = function() {
     return res;
 }
 
-File.readln = {help:function() {
+File.readLine = {help:function() {
     setapi.helptext ({
-        name:"f.readln",
+        name:"f.readLine",
         text:<<<
             Tries to read a line of text from an open file. Returns
             the line without its trailing newline. If the last line
@@ -209,7 +209,7 @@ File.readln = {help:function() {
     });
 }}
 
-setapi (File.readln, "File.readln");
+setapi (File.readLine, "File.readLine");
 
 // ============================================================================
 // METHOD File::write
@@ -240,15 +240,15 @@ File.write = {help:function() {
 setapi (File.write, "File.write");
 
 // ============================================================================
-// METHOD File::writeln
+// METHOD File::writeLine
 // ============================================================================
-File::writeln = function(str) {
+File::writeLine = function(str) {
     return this.write (str + '\n');
 }
 
-File.writeln = {help:function() {
+File.writeLine = {help:function() {
     setapi.helptext ({
-        name:"f.writeln",
+        name:"f.writeLine",
         args:[
             {name:"data",text:"Text to write"}
         ],
@@ -259,7 +259,7 @@ File.writeln = {help:function() {
     });
 }}
 
-setapi (File.writeln, "File.writeln");
+setapi (File.writeLine, "File.writeLine");
 
 // ============================================================================
 // METHOD File::printf
