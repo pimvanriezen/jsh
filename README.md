@@ -208,3 +208,12 @@ while (m = c.recv()) {
 
 echo ("Total sum: "+totalsum);
 ```
+
+# Getting Started
+
+Just clone the repository and run 'make'. There are currently no external library
+dependencies, and the project should build cleanly on both Linux and macOS.
+You can give the install a try by running ./jsh from within the build-dir,
+or you can install to /usr/local using Make install.
+
+Once you're in the shell, use help() to get a feel of the land.
