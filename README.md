@@ -98,6 +98,7 @@ with the text being indented, by looking at the first line of text, and
 cutting that indentation out of each subsequent line. As long as you're
 not being weirdly esoteric in mixing tabs and spaces, this works out
 quite well:
+
 ```javascript
 var setSystemResolverOptions = function(domain,pri,sec) {
     if (! domain) domain = "local";
@@ -113,6 +114,28 @@ var setSystemResolverOptions = function(domain,pri,sec) {
     
     save (rconf, "/etc/resolv.conf");
 }
+```
+
+Since we're incompatible now anyway, another quality of life feature added
+to the parser is the '::' operator for objects, which accesses properties
+within their prototype. So you can now write stuff like this:
+
+```javascript
+var Accumulator = function() {
+    this._sum = 0;
+}
+
+Accumulator::add = function(i) {
+    this._sum += i;
+    return this;
+}
+
+Accumulator::sum = function(i) {
+    return this._sum;
+}
+
+var a = new Accumulator().add("15").add("27");
+echo (a.sum());
 ```
 
 ## And some more sugar (job control)
