@@ -650,10 +650,10 @@ sys.io.open.help = function() {
         name:"sys.io.open",
         args:[
             {name:"file",text:"Filename to open"},
-            {name:"mode",text:{
+            {name:"mode",text:<<<
                 Access mode. A string with one or more single character
                 flags for read(r), write(r), truncate(t), and append(a).
-            }
+            >>>}
         ],
         text:<<<
             Opens a fileystem file. Returns a file descriptor.
@@ -688,10 +688,10 @@ sys.io.read.help = function() {
         name:"sys.io.read",
         args:[
             {name:"fd",text:"Filedescriptor to read from"},
-            {name:"size",text:{
+            {name:"size",text:<<<
                 Number of bytes to read. Returned buffer will be smaller
                 if end-of-file is reached.
-            }
+            >>>}
         ],
         text:<<<
             Reads data from an open file descriptor. Returns a raw
@@ -710,9 +710,9 @@ sys.io.write.help = function() {
         name:"sys.io.write",
         args:[
             {name:"fd",text:"Filedescriptor to write to"},
-            {name:"data",text:{
+            {name:"data",text:<<<
                 An Uint8Array with the bytes that should be written.
-            }
+            >>>}
         ],
         text:<<<
             Writes data to an open file descriptor. Returns false if the
