@@ -121,3 +121,180 @@ duk_ret_t sys_io_write (duk_context *ctx) {
     return 1;
 }
 
+struct fdref {
+    struct fdref    *next;
+    int              fd;
+    int              refid;
+};
+
+typedef struct fdref *fdref_ptr;
+
+void fdref_init (struct fdref **baseptr) {
+    *baseptr = NULL;
+}
+
+fdref_ptr fdref_add (fdref_ptr *baseptr, int fd, int refid) {
+    fdref_ptr res = malloc (sizeof (struct fdref));
+    fdref_ptr crsr;
+    
+    res->next = NULL;
+    res->fd = fd;
+    res->refid = refid;
+    
+    if (! *baseptr) {
+        *baseptr = res;
+        return res;
+    }
+    
+    crsr = *baseptr;
+    while (crsr->next) crsr = crsr->next;
+    crsr->next = res;
+    return res;
+}
+
+int fdref_get_refid (fdref_ptr *baseptr, int fd) {
+    fdref_ptr crsr = *baseptr;
+    while (crsr) {
+        if (crsr->fd == fd) return crsr->refid;
+        crsr = crsr->next;
+    }
+    return -1;
+}
+
+void fdref_free (fdref_ptr *baseptr) {
+    fdref_ptr crsr, ncrsr;
+    if (! baseptr) return;
+    crsr = *baseptr;
+    while (crsr) {
+        ncrsr = crsr->next;
+        free (crsr);
+        crsr = ncrsr;
+    }
+    *baseptr = NULL;
+}
+
+int duk_get_fd (duk_context *ctx, int argidx, int arrayidx) {
+    int popcnt = 0;
+    int res = -1;
+    if (! duk_is_array (ctx, argidx)) {
+        fprintf (stderr, "getfd: notarray(%i)\n",arrayidx);
+        if (arrayidx != 0) return -1;
+        duk_dup (ctx, argidx);
+        popcnt++;
+    }
+    else {
+        fprintf (stderr, "getfd: isarray\n");
+        duk_get_prop_index (ctx, argidx, arrayidx);
+        popcnt++;
+    }
+    if (duk_is_object (ctx, -1)) {
+        fprintf (stderr, "getfd: isobject\n");
+        duk_get_prop_string (ctx, -1, "fd");
+        popcnt++;
+    }
+    if (duk_is_number (ctx, -1)) {
+        fprintf (stderr, "getfd: isnumber\n");
+        res = duk_get_int (ctx, -1);
+        fprintf (stderr, "     : => %i\n", res);
+    }
+    for (int i=0; i<popcnt; ++i) duk_pop (ctx);
+    return res;
+}
+
+int duk_get_fdarg_len (duk_context *ctx, int argidx) {
+    int res = 0;
+    if (! duk_is_array (ctx, argidx)) return 1;
+    duk_get_prop_string (ctx, argidx, "length");
+    res = duk_get_int (ctx, -1);
+    duk_pop (ctx);
+    return res;
+}
+
+void duk_push_fdarg (duk_context *ctx, int argidx, int arrayidx) {
+    int offs = 0;
+    
+    if (! duk_is_array (ctx, -1)) return;
+    duk_get_prop_index (ctx, -1, argidx);
+    
+    duk_get_prop_string (ctx, -1, "length");
+    offs = duk_get_int (ctx, -1);
+    duk_pop(ctx);
+    
+    
+    if (! duk_is_array (ctx, argidx)) {
+        if (arrayidx != 0) return;
+        duk_dup (ctx, argidx);
+    }
+    else {
+        duk_get_prop_index (ctx, argidx, arrayidx);
+    }
+    duk_put_prop_index (ctx, -2, offs);
+    duk_pop (ctx); 
+}
+
+duk_ret_t sys_io_select (duk_context *ctx) {
+    if (duk_get_top (ctx) < 3) return DUK_RET_TYPE_ERROR;
+    
+    int i = 0;
+    int ai = 0;
+    int maxfd = 0;
+    int timeout_ms = 0;
+    fdref_ptr sets[3];
+    fd_set fds[3];
+    int numfd[3];
+    struct timeval tv;
+    
+    fdref_init (&sets[0]);
+    fdref_init (&sets[1]);
+    fdref_init (&sets[2]);
+    
+    if (duk_get_top (ctx) > 3) {
+        timeout_ms = duk_get_int (ctx, 3);
+        tv.tv_sec = timeout_ms/1000;
+        tv.tv_usec = 1000 * (timeout_ms % 1000);
+    }
+    else {
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
+    }
+    
+    for (i=0; i<3; ++i) {
+        FD_ZERO (&fds[i]);
+        numfd[i] = duk_get_fdarg_len (ctx, i);
+        fprintf (stderr,"numfd(%i) = %i\n", i, numfd[i]);
+        for (ai=0; ai<numfd[i]; ++ai) {
+            int infd = duk_get_fd (ctx, i, ai);
+            if (infd>0) {
+                fprintf (stderr, "foundfd(%i,%i) = %i\n", i, ai, infd);
+                fdref_add (&sets[i], infd, ai);
+                FD_SET (infd, &fds[i]);
+                if (infd > maxfd) maxfd = infd;
+            }
+        }
+    }
+    
+    duk_push_array (ctx); // result array[3]
+    duk_push_array (ctx);
+    duk_put_prop_index (ctx, -2, 0);
+    duk_push_array (ctx);
+    duk_put_prop_index (ctx, -2, 1);
+    duk_push_array (ctx);
+    duk_put_prop_index (ctx, -2, 2);
+    
+    if (select (maxfd+1, &fds[0], &fds[1], &fds[2], &tv) > 0) {
+        for (i=0; i<3; ++i) {
+            for (ai=0; ai<numfd[i]; ++ai) {
+                int posfd = duk_get_fd (ctx, i, ai);
+                fprintf (stderr, "select.addfd(%i,%i) = %i\n",i,ai,posfd);
+                if (posfd>0 && FD_ISSET(posfd, &fds[i])) {
+                    duk_push_fdarg (ctx, i, ai);
+                }
+            }
+        }
+    }
+    
+    fdref_free (&sets[0]);
+    fdref_free (&sets[1]);
+    fdref_free (&sets[2]);
+    return 1;
+}

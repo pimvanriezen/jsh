@@ -132,6 +132,7 @@ void sys_init (duk_context *ctx) {
     iocall (close, 1);
     iocall (read, 2);
     iocall (write, 2);
+    iocall (select, DUK_VARARGS);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     duk_def_prop (ctx, -3, PROPFLAGS);
