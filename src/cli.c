@@ -231,6 +231,23 @@ static const char *linenoise_completion_script =
     "    var match, propseq, obj, i, partial, names, name, sanity;\n"
     "\n"
     "    if (!input) { return; }\n"
+    "\n"
+    "    var quotesplit = input.split(/['\"]/);\n"
+    "    if ((quotesplit.length & 1) == 0) {\n"
+    "        var pth = quotesplit[quotesplit.length-1];\n"
+    "        var partial = input.substr (0,input.length - pth.length);\n"
+    "        if (pth == \"\") return;\n"
+    "        var options = sys.glob (pth+'*');\n"
+    "        if (! options.length) return;\n"
+    "        var res = [];\n"
+    "        for (var i=0; i<options.length;++i) {\n"
+    "            var opt = options[i];\n"
+    "            if (stat(opt).isDir) opt += '/';\n"
+    "            addCompletion (partial+opt);\n"
+    "        }\n"
+    "        return;\n"
+    "    }\n"
+    "\n"
     "    match = /^.*?((?:\\w+\\.)*\\w*)$/.exec(input);\n"
     "    if (!match || !match[1]) { return; }\n"
     "    var propseq = match[1].split('.');\n"
@@ -257,7 +274,7 @@ static const char *linenoise_completion_script =
     "      }\n"
     "      obj = Object.getPrototypeOf(Object(obj));\n"
     "    }\n"
-    "})";
+    "})\n";
 
 static const char *linenoise_hints_script =
     "(function linenoiseHints(input) {\n"
@@ -266,6 +283,25 @@ static const char *linenoise_hints_script =
     "    var first, sanity;\n"
     "\n"
     "    if (!input) { return; }\n"
+    "    \n"
+    "    var quotesplit = input.split(/['\"]/);\n"
+    "    if ((quotesplit.length & 1) == 0) {\n"
+    "        var pth = quotesplit[quotesplit.length-1];\n"
+    "        if (pth == \"\") return;\n"
+    "        var options = sys.glob (pth+'*');\n"
+    "        if (! options.length) return;\n"
+    "        var res = [];\n"
+    "        for (var i=0; i<options.length;++i) {\n"
+    "            var opt = options[i];\n"
+    "            if (stat(opt).isDir) opt += '/';\n"
+    "            if (! i) {\n"
+    "                res.push (opt.substr(pth.length));\n"
+    "            }\n"
+    "            else res.push (opt);\n"
+    "        }\n"
+    "        return { hints: res.join(' | '), color: 2 };\n"
+    "    }\n"
+    "    \n"
     "    match = /^.*?((?:\\w+\\.)*\\w*)$/.exec(input);\n"
     "    if (!match || !match[1]) { return; }\n"
     "    var propseq = match[1].split('.');\n"
@@ -289,21 +325,20 @@ static const char *linenoise_hints_script =
     "            if (--sanity < 0) { throw new Error('sanity'); }\n"
     "            name = names[i];\n"
     "            if (Number(name) >= 0) { continue; }  // ignore array keys\n"
-    "            if (name.substring(0, partial.length) !== partial) {\n" 
+    "            if (name.substring(0, partial.length) !== partial) {\n"
     "                continue;\n"
     "            }\n"
     "            if (name === partial) { continue; }\n"
     "            if (found[name]) { continue; }\n"
     "            found[name] = true;\n"
-    "            res.push(res.length === 0 ? name.substring(partial.length) :"
-    " (first ? ' || ' : ' | ') + name);\n"
+    "            res.push(res.length === 0 ? name.substring(partial.length) : (first ? ' || ' : ' | ') + name);\n"
     "            first = false;\n"
     "        }\n"
     "        obj = Object.getPrototypeOf(Object(obj));\n"
     "    }\n"
     "    return { hints: res.join(''), color: 35, bold: 1 };\n"
-    "})";
-
+    "})\n";
+    
 static duk_ret_t linenoise_add_completion(duk_context *ctx) {
     linenoiseCompletions *lc;
 
@@ -719,7 +754,7 @@ int main(int argc, char *argv[]) {
     int run_stdin = 0;
     const char *compile_filename = NULL;
     int i;
-
+    
     main_argc = argc;
     main_argv = (char **) argv;
 

@@ -22,12 +22,21 @@ char *handle_quoting (const char *src) {
     int spacestoskip = 0;
     int hadcontent = 0;
     const char *linestart;
+    char backtick=0;
     
     t = textbuffer_alloc();
     
     while ((*c)) {
         if (currentquote == '<') {
-            if (c[0] == '>' && c[1] == '>' && c[2] == '>') {
+            if (backtick && c[0] == '`' && c[1] == '>' && c[2] == '>' &&
+                c[3] == '>') {
+                textbuffer_add_c (t, '"');
+                textbuffer_add (t, ')');
+                currentquote = 0;
+                backtick = 0;
+                c += 4;
+            }
+            else if ((!backtick) && c[0] == '>' && c[1] == '>' && c[2] == '>') {
                 textbuffer_add_c (t, '"');
                 textbuffer_add (t, ')');
                 currentquote = 0;
@@ -135,6 +144,10 @@ char *handle_quoting (const char *src) {
         }
         else if (!currentquote && c[0] == '<' && c[1] == '<' && c[2] == '<') {
             c += 3;
+            if (*c == '`') {
+                backtick=1;
+                c++;
+            }
             currentquote = '<';
             quoteline = 0;
             skippedspaces = 0;

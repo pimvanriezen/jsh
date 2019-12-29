@@ -141,7 +141,7 @@ File::read = function(sz) {
         return res;
     }
     var inbuf = sys.io.read (this.fd, sz - (this.rdbuf.length));
-    if (! inbuf) {
+    if (! inbuf.length) {
         sys.io.close (this.fd);
         this.fd = null;
         if (! this.rdbuf.length) return null;
@@ -149,6 +149,8 @@ File::read = function(sz) {
         this.rdbuf = "";
         return res;
     }
+    
+    this.rdbuf += this.dec.decode (inbuf);
     res = this.rdbuf.slice (0,sz);
     this.rdbuf = this.rdbuf.substr (sz);
     return res;
@@ -178,7 +180,7 @@ File::readLine = function() {
     var nl = this.rdbuf.indexOf ('\n');
     while (nl<0) {
         var inbuf = sys.io.read (this.fd, 256);
-        if (! inbuf) {
+        if (! inbuf.length) {
             sys.io.close (this.fd);
             this.fd = null;
             if (this.rdbuf.length) {
@@ -288,7 +290,7 @@ setapi (File.printf, "File.printf");
 // METHOD File::printf
 // ============================================================================
 File::eof = function() {
-    if (this.rdbuf.length >= 0) return false;
+    if (this.rdbuf.length > 0) return false;
     if (! this.fd) return true;
     return false;
 }
