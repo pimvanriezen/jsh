@@ -77,6 +77,9 @@ duk_ret_t sys_io_open (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_io_close
+// ============================================================================
 duk_ret_t sys_io_close (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int fd = duk_get_int (ctx, 0);
@@ -85,6 +88,9 @@ duk_ret_t sys_io_close (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION sys_io_read
+// ============================================================================
 duk_ret_t sys_io_read (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int fd = duk_get_int (ctx, 0);
@@ -101,6 +107,9 @@ duk_ret_t sys_io_read (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_io_write
+// ============================================================================
 duk_ret_t sys_io_write (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int fd = duk_get_int (ctx, 0);
@@ -121,6 +130,12 @@ duk_ret_t sys_io_write (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// STRUCT fdref
+// ------------
+// Keeps an association between a filedescriptor and its place in one of the
+// arguments to sys.io.select().
+// ============================================================================
 struct fdref {
     struct fdref    *next;
     int              fd;
@@ -129,10 +144,16 @@ struct fdref {
 
 typedef struct fdref *fdref_ptr;
 
+// ============================================================================
+// FUNCTION fdref_init
+// ============================================================================
 void fdref_init (struct fdref **baseptr) {
     *baseptr = NULL;
 }
 
+// ============================================================================
+// FUNCTION fdref_add
+// ============================================================================
 fdref_ptr fdref_add (fdref_ptr *baseptr, int fd, int refid) {
     fdref_ptr res = malloc (sizeof (struct fdref));
     fdref_ptr crsr;
@@ -152,6 +173,9 @@ fdref_ptr fdref_add (fdref_ptr *baseptr, int fd, int refid) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION fdref_get_refid
+// ============================================================================
 int fdref_get_refid (fdref_ptr *baseptr, int fd) {
     fdref_ptr crsr = *baseptr;
     while (crsr) {
@@ -161,6 +185,9 @@ int fdref_get_refid (fdref_ptr *baseptr, int fd) {
     return -1;
 }
 
+// ============================================================================
+// FUNCTION fdref_free
+// ============================================================================
 void fdref_free (fdref_ptr *baseptr) {
     fdref_ptr crsr, ncrsr;
     if (! baseptr) return;
@@ -173,6 +200,16 @@ void fdref_free (fdref_ptr *baseptr) {
     *baseptr = NULL;
 }
 
+// ============================================================================
+// FUNCTION duk_get_fd
+// -------------------
+// Given a duktape function context, take the argument at argidx, and get
+// the element within at position arrayidx (if arrayidx is 0, the argument
+// is taken to be an array of length 1 with that argument as its only
+// member). If the resolved positional argument is a number, return this
+// as a filedescriptor. If it is an object, get a member called "fd" and
+// return that as a filedescriptor. In failing cases, return 1.
+// ============================================================================
 int duk_get_fd (duk_context *ctx, int argidx, int arrayidx) {
     int popcnt = 0;
     int res = -1;
@@ -201,15 +238,34 @@ int duk_get_fd (duk_context *ctx, int argidx, int arrayidx) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION duk_get_fdarg_len
+// --------------------------
+// Given the context described above in duk_get_fd, figure out how many
+// elements are available for the argument at argidx.
+// ============================================================================
 int duk_get_fdarg_len (duk_context *ctx, int argidx) {
     int res = 0;
-    if (! duk_is_array (ctx, argidx)) return 1;
+    if (! duk_is_array (ctx, argidx)) {
+        if (duk_is_null (ctx, argidx)) return 0;
+        return 1;
+    }
     duk_get_prop_string (ctx, argidx, "length");
     res = duk_get_int (ctx, -1);
     duk_pop (ctx);
     return res;
 }
 
+// ============================================================================
+// FUNCTION duk_push_fdarg
+// -----------------------
+// We were provided objects or numbers in the arguments to sys.io.select.
+// Rather than spitting back just plain fds, match it back to the object
+// provided in the arguments, whatever it may be.
+//
+// Assumes the top of the stack contains an array consisting of (argidx)
+// elements, themselves being array.
+// ============================================================================
 void duk_push_fdarg (duk_context *ctx, int argidx, int arrayidx) {
     int offs = 0;
     
@@ -219,7 +275,6 @@ void duk_push_fdarg (duk_context *ctx, int argidx, int arrayidx) {
     duk_get_prop_string (ctx, -1, "length");
     offs = duk_get_int (ctx, -1);
     duk_pop(ctx);
-    
     
     if (! duk_is_array (ctx, argidx)) {
         if (arrayidx != 0) return;
@@ -232,6 +287,9 @@ void duk_push_fdarg (duk_context *ctx, int argidx, int arrayidx) {
     duk_pop (ctx); 
 }
 
+// ============================================================================
+
+// ============================================================================
 duk_ret_t sys_io_select (duk_context *ctx) {
     if (duk_get_top (ctx) < 3) return DUK_RET_TYPE_ERROR;
     
