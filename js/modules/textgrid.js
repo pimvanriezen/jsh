@@ -1,32 +1,32 @@
 // ============================================================================
-// CONSTRUCTOR AutoColumn
+// CONSTRUCTOR TextGrid
 // ============================================================================
-var AutoColumn = function() {
+var TextGrid = function() {
     this.data = [];
     this._indent = 0;
     this._minwidth = 4;
 }
 
 // ============================================================================
-// METHOD AutoColumn::add
+// METHOD TextGrid::add
 // ============================================================================
-AutoColumn::add = function(obj) {
+TextGrid::add = function(obj) {
     this.data.push (""+obj);
     return this;
 }
 
 // ============================================================================
-// METHOD AutoColumn::minWidth
+// METHOD TextGrid::minWidth
 // ============================================================================
-AutoColumn::minWidth = function(w) {
+TextGrid::minWidth = function(w) {
     this._minwidth = w;
     return this;
 }
 
 // ============================================================================
-// METHOD AutoColumn::setData
+// METHOD TextGrid::setData
 // ============================================================================
-AutoColumn::setData = function(obj) {
+TextGrid::setData = function(obj) {
     if (!obj) return;
     if (typeof(obj) != "object") return;
     if (obj.constructor != Array) return;
@@ -35,17 +35,17 @@ AutoColumn::setData = function(obj) {
 }
 
 // ============================================================================
-// METHOD AutoColumn::indent
+// METHOD TextGrid::indent
 // ============================================================================
-AutoColumn::indent = function(i) {
+TextGrid::indent = function(i) {
     this._indent = parseInt(i);
     return this;
 }
 
 // ============================================================================
-// METHOD AutoColumn::format
+// METHOD TextGrid::format
 // ============================================================================
-AutoColumn::format = function() {
+TextGrid::format = function() {
     var arr = this.data;
     var indent = this._indent;
     var res = "";
@@ -75,9 +75,9 @@ AutoColumn::format = function() {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
-AutoColumn.help = function() {
+TextGrid.help = function() {
     setapi.helptext({
-        name:"c = new AutoColumn",
+        name:"c = new TextGrid",
         text:<<<
             Utility class for creating a grid-layout of bits of text
             that should fit the screen efficiently. Once constructed,
@@ -99,6 +99,6 @@ AutoColumn.help = function() {
     >>>));
 }
 
-setapi (AutoColumn,"AutoColumn");
+setapi (TextGrid,"TextGrid");
 
-module.exports = AutoColumn;
+module.exports = TextGrid;

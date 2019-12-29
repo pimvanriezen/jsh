@@ -24,7 +24,7 @@ File.help = function() {
         if (File[i].help) list.push("File."+i);
     }
 
-    print (new AutoColumn().setData(list).indent(4).format());
+    print (new TextGrid().setData(list).indent(4).format());
 }
 
 setapi (File, "File");

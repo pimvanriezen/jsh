@@ -80,22 +80,22 @@ Channel.help = function() {
     });
     echo("");
     echo (TextTable.auto(<<<
-        c.send(data)     Sends data to the Channel, returns false if
-                         the Channel is empty (except for us). Data sent
+        c.send(data)     Sends data to the channel, returns false if
+                         the channel is empty (except for us). Data sent
                          is serialized as JSON, so you shouldn't have
                          to worry about the type.
-        c.recv()         Receives data from the Channel, returns null
+        c.recv()         Receives data from the channel, returns null
                          if the Channel is empty. Received data
                          is always deserialized back from JSON, and
                          should end up with the original type.
-        c.senderror(txt) From a coroutine, set Channel to an error state.
-        c.error()        Returns error string, or false if the Channel
+        c.senderror(txt) From a coroutine, set channel to an error state.
+        c.error()        Returns error string, or false if the channel
                          had no errors.
         c.isempty()      Returns true if there are no listeners left on
-                         the Channel.
-        c.exit()         Tells any other parties on the Channel that this
+                         the channel.
+        c.exit()         Tells any other parties on the channel that this
                          process will stop using it.
-        c.close()        Completely closes the Channel. If there were still
+        c.close()        Completely closes the channel. If there were still
                          active coroutines spawned from it, they will be
                          killed.
     >>>, 2).indent(4).boldColumn(0).format());
@@ -135,7 +135,7 @@ go.help = function() {
     setapi.helptext({
         name:"go",
         args:[
-            {name:"Channel",text:<<<
+            {name:"channel",text:<<<
                 A created Channel object that will be used for communicating
                 with the coroutine.
             >>>},

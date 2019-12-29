@@ -11,11 +11,11 @@ Array.help = function() {
     >>>));
     
     var list = [];
-    for (i in Array) {
+    for (var i in Array) {
         if (Array[i].help) list.push("Array."+i);
     }
     
-    print (new AutoColumn().setData(list).indent(4).format());
+    print (new TextGrid().setData(list).indent(4).format());
 }
 
 setapi (Array, "Array");

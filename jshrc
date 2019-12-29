@@ -29,7 +29,7 @@ which       = require("which");
 len         = require("len");
 
 TextTable   = require("texttable");
-AutoColumn  = require("autocolumn");
+TextGrid    = require("textgrid");
 File        = require("file");
 // ============================================================================
 // Set up the result formatter for the interactive shell

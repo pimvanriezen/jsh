@@ -15,7 +15,7 @@ Number.help = function() {
         if (Number[i].help) list.push("Number."+i);
     }
     
-    print (new AutoColumn().setData(list).indent(4).format());
+    print (new TextGrid().setData(list).indent(4).format());
 }
 
 setapi (Number, "Number");

@@ -15,7 +15,7 @@ String.help = function() {
         if (String[i].help) list.push("String."+i);
     }
     
-    print (new AutoColumn().setData(list).indent(4).format());
+    print (new TextGrid().setData(list).indent(4).format());
 }
 
 setapi (String, "String");
