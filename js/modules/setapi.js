@@ -207,6 +207,16 @@ var setapi = function(arg1,arg2) {
                         if (def.addnewline) stdin += '\n';
                     }
                 }
+                else if (def.unglob && !exists (args[def.arg])) {
+                    var matches = sys.glob (args[def.arg]);
+                    if (! matches.length) {
+                        printerr ("Wildcard doesn't match any files: "+def.arg);
+                        return null;
+                    }
+                    for (var ii=0; ii<matches.length; ++ii) {
+                        argv.push (matches[i]);
+                    }
+                }
                 else argv.push (""+args[def.arg]);
                 continue;
             }
@@ -221,7 +231,7 @@ var setapi = function(arg1,arg2) {
                 }
             }
         }
-
+        
         var res;
         if (f) {
             res = f(args);

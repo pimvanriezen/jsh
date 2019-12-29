@@ -7,7 +7,7 @@ cat.help = function() {
     setapi.helptext ({
         name:"cat",
         args:[
-            {name:"filename",text:"File to output"}
+            {name:"filename",unglob:true,text:"File to output"}
         ],
         text:"Prints the raw contents of a file to the console."
     });
