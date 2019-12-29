@@ -51,7 +51,10 @@ var installFile = function(src,dst) {
 
 The above script uses /usr/bin/md5sum and /usr/bin/cp on a CentOS system,
 like a proper shellscript, but without all the awking, or cutting, or
-regular expression voodoo you'd normally expect to get involved there.
+regular expression voodoo you'd normally expect to get involved there. It's
+also safer than most shellcode, because parameters don't end up being
+suddenly ambiguous due to satanic quoting and expansion that's performed
+by shells.
 
 ## Well-documented interfaces
 
