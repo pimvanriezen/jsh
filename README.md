@@ -105,12 +105,12 @@ var setSystemResolverOptions = function(domain,pri,sec) {
     if (! pri) pri = "4.4.4.4";
     if (! sec) sec = "8.8.8.8";
     
-    var rconf = <<<
+    var rconf = <<<`
         ; System resolver configuration, do not edit manually.
         domain ${domain}
         nameserver ${pri}
         nameserver ${sec}
-    >>>;
+    `>>>;
     
     save (rconf, "/etc/resolv.conf");
 }
