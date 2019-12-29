@@ -131,7 +131,7 @@ duk_ret_t sys_uptime (duk_context *ctx) {
 #ifdef __linux__
     struct sysinfo info;
     if (sysinfo (&info) < 0) {
-        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not read "
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not read "
                                "sysinfo");
         return duk_throw (ctx);
     }
@@ -140,7 +140,7 @@ duk_ret_t sys_uptime (duk_context *ctx) {
 #else
     struct timespec ts;
     if (clock_gettime (CLOCK_MONOTONIC, &ts) < 0) {
-        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not read "
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not read "
                                "monotonic clock");
         return duk_throw (ctx);
     }
@@ -156,7 +156,7 @@ duk_ret_t sys_loadavg (duk_context *ctx) {
 #ifdef __linux__
     struct sysinfo info;
     if (sysinfo (&info) < 0) {
-        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not read "
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not read "
                                "sysinfo");
         return duk_throw (ctx);
     }
@@ -174,7 +174,7 @@ duk_ret_t sys_loadavg (duk_context *ctx) {
     uint32_t avg[6];
     size_t sz = sizeof(avg);
     if (sysctlbyname ("vm.loadavg", &avg, &sz, NULL, 0)) {
-        duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "Could not get "
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not get "
                                "sysctl (vm.loadavg)");
         return duk_throw (ctx);
     }

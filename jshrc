@@ -30,6 +30,7 @@ len         = require("len");
 
 TextTable   = require("texttable");
 AutoColumn  = require("autocolumn");
+File        = require("file");
 // ============================================================================
 // Set up the result formatter for the interactive shell
 // ============================================================================

@@ -23,6 +23,7 @@
 #include "sys_run.h"
 #include "sys_misc.h"
 #include "sys_module.h"
+#include "sys_io.h"
 
 // ============================================================================
 // FUNCTION mystrdup
@@ -50,6 +51,7 @@ void sys_init (duk_context *ctx) {
 
     duk_idx_t obj_idx;
     duk_idx_t chanobj_idx;
+    duk_idx_t ioobj_idx;
     
     #define PROPFLAGS DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | \
             DUK_DEFPROP_SET_CONFIGURABLE
@@ -63,6 +65,11 @@ void sys_init (duk_context *ctx) {
         duk_push_string (ctx, #xxx); \
         duk_push_c_function (ctx, sys_chan_##xxx, type); \
         duk_def_prop (ctx, chanobj_idx, PROPFLAGS);
+    
+    #define iocall(xxx,type) \
+        duk_push_string (ctx, #xxx); \
+        duk_push_c_function (ctx, sys_io_##xxx, type); \
+        duk_def_prop (ctx, ioobj_idx, PROPFLAGS);
     
     duk_push_global_object (ctx);
     duk_push_string (ctx, "sys");
@@ -115,6 +122,16 @@ void sys_init (duk_context *ctx) {
     chancall (isempty, 1);
     chancall (senderror, 2);
     chancall (error, 1);
+    
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "io");
+    ioobj_idx = duk_push_object (ctx);
+    
+    iocall (open, 2);
+    iocall (close, 1);
+    iocall (read, 2);
+    iocall (write, 2);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     duk_def_prop (ctx, -3, PROPFLAGS);

@@ -642,3 +642,83 @@ sys.go.help = function() {
 
 setapi (sys.go, "sys.go");
 
+// ============================================================================
+// sys.io.open
+// ============================================================================
+sys.io.open.help = function() {
+    setapi.helptext ({
+        name:"sys.io.open",
+        args:[
+            {name:"file",text:"Filename to open"},
+            {name:"mode",text:{
+                Access mode. A string with one or more single character
+                flags for read(r), write(r), truncate(t), and append(a).
+            }
+        ],
+        text:<<<
+            Opens a fileystem file. Returns a file descriptor.
+        >>>
+    });
+}
+
+setapi (sys.io.open, "sys.io.open");
+
+// ============================================================================
+// sys.io.close
+// ============================================================================
+sys.io.close.help = function() {
+    setapi.helptext ({
+        name:"sys.io.close",
+        args:[
+            {name:"fd",text:"Filedescriptor to close"},
+        ],
+        text:<<<
+            Closes a filedescriptor.
+        >>>
+    });
+}
+
+setapi (sys.io.close, "sys.io.close");
+
+// ============================================================================
+// sys.io.read
+// ============================================================================
+sys.io.read.help = function() {
+    setapi.helptext ({
+        name:"sys.io.read",
+        args:[
+            {name:"fd",text:"Filedescriptor to read from"},
+            {name:"size",text:{
+                Number of bytes to read. Returned buffer will be smaller
+                if end-of-file is reached.
+            }
+        ],
+        text:<<<
+            Reads data from an open file descriptor. Returns a raw
+            Uint8Array with the read bytes.
+        >>>
+    });
+}
+
+setapi (sys.io.read, "sys.io.read");
+
+// ============================================================================
+// sys.io.read
+// ============================================================================
+sys.io.write.help = function() {
+    setapi.helptext ({
+        name:"sys.io.write",
+        args:[
+            {name:"fd",text:"Filedescriptor to write to"},
+            {name:"data",text:{
+                An Uint8Array with the bytes that should be written.
+            }
+        ],
+        text:<<<
+            Writes data to an open file descriptor. Returns false if the
+            data could not be successfully written.
+        >>>
+    });
+}
+
+setapi (sys.io.write, "sys.io.write");

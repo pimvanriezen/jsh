@@ -47,6 +47,10 @@ include.help = function() {
     });
 }
 
+// ============================================================================
+// Override for Duktape require, picks up exceptions so we can report
+// proper errors.
+// ============================================================================
 sys.require = require;
 require = function(modname) {
     try {
