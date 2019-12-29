@@ -1,5 +1,9 @@
 var exists = function(path) {
-    return ($(path).count() != 0);
+    if (path.match (/[*?]/)) {
+        return ($(path).count() != 0);
+    }
+    else if (stat (path)) return true;
+    return false;
 }
 
 exists.help = function() {
