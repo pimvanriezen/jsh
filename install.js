@@ -26,7 +26,7 @@ var dirmode = true;
 // ----------------------------------------------------------------------------
 // Prints out how many files we copies or directories we created
 // ----------------------------------------------------------------------------
-var dumpcopied = function(nocopies) {
+var dumpCopied = function(nocopies) {
     var endtag;
     if (dirmode) {
         endtag = " "+copied+" director"+(copied==1 ? "y":"ies");
@@ -48,7 +48,7 @@ var dumpcopied = function(nocopies) {
 // Copies a file, provided the destination file doesn't exist, or has an
 // MD5 checksum different than the source.
 // ----------------------------------------------------------------------------
-var mycp = function(src,dst,srcid) {
+var installFile = function(src,dst,srcid) {
     if (! srcid) srcid = src.replace(/.*\//,"");
     if ((! exists (dst)) || md5sum (src) != md5sum (dst)) {
         if (! cp (src, dst)) {
@@ -67,7 +67,7 @@ var mycp = function(src,dst,srcid) {
 // ----------------------------------------------------------------------------
 // Creates a direcotry
 // ----------------------------------------------------------------------------
-var mymkdir = function(name,mode) {
+var createDir = function(name,mode) {
     copied++;
     copiedfiles.push(name);
     mkdir (name, mode);
@@ -76,7 +76,7 @@ var mymkdir = function(name,mode) {
 // ----------------------------------------------------------------------------
 // Announces the next action we will take
 // ----------------------------------------------------------------------------
-var banner = function(txt) {
+var printBanner = function(txt) {
     var bannerstr = "* "+txt+"...";
     bannersize = bannerstr.length;
     print (bannerstr);
@@ -90,7 +90,7 @@ var f = function(n) { return basedir + '/' + n; }
 // ============================================================================
 // The actual install job
 // ============================================================================
-banner ("Creating filesystem structure");
+printBanner ("Creating filesystem structure");
 var dirs = [
     "lib/jsh",
     "lib/jsh/modules",
@@ -100,38 +100,38 @@ var dirs = [
 
 for (var i in dirs) {
     var d = dirs[i];
-    if (! exists (f(d))) mymkdir (f(d));
+    if (! exists (f(d))) createDir (f(d));
 }
 
-dumpcopied();
+dumpCopied();
 dirmode = false;
 
 // ----------------------------------------------------------------------------
-banner ("Copying base files");
-mycp ("jshrc",f("lib/jsh/jshrc"));
-mycp ("bin/jsh",f("bin/jsh"));
-dumpcopied();
+printBanner ("Copying base files");
+installFile ("jshrc",f("lib/jsh/jshrc"));
+installFile ("bin/jsh",f("bin/jsh"));
+dumpCopied();
 
 // ----------------------------------------------------------------------------
 
 cd("js");
-banner("Copying base modules");
+printBanner("Copying base modules");
 $("modules/*.js").each (function (file) {
-    if (! file.isDir) {
-        mycp (file, f("lib/jsh/"+file));
+    if (! stat(file).isDir) {
+        installFile (file, f("lib/jsh/"+file));
     }
 });
-dumpcopied();
+dumpCopied();
 
 // ----------------------------------------------------------------------------
-banner ("Copying global includes");
+printBanner ("Copying global includes");
 $("modules/global.d/*.js").each (function (file) {
-    mycp (file, f("lib/jsh/"+file));
+    installFile (file, f("lib/jsh/"+file));
 });
-dumpcopied();
+dumpCopied();
 
 // ----------------------------------------------------------------------------
-banner("Removing outdated global includes");
+printBanner("Removing outdated global includes");
 $(f("lib/jsh/modules/global.d/*.js")).each (function (file) {
     fnam = file.replace (/.*\//, "");
     if (! exists ("modules/global.d/"+fnam)) {
@@ -140,13 +140,13 @@ $(f("lib/jsh/modules/global.d/*.js")).each (function (file) {
         copied++;
     }
 });
-dumpcopied();
+dumpCopied();
 
 // ----------------------------------------------------------------------------
-banner ("Copying apps");
+printBanner ("Copying apps");
 $("app/*.app.js").each (function (app) {
-    mycp (app, f("lib/jsh/"+app));
+    installFile (app, f("lib/jsh/"+app));
 });
-dumpcopied();
+dumpCopied();
 
 cd(-1);
