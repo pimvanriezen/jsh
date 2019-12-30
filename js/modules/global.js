@@ -42,7 +42,7 @@ include.help = function() {
             has matches on the glob.
             
             You can check up on loaded modules and includes by calling
-            dump(sys.modules).
+            sys.module.list().
         >>>
     });
 }
