@@ -81,6 +81,32 @@ void sys_sock_init (void) {
     memset (SOCKINFO, 0, 1024 * sizeof(sockdata));
 }
 
+duk_ret_t sys_sock_unix (duk_context *ctx) {
+    const char *path = duk_to_string (ctx, 0);
+    int sock;
+    struct sockaddr_un remote;
+    
+    memset (&remote, 0, sizeof(remote));
+    remote.sun_family = AF_UNIX;
+    strncpy (remote.sun_path, path, 100);
+    
+    sock = socket (PF_UNIX, SOCK_STREAM, 0);
+    if (sock < 0) {
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not create socket");
+        return duk_throw (ctx);
+    }
+    
+    if (connect (sock, (struct sockaddr *) &remote, sizeof(remote)) != 0) {
+        close (sock);
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    register_socket (sock, SOCK_UNIX_OUT, NULL, 0);
+    duk_push_int (ctx, sock);
+    return 1;
+}
+
 duk_ret_t sys_sock_tcp (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     const char *addrspec = duk_to_string (ctx, 0);
@@ -160,6 +186,42 @@ duk_ret_t sys_sock_tcp (duk_context *ctx) {
     free (addr);
     if (bindaddr) free (bindaddr);
     
+    duk_push_int (ctx, sock);
+    return 1;
+}
+
+duk_ret_t sys_sock_unix_listen (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    const char *path = duk_to_string (ctx, 0);
+    int pram;
+    struct sockaddr_un local;
+    
+    memset (&local, 0, sizeof (local));
+    
+    int sock = socket (PF_UNIX, SOCK_STREAM, 0);
+    if (sock < 0) {
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not create socket");
+        return duk_throw (ctx);
+    }
+    
+    local.sun_family = AF_UNIX;
+    strncpy (local.sun_path, path, 100);
+    
+    setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, (char *) &pram, sizeof(pram));
+    
+    if (bind (sock, (struct sockaddr*) &local, sizeof(local)) < 0) {
+        close (sock);
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    if (listen (sock, 16) != 0) {
+        close (sock);
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    register_socket (sock, SOCK_UNIX_LISTEN, NULL, 0);
     duk_push_int (ctx, sock);
     return 1;
 }
@@ -244,7 +306,6 @@ duk_ret_t sys_sock_accept (duk_context *ctx) {
     struct sockaddr_in6 remote;
     struct sockaddr_in6 peer;
     socklen_t anint=1;
-    int pram=1;
     
     memset (&remote, 0, sizeof (remote));
     memset (&peer, 0, sizeof (peer));
@@ -328,3 +389,4 @@ duk_ret_t sys_sock_stat (duk_context *ctx) {
     }
     return 1;
 }
+

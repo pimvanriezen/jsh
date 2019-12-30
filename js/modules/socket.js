@@ -9,7 +9,13 @@ var Socket = function() {
 }
 
 Socket::connect = function(addr,port) {
-    this.fd = sys.sock.tcp (""+addr, parseInt(port));
+    if (! port) {
+        this.fd = sys.sock.unix (addr);
+        this.eol = '\n';
+    }
+    else {
+        this.fd = sys.sock.tcp (""+addr, parseInt(port));
+    }
 }
 
 Socket::close = File::close;

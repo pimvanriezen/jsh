@@ -35,7 +35,9 @@ void unregister_socket (int);
 socktype socket_type (int);
 
 void sys_sock_init (void);
+duk_ret_t sys_sock_unix (duk_context *);
 duk_ret_t sys_sock_tcp (duk_context *);
+duk_ret_t sys_sock_unix_listen (duk_context *);
 duk_ret_t sys_sock_tcp_listen (duk_context *);
 duk_ret_t sys_sock_accept (duk_context *);
 duk_ret_t sys_sock_stat (duk_context *);

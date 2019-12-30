@@ -238,7 +238,7 @@ File::readLine = function() {
             return null;
         }
         this.rdbuf += this.dec.decode (inbuf);
-        nl = this.rdbuf.indexOf ('\n');
+        nl = this.rdbuf.indexOf (this.eol);
     }
     var res = this.rdbuf.slice (0, nl);
     this.rdbuf = this.rdbuf.substr (nl+this.eol.length);

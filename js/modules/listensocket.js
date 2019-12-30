@@ -2,6 +2,7 @@ var Socket = require("socket");
 
 var ListenSocket = function() {
     this.fd = null;
+    this.unix = false;
 }
 
 ListenSocket::listenTo = function (arg1, arg2) {
@@ -11,9 +12,17 @@ ListenSocket::listenTo = function (arg1, arg2) {
     
     if (arg2) {
         this.fd = sys.sock.tcp_listen (arg1, arg2);
+        this.unix = false;
     }
     else {
-        this.fd = sys.sock.tcp_listen (arg1);
+        if (parseInt (arg1)) {
+            this.fd = sys.sock.tcp_listen (arg1);
+            this.unix = false;
+        }
+        else {
+            this.fd = sys.sock.unix_listen (arg1);
+            this.unix = true;
+        }
     }
     return (this.fd ? true : false);
 }
@@ -24,6 +33,7 @@ ListenSocket::accept = function() {
     if (! clientfd) return null;
     var res = new Socket();
     res.fd = clientfd;
+    res.eol = (this.unix) ? '\n' : '\r\n';
     return res;
 }
 
