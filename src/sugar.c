@@ -7,7 +7,7 @@
 #include <stdint.h>  /* Assume C99/C++11 with linenoise. */
 #include <fcntl.h>
 #include <unistd.h>
-#include "quoting.h"
+#include "sugar.h"
 
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
