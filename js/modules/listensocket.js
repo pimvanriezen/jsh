@@ -1,10 +1,37 @@
 var Socket = require("socket");
 
+// ============================================================================
+// CONSTRUCTOR
+// ============================================================================
 var ListenSocket = function() {
     this.fd = null;
     this.unix = false;
 }
 
+ListenSocket.help = function() {
+    setapi.helptext({
+        name:"ls = new ListenSocket",
+        text:<<<
+            A class for setting up a socket-based server, that can listen
+            on a TCP or Unix Domain address for incoming connnections.
+            
+            Available functions on constructed objects:
+        >>>
+    });
+    
+    var list = [];
+    for (var i in ListenSocket) {
+        if (ListenSocket[i].help) list.push ("ListenSocket."+i);
+    }
+    
+    print (new TextGrid().setData(list).indent(4).format());
+}
+
+setapi (ListenSocket,"ListenSocket");   
+
+// ============================================================================
+// METHOD ListenSocket::listenTo
+// ============================================================================
 ListenSocket::listenTo = function (arg1, arg2) {
     if (this.fd) {
         throw new Error ("Socket is already listening");
@@ -27,6 +54,33 @@ ListenSocket::listenTo = function (arg1, arg2) {
     return (this.fd ? true : false);
 }
 
+ListenSocket.listenTo = {help:function() {
+    setapi.helptext ({
+        name:"ls.listenTo",
+        args:[
+            {name:"spec",text:<<<
+                Either one or two arguments. If it is one, and the argument
+                is a string, it is taken as the path for a unix domain
+                socket to listen on. If it is a number, it is a port number
+                that will be bound to INADDR_ANY.
+                
+                In case of two arguments, an IPv4/IPv6 address and a port
+                number are expected.
+            >>>}
+        ],
+        text:<<<
+            Sets up the socket for listening to a specific port and/or
+            address. Returns true if the socket is now listening, false
+            otherwise.
+        >>>
+    })
+}}
+
+setapi (ListenSocket.listenTo, "ListenSocket.listenTo");
+
+// ============================================================================
+// METHOD ListenSocket::accept
+// ============================================================================
 ListenSocket::accept = function() {
     if (! this.fd) return null;
     var clientfd = sys.sock.accept (this.fd);
@@ -37,10 +91,36 @@ ListenSocket::accept = function() {
     return res;
 }
 
+ListenSocket.accept = {help:function() {
+    setapi.helptext ({
+        name:"ls.accept",
+        text:<<<
+            Waits for an incoming connection. Returns a socket for the new
+            connection, or null if it failed.
+        >>>
+    });
+}}
+
+setapi (ListenSocket.accept,"ListenSocket.accept");
+
+// ============================================================================
+// METHOD ListenSocket::close
+// ============================================================================
 ListenSocket::close = function() {
     if (! this.fd) return;
     sys.io.close (this.fd);
     this.fd = null;
 }
+
+ListenSocket.close = {help:function() {
+    setapi.helptext ({
+        name:"ls.close",
+        text:<<<
+            Closes a listening socket.
+        >>>
+    });
+}}
+
+setapi (ListenSocket.close,"ListenSocket.close");
 
 module.exports = ListenSocket;
