@@ -78,25 +78,25 @@ TextGrid::format = function() {
 TextGrid.help = function() {
     setapi.helptext({
         name:"c = new TextGrid",
-        text:<<<
+        text:<<<`
             Utility class for creating a grid-layout of bits of text
             that should fit the screen efficiently. Once constructed,
             the following functions are available on the object:
-        >>>
+        `>>>
     });
     
     echo ("");
-    echo (TextTable.auto(<<<
+    echo (TextTable.auto(<<<`
         c.add(cell)         Adds a single text cell to the layout.
         c.setData(array)    Sets the full array of text nodes for the layout.
         c.indent(i)         Sets the indent level when displaying.
         c.minWidth(i)       The minimal width cells should get
         c.format()          Formats the layout and returns it as a string.
-    >>>, 2).indent(4).boldColumn(0).format());
+    `>>>, 2).indent(4).boldColumn(0).format());
     
-    print (setapi.textformat(<<<
+    print (setapi.textformat(<<<`
         All methods except format() allow chaining.
-    >>>));
+    `>>>));
 }
 
 setapi (TextGrid,"TextGrid");

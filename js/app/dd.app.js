@@ -19,9 +19,9 @@ var dd = setapi ([
     },
     {flag:{"noTruncate":""},helptext:"Don't truncate output file"},
     {flag:{"sparse":""},helptext:"Write output sparsely, skipping empty blocks"},
-    {helptext:<<<
+    {helptext:<<<`
         Copies binary data between two files/devices.
-    >>>},
+    `>>>},
     {f:function(args) {
         argv = [];
         if (args.inputFile) argv.push ("if="+args.inputFile);
@@ -60,9 +60,9 @@ dd.zero = setapi ([
     {setarg:"size"},
     {arg:"file",helptext:"Output file"},
     {arg:"size",helptext:"Desired size in 1KB blocks"},
-    {helptext:<<<
+    {helptext:<<<`
         Creates a new file, filled with zeroes to a specific size.
-    >>>},
+    `>>>},
     {f:function(args) {
         return dd({outputFile:args.file,count:args.size});
     }}

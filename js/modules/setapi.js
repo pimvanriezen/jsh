@@ -32,31 +32,31 @@ help = function(helpfor) {
     if (typeof (helpfor) != "number") {
         if (helpfor && helpfor.help) return helpfor.help();
         if (helpfor) {
-            print ($textformat(<<<
+            print ($textformat(<<<`
                 No help available: The object provided has no .help() function
                 implemented.
-            >>>));
+            `>>>));
             return;
         }
     }
     
     if (helpfor > 0) helplevel = helpfor;
     
-    var helpstr = <<<
+    var helpstr = <<<`
         These are the user level functions. You can
         call help(sys) to show a list of documented system functions.
-    >>>;
-    if (helplevel) helpstr = <<<
+    `>>>;
+    if (helplevel) helpstr = <<<`
         These are the system level functions. Many of them will have been
         wrapped in a more elegant API at the user level.
-    >>>;
+    `>>>;
     
-    print ($textformat(<<<
+    print ($textformat(<<<`
         Call help(command) with a function from this list to check for its
         syntax. ${helpstr}
         
         Documented functions:
-    >>>));
+    `>>>));
         
     var list = [];
     var classlist = [];

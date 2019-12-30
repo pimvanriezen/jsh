@@ -12,12 +12,12 @@ var File = function() {
 File.help = function() {
     setapi.helptext({
         name:"f = new File",
-        text:<<<
+        text:<<<`
             Class for dealing with files in a more granular fashion than
             just smashing their whole contents into a string.
             
             Available functions on constructed objects:
-        >>>
+        `>>>
     });
     
     var list = [];
@@ -46,10 +46,10 @@ File.openRead = {help:function() {
         args:[
             {name:"filename",text:"The file to open"}
         ],
-        text:<<<
+        text:<<<`
             Opens a filesystem file for reading. Returns false if the
             file could not be opened.
-        >>>
+        `>>>
     });
 }}
 
@@ -73,10 +73,10 @@ File.openWrite = {help:function() {
         args:[
             {name:"filename",text:"The file to open"}
         ],
-        text:<<<
+        text:<<<`
             Opens a filesystem file for writing. Returns false if the
             file could not be opened.
-        >>>
+        `>>>
     });
 }}
 
@@ -101,11 +101,11 @@ File.openAppend = {help:function() {
         args:[
             {name:"filename",text:"The file to open"}
         ],
-        text:<<<
+        text:<<<`
             Opens a filesystem file for writing, but appending to the end
             of the file if it already exists. Returns false if the
             file could not be opened.
-        >>>
+        `>>>
     });
 }}
 
@@ -122,9 +122,9 @@ File::close = function() {
 File.close = {help:function() {
     setapi.helptext ({
         name:"f.close",
-        text:<<<
+        text:<<<`
             Closes the associated file (if it is not already closed).
-        >>>
+        `>>>
     });
 }}
 
@@ -142,14 +142,14 @@ File.canRead = {help:function() {
     setapi.helptext ({
         name:"f.canRead",
         args:[
-            {name:"timeout",text:<<<
+            {name:"timeout",text:<<<`
                 The timeout in milliseconds. If not provided, it is
                 defaulted to 0.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Returns true if there's data to be read on the file.
-        >>>
+        `>>>
     });
 }}
 
@@ -165,14 +165,14 @@ File.canWrite = {help:function() {
     setapi.helptext ({
         name:"f.canWrite",
         args:[
-            {name:"timeout",text:<<<
+            {name:"timeout",text:<<<`
                 The timeout in milliseconds. If not provided, it is
                 defaulted to 0.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Returns true if data can be written to the file.
-        >>>
+        `>>>
     });
 }}
 
@@ -209,11 +209,11 @@ File.read = {help:function() {
         args:[
             {name:"size",text:"Number of bytes to read"}
         ],
-        text:<<<
+        text:<<<`
             Reads data from an open file. Tries to read the provided
             number of bytes, but if the end-of-file is reached before,
             less are returned.
-        >>>
+        `>>>
     });
 }}
 
@@ -248,13 +248,13 @@ File::readLine = function() {
 File.readLine = {help:function() {
     setapi.helptext ({
         name:"f.readLine",
-        text:<<<
+        text:<<<`
             Tries to read a line of text from an open file. Returns
             the line without its trailing newline. If the last line
             of a file has no newline, this mischief is ignored.
             Returns null if no line could be read because the file
             ran out of them (or some other error occured).
-        >>>
+        `>>>
     });
 }}
 
@@ -279,10 +279,10 @@ File.write = {help:function() {
         args:[
             {name:"data",text:"Data to write"}
         ],
-        text:<<<
+        text:<<<`
             Writes data to an opened file. Returns false if the data
             could not be written.
-        >>>
+        `>>>
     });
 }}
 
@@ -301,10 +301,10 @@ File.writeLine = {help:function() {
         args:[
             {name:"data",text:"Text to write"}
         ],
-        text:<<<
+        text:<<<`
             Writes data to an opened file, with a newline appended. Returns
             false if the data could not be written.
-        >>>
+        `>>>
     });
 }}
 
@@ -323,11 +323,11 @@ File.printf = {help:function() {
         args:[
             {name:"fmt",text:"Format string (optional arguments follow)"}
         ],
-        text:<<<
+        text:<<<`
             Writes formatted text to an open file. See help(printf) for
             format specifications. Returns false if the data could not
             be written.
-        >>>
+        `>>>
     });
 }}
 
@@ -345,10 +345,10 @@ File::eof = function() {
 File.eof = {help:function() {
     setapi.helptext ({
         name:"f.eof",
-        text:<<<
+        text:<<<`
             Returns true if no more data can be read from (or written to)
             the file.
-        >>>
+        `>>>
     });
 }}
 

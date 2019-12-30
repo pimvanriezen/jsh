@@ -2,13 +2,13 @@
 // Extensions to the Number class
 // ============================================================================
 Number.help = function() {
-    print (setapi.textformat (<<<
+    print (setapi.textformat (<<<`
         The following extra functions have been added to the Number
         class prototype. Type help(Number.function) for more specific
         information.
         
         Available functions on constructed objects:
-    >>>));
+    `>>>));
     
     var list = [];
     for (i in Number) {
@@ -37,12 +37,12 @@ Number::toSize = function () {
 Number.toSize = {help:function() {
     setapi.helptext ({
         name:"num.toSize",
-        text:<<<
+        text:<<<`
             Converts the number to a size string, moving up an order
             of magnitude on the scale each time the number exceeds
             10000. So (10000).toSize() = "10000", but
             (10001).toSize() = "10K".
-        >>>
+        `>>>
     });
 }}
 

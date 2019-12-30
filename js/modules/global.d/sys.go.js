@@ -73,13 +73,13 @@ Channel::close = function() {
 Channel.help = function() {
     setapi.helptext({
         name:"c = new Channel",
-        text:<<<
+        text:<<<`
             Create a Channel object to communicate with co-routines.
             The returned object has the following functions available:
-        >>>
+        `>>>
     });
     echo("");
-    echo (TextTable.auto(<<<
+    echo (TextTable.auto(<<<`
         c.send(data)     Sends data to the channel, returns false if
                          the channel is empty (except for us). Data sent
                          is serialized as JSON, so you shouldn't have
@@ -98,11 +98,11 @@ Channel.help = function() {
         c.close()        Completely closes the channel. If there were still
                          active coroutines spawned from it, they will be
                          killed.
-    >>>, 2).indent(4).boldColumn(0).format());
-    print (setapi.textformat(<<<
+    `>>>, 2).indent(4).boldColumn(0).format());
+    print (setapi.textformat(<<<`
         See help(go) for information on how to spawn a coroutine that can
         communicate through the channel.
-    >>>));
+    `>>>));
 }
 
 setapi (Channel, "Channel");
@@ -135,18 +135,18 @@ go.help = function() {
     setapi.helptext({
         name:"go",
         args:[
-            {name:"channel",text:<<<
+            {name:"channel",text:<<<`
                 A created Channel object that will be used for communicating
                 with the coroutine.
-            >>>},
-            {name:"func",text:<<<
+            `>>>},
+            {name:"func",text:<<<`
                 The function to spawn. The function will always get, as its
                 first argument, a reference to the Channel object. Any
                 extra arguments after the function passed to go() will
                 be passed to the function as well (after the Channel).
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Spawns a coroutine, running in its own address space but within
             the same javascript context we already have. The code run
             inside the routine has no access to the console, or any of the
@@ -155,7 +155,7 @@ go.help = function() {
             
             See help(Channel) for information on how to interact with a
             Channel.
-        >>>
+        `>>>
     })
 }
 

@@ -38,10 +38,10 @@ sys.module.list = function() {
 sys.module.list.help = function() {
     setapi.helptext ({
         name:"sys.module.list",
-        text:<<<
+        text:<<<`
             Prints out the status of loaded and parsed javascript modules
             within the shell environment.
-        >>>
+        `>>>
     });
 }
 

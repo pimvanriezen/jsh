@@ -2,13 +2,13 @@
 // Extensions to the Array class
 // ============================================================================
 Array.help = function() {
-    print (setapi.textformat (<<<
+    print (setapi.textformat (<<<`
         The following extra functions have been added to the Array
         class prototype. Type help(Array.function) for more specific
         information.
         
         Available functions on constructed objects:
-    >>>));
+    `>>>));
     
     var list = [];
     for (var i in Array) {
@@ -33,10 +33,10 @@ Array.contains = {help:function() {
         args:[
             {name:"value",text:"The value to look for"}
         ],
-        text:<<<
+        text:<<<`
             Returns true if the provided value is contained within
             the array.
-        >>>
+        `>>>
     });
 }}
 
@@ -64,14 +64,14 @@ Array.remove = {help:function() {
     setapi.helptext ({
         name:"array.remove",
         args:[
-            {name:"match",text:<<<
+            {name:"match",text:<<<`
                 Either a string that should be removed from the array,
                 or an index.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Removes an element from the array, modifying it.
-        >>>
+        `>>>
     });
 }}
 
@@ -91,10 +91,10 @@ Object.defineProperty (Array.prototype, 'sum', {
 Array.sum = {help:function() {
     setapi.helptext ({
         name:"array.sum",
-        text:<<<
+        text:<<<`
             Returns the sum of all elements in the array, provided
             they can be parsed as numbers. Will return NaN if not.
-        >>>
+        `>>>
     });
 }}
 
@@ -119,22 +119,22 @@ Array.cut = {help:function() {
     setapi.helptext ({
         name:"array.cut",
         args:[
-            {name:"index",text:<<<
+            {name:"index",text:<<<`
                 The field to cut out, indexing starts at 0. If the field
                 provided is negative, it is counted from the right, with
                 -1 being the last field.
-            >>>},
-            {name:"delimiter",text:<<<
+            `>>>},
+            {name:"delimiter",text:<<<`
                 Character or regular expression pattern to use as a means
                 of splitting up the string. If this argument is left out,
                 it defaults to splitting on arbitrary amounts of white
                 space.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Cuts a specific field out of each string in the array. Returns
             an array with the transformation applied.
-        >>>
+        `>>>
     });
 }}
 
@@ -164,23 +164,23 @@ Array.grep = {help:function() {
     setapi.helptext ({
         name:"array.grep",
         args:[
-            {name:"pattern",text:<<<
+            {name:"pattern",text:<<<`
                 Regular expression pattern to match lines against.
-            >>>},
-            {name:"process",text:<<<
+            `>>>},
+            {name:"process",text:<<<`
                 [Optional] Regular expression pattern that will
                 be applied to a matchine line, and either deleted
                 or replaced with the third argument.
-            >>>},
-            {name:"replace",text:<<<
+            `>>>},
+            {name:"replace",text:<<<`
                 Replacement string for processing
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Given the array contains a list of strings, a new array
             is returned with only the strings matching the pattern,
             with transformation optionally applied.
-        >>>
+        `>>>
     })
 }}
 
@@ -228,7 +228,7 @@ Array.intern = {help:function() {
     setapi.helptext ({
         name:"array.intern",
         args:[
-            {name:"obj",text:<<<
+            {name:"obj",text:<<<`
                 The object to intern. If it's a primitive, it will
                 just be pushed into the array. If it is an array,
                 all its elements will be added as new elements in
@@ -237,12 +237,12 @@ Array.intern = {help:function() {
                 value is an object, its members will be merged into
                 that row, otherwise they will be stashed in
                 row[n].value.
-            >>>},
+            `>>>},
         ],
-        text:<<<
+        text:<<<`
             Interns a given argument into an already created array.
             Returns a reference to the array itself (not a new copy).
-        >>>
+        `>>>
     })
 }}
 

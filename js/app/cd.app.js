@@ -19,18 +19,18 @@ cd.help = function() {
     setapi.helptext ({
         name:"cd",
         args:[
-            {name:"path",text: <<<
+            {name:"path",text: <<<`
                 Relative or absolute path of the new directory, or a
                 negative number indicating a relative position in
                 the history. If left empty, the path is assumed
                 to be the home directory of the current user.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Pushes the current working directory into the history, and changes
             it to a new directory. Call cd.history() to get a view of the
             current history.
-        >>>
+        `>>>
     });
 }
 

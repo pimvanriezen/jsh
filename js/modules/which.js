@@ -29,7 +29,7 @@ which.help = function() {
         args:[
             {name:"cmd",text:"The unix command"}
         ],
-        text:<<<
+        text:<<<`
             Resolves a unix command to its path on the filesystem
             through chasing the env.PATH variable. Returns the absolute
             path for the command, if it can be resolved.
@@ -37,7 +37,7 @@ which.help = function() {
             If the command provided is a function that happens to wrap
             an actual unix command, the path of that unix command
             will be resolved.
-        >>>
+        `>>>
     });
 }
 

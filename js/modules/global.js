@@ -35,7 +35,7 @@ include.help = function() {
             {name:"pathspec",text:"File or wildcard match"}
         ],
         opts:[],
-        text:<<<
+        text:<<<`
             Includes one or more javascript files, parsing them into the
             global scope. The system will look through all elements
             of env.JSH_MODULE_PATH, and will pick the first one that
@@ -43,7 +43,7 @@ include.help = function() {
             
             You can check up on loaded modules and includes by calling
             sys.module.list().
-        >>>
+        `>>>
     });
 }
 
@@ -193,11 +193,11 @@ defaults.help = function() {
             {name:"data",text:"Object with a key/value dictionary of "+
                               "the environment variables to be defaulted."}
         ],
-        text:<<<
+        text:<<<`
             Set multiple defaults environment variables. If the key is
             accessed through env.KEY, and KEY is not in the environment, the
             default will be obtained.
-        >>>
+        `>>>
     });
 }
 

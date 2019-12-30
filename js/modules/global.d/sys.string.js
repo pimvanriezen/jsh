@@ -2,13 +2,13 @@
 // Augmentations for the string class
 // ============================================================================
 String.help = function() {
-    print (setapi.textformat (<<<
+    print (setapi.textformat (<<<`
         The following extra functions have been added to the String
         class prototype. Type help(String.function) for a more
         specific list.
         
         Available functions on constructed objects:
-    >>>));
+    `>>>));
     
     var list = [];
     for (i in String) {
@@ -38,12 +38,12 @@ String.padStart = {help:function() {
             {name:"length",text:"Length to pad the string to"},
             {name:"char",text:"[Optional] Character to use for padding"},
         ],
-        text:<<<
+        text:<<<`
             Cuts the string to an exact length. If the string is shorter
             than the length provided, it is padded from the left with
             spaces (or the provided character). The newly built String
             is returned, and the original is left untouched.
-        >>>
+        `>>>
     });
 }}
 
@@ -67,12 +67,12 @@ String.padEnd = {help:function() {
             {name:"length",text:"Length to pad the string to"},
             {name:"char",text:"[Optional] Character to use for padding"},
         ],
-        text:<<<
+        text:<<<`
             Cuts the string to an exact length. If the string is shorter
             than the length provided, it is padded at the right side with
             spaces (or the provided character). The newly built String
             is returned, and the original is left untouched.
-        >>>
+        `>>>
     });
 }}
 
@@ -91,9 +91,9 @@ String.save = {help:function() {
         args:[
             {name:"path",text:"Path and filename to save to."}
         ],
-        text:<<<
+        text:<<<`
             Writes a string to disk.
-        >>>
+        `>>>
     })
 }}
 
@@ -120,11 +120,11 @@ String.summarize = {help:function() {
         args:[
             {name:"width",text:"Maximum width of the string."}
         ],
-        text:<<<
+        text:<<<`
             Shortens a string if it exceeds a certain width, taking
             even ends from the left and the right, with an ellipsis
             in the middle representing the excess characters.
-        >>>
+        `>>>
     })
 }}
 
@@ -153,11 +153,11 @@ String.grep = {help:function() {
                 Replacement string for processing
             >>>}
         ],
-        text:<<<
+        text:<<<`
             Splits a string up by newlines, then pulls them through
             Array.grep() to yield an array of processed lines
             matching the given pattern.
-        >>>
+        `>>>
     })
 }}
 
@@ -190,10 +190,10 @@ String.wrap = {help:function() {
         args:[
             {name:"width",text:"Maximum width of text lines."}
         ],
-        text:<<<
+        text:<<<`
             Returns a word-wrapped version of the string, with newlines
             added for every time a line would exceed the width.
-        >>>
+        `>>>
     })
 }}
 
@@ -215,22 +215,22 @@ String.cut = {help:function() {
     setapi.helptext ({
         name:"string.cut",
         args:[
-            {name:"index",text:<<<
+            {name:"index",text:<<<`
                 The field to cut out, indexing starts at 0. If the field
                 provided is negative, it is counted from the right, with
                 -1 being the last field.
-            >>>},
-            {name:"delimiter",text:<<<
+            `>>>},
+            {name:"delimiter",text:<<<`
                 Character or regular expression pattern to use as a means
                 of splitting up the string. If this argument is left out,
                 it defaults to splitting on arbitrary amounts of white
                 space.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Cuts a specific field out of a string that can reasonably
             be split up by some kind of delimiter.
-        >>>
+        `>>>
     });
 }}
 
@@ -261,12 +261,12 @@ String.rewrap = {help:function() {
         args:[
             {name:"width",text:"New maximum line width"}
         ],
-        text:<<<
+        text:<<<`
             Transforms text that has potentially already been wrapped,
             splits it up into paragraphs, and word-wraps each paragraph
             to the desired line length. Paragraphs should have an empty
             line between them for this to work.
-        >>>
+        `>>>
     })
 }}
 

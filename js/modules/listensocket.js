@@ -11,12 +11,12 @@ var ListenSocket = function() {
 ListenSocket.help = function() {
     setapi.helptext({
         name:"ls = new ListenSocket",
-        text:<<<
+        text:<<<`
             A class for setting up a socket-based server, that can listen
             on a TCP or Unix Domain address for incoming connnections.
             
             Available functions on constructed objects:
-        >>>
+        `>>>
     });
     
     var list = [];
@@ -58,7 +58,7 @@ ListenSocket.listenTo = {help:function() {
     setapi.helptext ({
         name:"ls.listenTo",
         args:[
-            {name:"spec",text:<<<
+            {name:"spec",text:<<<`
                 Either one or two arguments. If it is one, and the argument
                 is a string, it is taken as the path for a unix domain
                 socket to listen on. If it is a number, it is a port number
@@ -66,13 +66,13 @@ ListenSocket.listenTo = {help:function() {
                 
                 In case of two arguments, an IPv4/IPv6 address and a port
                 number are expected.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Sets up the socket for listening to a specific port and/or
             address. Returns true if the socket is now listening, false
             otherwise.
-        >>>
+        `>>>
     })
 }}
 
@@ -94,10 +94,10 @@ ListenSocket::accept = function() {
 ListenSocket.accept = {help:function() {
     setapi.helptext ({
         name:"ls.accept",
-        text:<<<
+        text:<<<`
             Waits for an incoming connection. Returns a socket for the new
             connection, or null if it failed.
-        >>>
+        `>>>
     });
 }}
 
@@ -115,9 +115,9 @@ ListenSocket::close = function() {
 ListenSocket.close = {help:function() {
     setapi.helptext ({
         name:"ls.close",
-        text:<<<
+        text:<<<`
             Closes a listening socket.
-        >>>
+        `>>>
     });
 }}
 

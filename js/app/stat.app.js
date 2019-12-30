@@ -8,13 +8,13 @@ stat.help = function() {
         args:[
             {name:"path",text:"Path of filesystem object to inspect"}
         ],
-        text:<<<
+        text:<<<`
             Inspects a filesystem object and returns some of its
             characteristics in an object with the following fields:
-        >>>
+        `>>>
     });
     echo ("");
-    echo (TextTable.auto(<<<
+    echo (TextTable.auto(<<<`
         mode         number  The unix filesystem mode
         modestring   string  The mode expressed as text, like ls() output.
         uid          number  Userid of the owner
@@ -30,7 +30,7 @@ stat.help = function() {
         isLink       boolean Set to true, if the object is a link
         isSocket     boolean Set to true, if the object is a socket
         isExecutable boolean Set to true, if the object is executable
-    >>>,3).boldColumn(0).indent(4).format());
+    `>>>,3).boldColumn(0).indent(4).format());
 }
 
 module.version = "1.0.1";

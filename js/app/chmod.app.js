@@ -35,10 +35,10 @@ var chmod = setapi ([
         }
         return sys.chmod (args.path, mode);
     }},
-    {helptext:<<<
+    {helptext:<<<`
         Changes file permissions. Accepts either an integer for the new
         mode or a relative specification, e.g. "a+x".
-    >>>}
+    `>>>}
 ]);
 
 module.version = "1.0.1";

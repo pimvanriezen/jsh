@@ -32,15 +32,15 @@ sys.dir.help = function() {
     setapi.helptext ({
         name:"sys.dir",
         args:[
-            {name:"path",text:<<<
+            {name:"path",text:<<<`
                 Path, leave empty for current working directory.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Returns a list of filesystem objects in the requested
             directory as an array of strings matching their
             filenames.
-        >>>
+        `>>>
     });
 }
 
@@ -54,15 +54,15 @@ sys.eval.help = function() {
         name:"sys.eval",
         args:[
             {name:"code",text:"The javascript code to evaluate"},
-            {name:"filename",text:<<<
+            {name:"filename",text:<<<`
                 [Optional] the filename the source code came from. Will
                 be visible in backtraces, &c.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Evaluates a bit of javascript code kept in a string,
             returning whatever the code returns.
-        >>>
+        `>>>
     });
 }
 
@@ -79,11 +79,11 @@ sys.parse.help = function() {
             {name:"context",text:"[Optional] Name of the context"},
             {name:"module",text:"[Optional] Name of the module"}
         ],
-        text:<<<
+        text:<<<`
             Loads a javascript source file, compiles it into bytecode and
             runs it. The context and module arguments are used for the
             internal bookkeepping of the system.
-        >>>
+        `>>>
     });
 }
 
@@ -98,12 +98,12 @@ sys.glob.help = function() {
         args:[
             {name:"match",text:"A filesystem wildcard expression"}
         ],
-        text:<<<
+        text:<<<`
             Matches a wildcard against files on the filesystem as seen
             from the current working directory. End users are
             encouraged to use the fquery frontend '$'. Returns
             an array of strings containing the matching paths.
-        >>>
+        `>>>
     });
 }
 
@@ -118,10 +118,10 @@ sys.getenv.help = function() {
         args:[
             {name:"key",text:"Name of the environment variable"}
         ],
-        text:<<<
+        text:<<<`
             Gets data from the system environment. End users are
             encouraged to use the env[] proxy.
-        >>>
+        `>>>
     });
 }
 
@@ -137,10 +137,10 @@ sys.setenv.help = function() {
             {name:"key",text:"Name of the environment variable"},
             {name:"value",text:"Value to set (should be string)"}
         ],
-        text:<<<
+        text:<<<`
             Writes data to the system environment. End users are
             encouraged to use the env[] proxy.
-        >>>
+        `>>>
     });
 }
 
@@ -155,9 +155,9 @@ sys.print.help = function() {
         args:[
             {name:"text",text:"Data to print (must be string)"}
         ],
-        text:<<<
+        text:<<<`
             Outputs a string to the console, without a newline.
-        >>>
+        `>>>
     });
 }
 
@@ -169,9 +169,9 @@ setapi (sys.print, "sys.print");
 sys.uptime.help = function() {
     setapi.helptext ({
         name:"sys.uptime",
-        text:<<<
+        text:<<<`
             Returns the system uptime in seconds.
-        >>>
+        `>>>
     });
 }
 
@@ -183,9 +183,9 @@ setapi (sys.uptime, "sys.uptime");
 sys.loadavg.help = function() {
     setapi.helptext ({
         name:"sys.loadavg",
-        text:<<<
+        text:<<<`
             Returns the system load average as an array of three numbers.
-        >>>
+        `>>>
     });
 }
 
@@ -199,15 +199,15 @@ sys.kill.help = function() {
         name:"sys.kill",
         args:[
             {name:"pid",text:"The pid to signal"},
-            {name:"signal",text:<<<
+            {name:"signal",text:<<<`
                 Either a number (0 to check if a process exists), or
                 a signal string in libc terms, e.g., "SIGABRT", "SIGTERM",
                 "SIGKILL".
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Sends a signal to a process.
-        >>>
+        `>>>
     });
 }
 
@@ -221,16 +221,16 @@ sys.read.help = function() {
         name:"sys.read",
         args:[
             {name:"file",text:"Path of file to read"},
-            {name:"maxsz",text:<<<
+            {name:"maxsz",text:<<<`
                 [Optional] Maximum number of bytes to read from the file,
                 return data will be truncated if it exceeds the size.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Reads data from the filesystem into a string. Note that this
             is not intended to deal with binary data, but rather
             with json/text/javascript files.
-        >>>
+        `>>>
     });
 }
 
@@ -246,9 +246,9 @@ sys.write.help = function() {
             {name:"data",text:"The string data to write"},
             {name:"file",text:"The path to write the data to"}
         ],
-        text:<<<
+        text:<<<`
             Writes a string to the filesystem.
-        >>>
+        `>>>
     });
 }
 
@@ -265,13 +265,13 @@ sys.run.help = function() {
             {name:"argv[]",text:"The arguments to pass"},
             {name:"stdin",text:"[Optional] data to feed its stdin."}
         ],
-        text:<<<
+        text:<<<`
             Executes a command, catching its output, if it had any,
             into a string that is returned. If the command
             returns with a non-zero exit status, false is returned.
             If the command wrote no output and has a zero exit-status,
             true is returned.
-        >>>
+        `>>>
     });
 }
 
@@ -287,12 +287,12 @@ sys.runconsole.help = function() {
             {name:"command",text:"The unix command to execute"},
             {name:"argv[]",text:"The arguments to pass"},
         ],
-        text:<<<
+        text:<<<`
             Executes a command, keeping its stdio hooked to the 
             foreground console. If the command
             returns with a non-zero exit status, false is returned.
             In other cases, true is returned.
-        >>>
+        `>>>
     });
 }
 
@@ -308,9 +308,9 @@ sys.mkdir.help = function() {
             {name:"path",text:"Name and path of the directory"},
             {name:"mode",text:"[Optional] The mode (number)"}
         ],
-        text:<<<
+        text:<<<`
             Creates a new directort.
-        >>>
+        `>>>
     });
 }
 
@@ -326,9 +326,9 @@ sys.chmod.help = function() {
             {name:"path",text:"The filesystem object to change"},
             {name:"mode",text:"The new mode (number)"}
         ],
-        text:<<<
+        text:<<<`
             Change permissions of a filesystem object.
-        >>>
+        `>>>
     })
 }
 
@@ -345,9 +345,9 @@ sys.chown.help = function() {
             {name:"uid",text:"The new userid (number)"},
             {name:"gid",text:"The new groupid (number)"}
         ],
-        text:<<<
+        text:<<<`
             Change ownership of a filesystem object.
-        >>>
+        `>>>
     });
 }
 
@@ -362,9 +362,9 @@ sys.getpwnam.help = function() {
         args:[
             {name:"username",text:"Requested username"}
         ],
-        text:<<<
+        text:<<<`
             Gets information about a unix account.
-        >>>
+        `>>>
     });
 }
 
@@ -379,9 +379,9 @@ sys.getpwuid.help = function() {
         args:[
             {name:"uid",text:"Requested userid (number)"}
         ],
-        text:<<<
+        text:<<<`
             Gets information about a unix account.
-        >>>
+        `>>>
     });
 }
 
@@ -396,9 +396,9 @@ sys.hostname.help = function() {
         args:[
             {name:"newname",text:"[Optional] new hostname"}
         ],
-        text:<<<
+        text:<<<`
             Gets or sets the system hostname.
-        >>>
+        `>>>
     });
 }
 
@@ -410,9 +410,9 @@ setapi (sys.hostname, "sys.hostname");
 sys.winsize.help = function() {
     setapi.helptext ({
         name:"sys.winsize",
-        text:<<<
+        text:<<<`
             Returns the projected width of the console.
-        >>>
+        `>>>
     });
 }
 
@@ -427,9 +427,9 @@ sys.stat.help = function() {
         args:[
             {name:"path",text:"Filesystem object to inspect"}
         ],
-        text:<<<
+        text:<<<`
             Returns information about a filesystem object.
-        >>>
+        `>>>
     });
 }
 
@@ -441,9 +441,9 @@ setapi (sys.stat, "sys.stat");
 sys.getuid.help = function() {
     setapi.helptext ({
         name:"sys.getuid",
-        text:<<<
+        text:<<<`
             Returns the current active userid.
-        >>>
+        `>>>
     });
 }
 
@@ -455,9 +455,9 @@ setapi (sys.getuid, "sys.getuid");
 sys.getgid.help = function() {
     setapi.helptext ({
         name:"sys.getgid",
-        text:<<<
+        text:<<<`
             Returns the current active groupid.
-        >>>
+        `>>>
     });
 }
 
@@ -469,9 +469,9 @@ setapi (sys.getgid, "sys.getgid");
 sys.getpid.help = function() {
     setapi.helptext ({
         name:"sys.getpid",
-        text:<<<
+        text:<<<`
             Returns the current process id.
-        >>>
+        `>>>
     });
 }
 
@@ -483,10 +483,10 @@ setapi (sys.getuid, "sys.getpid");
 sys.uname.help = function() {
     setapi.helptext ({
         name:"sys.uname",
-        text:<<<
+        text:<<<`
             Returns information about the underlying operating system
             kernel.
-        >>>
+        `>>>
     });
 }
 
@@ -498,10 +498,10 @@ setapi (sys.uname, "sys.uname");
 sys.channel.open.help = function() {
     setapi.helptext ({
         name:"sys.channel.open",
-        text:<<<
+        text:<<<`
             Opens a new channel object. Returns a number representing
             the channel id.
-        >>>
+        `>>>
     })
 }
 
@@ -517,10 +517,10 @@ sys.channel.send.help = function() {
             {name:"id",text:"The channel id"},
             {name:"data",text:"The data to send (string)"}
         ],
-        text:<<<
+        text:<<<`
             Sends string data to a channel. Returns false if no data
             could be sent (because there's nobody listening).
-        >>>
+        `>>>
     });
 }
 
@@ -535,11 +535,11 @@ sys.channel.recv.help = function() {
         args:[
             {name:"id",text:"The channel id"}
         ],
-        text:<<<
+        text:<<<`
             Receives string data from a channel. Returns the boolean value
             of false if no data could be read (because there are no
             senders). Otherwise the string data is returned.
-        >>>
+        `>>>
     });
 }
 
@@ -554,11 +554,11 @@ sys.channel.exit.help = function() {
         args:[
             {name:"id",text:"The channel id"}
         ],
-        text:<<<
+        text:<<<`
             Tells all listeners that we're quitting the circus, then
             closes all pipes associated with a channel. Any remaining
             queued messages are discarded.
-        >>>
+        `>>>
     });
 }
 
@@ -573,11 +573,11 @@ sys.channel.close.help = function() {
         args:[
             {name:"id",text:"The channel id"}
         ],
-        text:<<<
+        text:<<<`
             Completely shuts down a channel. If there are any child
             processes spawned on its behalf, they are unceremoniously
             killed.
-        >>>
+        `>>>
     });
 }
 
@@ -593,11 +593,11 @@ sys.channel.senderror.help = function() {
             {name:"id",text:"The channel id"},
             {name:"errstr",text:"The error string"}
         ],
-        text:<<<
+        text:<<<`
             From the perspective of a co-routine, this sets the
             channel on the other end into an error state that
             can be picked up through sys.channel.error().
-        >>>
+        `>>>
     });
 }
 
@@ -612,11 +612,11 @@ sys.channel.error.help = function() {
         args:[
             {name:"id",text:"The channel id"},
         ],
-        text:<<<
+        text:<<<`
             If any coroutines pushed an error through, the error
             string will be returned. If there were no errors on
             the channel, false is returned.
-        >>>
+        `>>>
     });
 }
 
@@ -628,9 +628,9 @@ setapi (sys.channel.error, "sys.channel.error");
 sys.channel.stat.help = function() {
     setapi.helptext ({
         name:"sys.channel.stat",
-        text:<<<
+        text:<<<`
             Returns information about the currently open channels.
-        >>>
+        `>>>
     });
 }
 
@@ -646,11 +646,11 @@ sys.go.help = function() {
             {name:"id",text:"The channel id associated with the coroutine"},
             {name:"func",text:"The function to call in the child process"}
         ],
-        text:<<<
+        text:<<<`
             Spawns a co-routine. All open filedescriptors will be closed
             for the child process, except for those needed to communicate
             with the associated channel.
-        >>>
+        `>>>
     });
 }
 
@@ -664,14 +664,14 @@ sys.io.open.help = function() {
         name:"sys.io.open",
         args:[
             {name:"file",text:"Filename to open"},
-            {name:"mode",text:<<<
+            {name:"mode",text:<<<`
                 Access mode. A string with one or more single character
                 flags for read(r), write(r), truncate(t), and append(a).
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Opens a fileystem file. Returns a file descriptor.
-        >>>
+        `>>>
     });
 }
 
@@ -686,9 +686,9 @@ sys.io.close.help = function() {
         args:[
             {name:"fd",text:"Filedescriptor to close"},
         ],
-        text:<<<
+        text:<<<`
             Closes a filedescriptor.
-        >>>
+        `>>>
     });
 }
 
@@ -702,15 +702,15 @@ sys.io.read.help = function() {
         name:"sys.io.read",
         args:[
             {name:"fd",text:"Filedescriptor to read from"},
-            {name:"size",text:<<<
+            {name:"size",text:<<<`
                 Number of bytes to read. Returned buffer will be smaller
                 if end-of-file is reached.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Reads data from an open file descriptor. Returns a raw
             Uint8Array with the read bytes.
-        >>>
+        `>>>
     });
 }
 
@@ -724,14 +724,14 @@ sys.io.write.help = function() {
         name:"sys.io.write",
         args:[
             {name:"fd",text:"Filedescriptor to write to"},
-            {name:"data",text:<<<
+            {name:"data",text:<<<`
                 An Uint8Array with the bytes that should be written.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             Writes data to an open file descriptor. Returns false if the
             data could not be successfully written.
-        >>>
+        `>>>
     });
 }
 
@@ -746,10 +746,10 @@ sys.sock.unix.help = function() {
         args:[
             {name:"path",text:"Socket to connect to"},
         ],
-        text:<<<
+        text:<<<`
             Creates and connects a unix domain socket. Returns the file
             descriptor for the socket, or false if the connection failed.
-        >>>
+        `>>>
     });
 }
 
@@ -766,10 +766,10 @@ sys.sock.tcp.help = function() {
             {name:"port",text:"TCP port to connect to"},
             {name:"binadaddr",text:"[Optional] local address to bind to"}
         ],
-        text:<<<
+        text:<<<`
             Creates and connects a TCP socket. Returns the file
             descriptor for the socket, or false if the connection failed.
-        >>>
+        `>>>
     });
 }
 
@@ -784,12 +784,12 @@ sys.sock.unixlisten.help = function() {
         args:[
             {name:"path",text:"Path of socket to set up"},
         ],
-        text:<<<
+        text:<<<`
             Creates a listening a unix domain socket. Returns the file
             descriptor for the socket, or false if the socket could
             not be created (like if the file for the socket already
             exists).
-        >>>
+        `>>>
     });
 }
 
@@ -805,11 +805,11 @@ sys.sock.tcplisten.help = function() {
             {name:"addr",text:"[Optional] IPv4 or IPv6 address to bind to"},
             {name:"port",text:"TCP port to bind to"},
         ],
-        text:<<<
+        text:<<<`
             Creates a listening a TCP socket. Returns the file
             descriptor for the socket, or false if the socket could
             not be created.
-        >>>
+        `>>>
     });
 }
 
@@ -824,13 +824,13 @@ sys.sock.accept.help = function() {
         args:[
             {name:"fd",text:"Filedescriptor of a listening socket"}
         ],
-        text:<<<
+        text:<<<`
             Waits for an incoming connection on the listening socket,
             then returns the file descriptor of a socket associated
             with this new connection.
             
             Returns false on failure.
-        >>>
+        `>>>
     });
 }
 
@@ -842,9 +842,9 @@ setapi (sys.sock.accept, "sys.sock.accept");
 sys.sock.stat.help = function() {
     setapi.helptext ({
         name:"sys.sock.stat",
-        text:<<<
+        text:<<<`
             Returns information about the currently open channels.
-        >>>
+        `>>>
     });
 }
 

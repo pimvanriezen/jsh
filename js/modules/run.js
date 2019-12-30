@@ -33,11 +33,11 @@ run.help = function() {
             {name:"cmd",text:"Command to run"},
             {name:"args",text:"Argument list"}
         ],
-        text:<<<
+        text:<<<`
             Executes a program and returns its output. Arguments an either
             be provided as a straight array, or as the rest of the argument
             list, or inline in the "cmd" key, separated by spaces.
-        >>>
+        `>>>
     });
 }
 
@@ -70,11 +70,11 @@ run.console.help = function() {
             {name:"cmd",text:"Command to run"},
             {name:"args",text:"Argument list"}
         ],
-        text:<<<
+        text:<<<`
             Behaves like run(), but executes connected to the shell's
             console, instead of exchanging data with the javascript
             layer.
-        >>>
+        `>>>
     });
 }
 
@@ -115,7 +115,7 @@ run.js.help = function() {
         args:[
             {name:"file",text:"Location of the script file"}
         ],
-        text:<<<
+        text:<<<`
             Loads and runs a javascript file, in its own sub-process so it
             cannot stink up the global heap, but its return value is
             what we get back, instead of its standard output. Any extra
@@ -127,7 +127,7 @@ run.js.help = function() {
             of JSAPI. If this is set to true, the script has been called
             through this mechanism and it can return a value, rather than
             do everything through stdout.
-        >>>
+        `>>>
     });
 }
 

@@ -2,11 +2,11 @@ var ps = setapi ([
     {name:"ps"},
     {opt:{command:true},helptext:"Match command against regexp"},
     {opt:{user:true},helptext:"Match user against regexp"},
-    {helptext:<<<
+    {helptext:<<<`
         Displays a list of processes, optionally filtered against provided
         match criteria. If you want programmatic access to the process
         list, use sys.ps() or access details through the proc[] object.
-    >>>},
+    `>>>},
     {f:function(args) {
         var listing = sys.ps(args);
         var t = new TextTable(8);

@@ -14,13 +14,13 @@ var Socket = function() {
 Socket.help = function() {
     setapi.helptext({
         name:"f = new Socket",
-        text:<<<
+        text:<<<`
             Class for handling tcp-based connections. Shares code and
             functionality with the File class, except for the parts
             where a connection is set up.
             
             Available functions on constructed objects:
-        >>>
+        `>>>
     });
     
     var list = [];
@@ -58,10 +58,10 @@ Socket.connect = {help:function() {
                 IP addresses can be either IPv4 or IPv6.
             `>>>}
         ],
-        text:<<<
+        text:<<<`
             Connect to a remote host or unix domain socket. Returns true on
             success, false on failure.
-        >>>
+        `>>>
     });
 }}
 

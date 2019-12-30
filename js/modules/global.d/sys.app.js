@@ -12,10 +12,10 @@ sys.app.load = function(appname, apppath) {
         name:appname,
     }
     
-    var pre = <<<
+    var pre = <<<`
         (function(){
             return function(module) {
-    >>>;
+    `>>>;
     
     var post = "}})()";
     var wrapped = pre + src + post;
@@ -78,15 +78,15 @@ sys.app.load.help = function() {
     setapi.helptext ({
         name:"sys.app.load",
         args:[
-            {name:"appname",text:<<<
+            {name:"appname",text:<<<`
                 Application name as it will appear in the global scope,
                 e.g. "nukelichtenstein"
-            >>>},
+            `>>>},
             {name:"path",text:"Path of the application's js source"}
         ],
-        text:<<<
+        text:<<<`
             Loads in a shell application.
-        >>>
+        `>>>
     });
 }
 
@@ -110,10 +110,10 @@ sys.app.scan = function() {
 sys.app.scan.help = function() {
     setapi.helptext ({
         name:"sys.app.scan",
-        text:<<<
+        text:<<<`
             Scans all jsh module paths for new or updated shell applications
             to load.
-        >>>
+        `>>>
     })
 }
 
@@ -152,9 +152,9 @@ sys.app.list = function() {
 sys.app.list.help = function() {
     setapi.helptext ({
         name:"sys.app.list",
-        text:<<<
+        text:<<<`
             Displays a list of all actively loaded shell applications.
-        >>>
+        `>>>
     })
 }
 

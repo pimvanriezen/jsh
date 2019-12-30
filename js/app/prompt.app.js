@@ -17,23 +17,23 @@ prompt.help = function() {
         args:[
             {name:"str",text:"The prompt format string"}
         ],
-        text:<<<
+        text:<<<`
             Changes the look of the shell prompt. The format string recognizes
             a couple of substitutions:
-        >>>
+        `>>>
     });
     echo ("");
-    echo (TextTable.auto(<<<
+    echo (TextTable.auto(<<<`
         %h The hostname
         %p The current working directory (summarized)
         %i The index in the directory history
         %# Prompt character, ":" for users, "#" for root
-    >>>,2).boldColumn(0).indent(4).format());
-    print (<<<
+    `>>>,2).boldColumn(0).indent(4).format());
+    print (<<<`
         You can also override the function completely to write a custom
         prompt, that gets executed every time the shell displays a new
         prompt.
-    >>>.rewrap(sys.winsize()));
+    `>>>.rewrap(sys.winsize()));
 }
 
 module.version = "1.0.2";

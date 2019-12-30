@@ -12,21 +12,21 @@ printf.help = function() {
     setapi.helptext ({
         name:"printf",
         args:[
-            {name:"fmt",text:<<<
+            {name:"fmt",text:<<<`
                 Format string. Extra arguments after the format string
                 are used to fill in the blanks.
-            >>>}
+            `>>>}
         ],
-        text:<<<
+        text:<<<`
             C-style printf, prints formatted text to the console. Newlines
             should be provided by the caller as needed. The libc style of
             precision and padding options are recognized. Types are coerced
             if possible, with the following argument types recognized in
             the format string:
-        >>>
+        `>>>
     });
     echo ("");
-    echo (TextTable.auto(<<<
+    echo (TextTable.auto(<<<`
         %s      String data
         %S      Also string data, but if a width is provided, the string
                 get summarized to that width
@@ -36,13 +36,13 @@ printf.help = function() {
         %j      JSON encoding
         %J      Colorized JSON encoding (for ANSI terminals)
         %%      Prints a percentage mark
-    >>>,2).indent(8).padding(4).boldColumn(0).format());
+    `>>>,2).indent(8).padding(4).boldColumn(0).format());
 
-    print (setapi.textformat (<<<
+    print (setapi.textformat (<<<`
         If you want get the formatted string for further processing, rather
         than sending it to the console, call sprintf() with the same
         parameters.
-    >>>));
+    `>>>));
 }
 
 setapi (printf, "printf");

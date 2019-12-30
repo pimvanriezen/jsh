@@ -296,15 +296,15 @@ TextTable.help = function() {
         args:[
             {name:"columns",text:"Number of columns in the table"}
         ],
-        text:<<<
+        text:<<<`
             Utility class for making table-based layouts on a console
             screen. Once created, the following functions are available
             on the object:
-        >>>
+        `>>>
     });
     
     echo ("");
-    echo (TextTable.auto(<<<
+    echo (TextTable.auto(<<<`
         t.stretchColumn(c)      Indicates which of the columns is the one that
                                 should grow to the full screenwidth as needed.
                                 Other columns will be sized to whatever is
@@ -328,11 +328,11 @@ TextTable.help = function() {
         t.addRow(cell,cell,...) Adds a row to the dataset.
         t.format()              Renders the table and returns it as a text
                                 string.
-    >>>, 2).indent(4).boldColumn(0).format());
+    `>>>, 2).indent(4).boldColumn(0).format());
     
-    print (setapi.textformat(<<<
+    print (setapi.textformat(<<<`
         All methods except format() allow chaining.
-    >>>));
+    `>>>));
 }
 
 setapi (TextTable,"TextTable");
