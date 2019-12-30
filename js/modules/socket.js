@@ -13,6 +13,8 @@ Socket::connect = function(addr,port) {
 }
 
 Socket::close = File::close;
+Socket::canRead = File::canRead;
+Socket::canWrite = File::canWrite;
 Socket::read = File::read;
 Socket::readLine = File::readLine;
 Socket::write = File::write;

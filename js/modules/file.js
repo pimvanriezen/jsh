@@ -131,6 +131,52 @@ File.close = {help:function() {
 setapi (File.close, "File.close");
 
 // ============================================================================
+// METHOD File::canRead
+// ============================================================================
+File::canRead = function(timeout) {
+    if (! timeout) timeout = 0;
+    return (sys.io.select (this.fd,null,null,timeout)[0].length != 0);
+}
+
+File.canRead = {help:function() {
+    setapi.helptext ({
+        name:"f.canRead",
+        args:[
+            {name:"timeout",text:<<<
+                The timeout in milliseconds. If not provided, it is
+                defaulted to 0.
+            >>>}
+        ],
+        text:<<<
+            Returns true if there's data to be read on the file.
+        >>>
+    });
+}}
+
+// ============================================================================
+// METHOD File::canWrite
+// ============================================================================
+File::canWrite = function(timeout) {
+    if (! timeout) timeout = 0;
+    return (sys.io.select (null,this.fd,null,timeout)[1].length != 0);
+}
+
+File.canWrite = {help:function() {
+    setapi.helptext ({
+        name:"f.canWrite",
+        args:[
+            {name:"timeout",text:<<<
+                The timeout in milliseconds. If not provided, it is
+                defaulted to 0.
+            >>>}
+        ],
+        text:<<<
+            Returns true if data can be written to the file.
+        >>>
+    });
+}}
+
+// ============================================================================
 // METHOD File::read
 // ============================================================================
 File::read = function(sz) {
