@@ -288,7 +288,13 @@ void duk_push_fdarg (duk_context *ctx, int argidx, int arrayidx) {
 }
 
 // ============================================================================
-
+// FUNCTION sys_io_select
+// ----------------------
+// Wrapping of select(). Accepts three arrays with filedescriptors and an
+// optional timeout in milliseconds. As a quality-of-life improvement, the
+// array can also be the direct element if it only contains one, and the
+// filedescriptors can also be objects with an 'fd' property, so that people
+// can toss File objects at it and get the right ones back.
 // ============================================================================
 duk_ret_t sys_io_select (duk_context *ctx) {
     if (duk_get_top (ctx) < 3) return DUK_RET_TYPE_ERROR;
@@ -316,34 +322,34 @@ duk_ret_t sys_io_select (duk_context *ctx) {
         tv.tv_usec = 0;
     }
     
+    // Fill the fd_set and fdref with our arguments.
     for (i=0; i<3; ++i) {
         FD_ZERO (&fds[i]);
         numfd[i] = duk_get_fdarg_len (ctx, i);
-        fprintf (stderr,"numfd(%i) = %i\n", i, numfd[i]);
         for (ai=0; ai<numfd[i]; ++ai) {
             int infd = duk_get_fd (ctx, i, ai);
             if (infd>0) {
-                fprintf (stderr, "foundfd(%i,%i) = %i\n", i, ai, infd);
                 fdref_add (&sets[i], infd, ai);
                 FD_SET (infd, &fds[i]);
                 if (infd > maxfd) maxfd = infd;
             }
         }
     }
-    
-    duk_push_array (ctx); // result array[3]
+
+    // result array[3]
+    duk_push_array (ctx);
     duk_push_array (ctx);
     duk_put_prop_index (ctx, -2, 0);
     duk_push_array (ctx);
     duk_put_prop_index (ctx, -2, 1);
     duk_push_array (ctx);
     duk_put_prop_index (ctx, -2, 2);
-    
+
+    // Do the actual job we were hired for    
     if (select (maxfd+1, &fds[0], &fds[1], &fds[2], &tv) > 0) {
         for (i=0; i<3; ++i) {
             for (ai=0; ai<numfd[i]; ++ai) {
                 int posfd = duk_get_fd (ctx, i, ai);
-                fprintf (stderr, "select.addfd(%i,%i) = %i\n",i,ai,posfd);
                 if (posfd>0 && FD_ISSET(posfd, &fds[i])) {
                     duk_push_fdarg (ctx, i, ai);
                 }
@@ -351,6 +357,7 @@ duk_ret_t sys_io_select (duk_context *ctx) {
         }
     }
     
+    // Give back what we took
     fdref_free (&sets[0]);
     fdref_free (&sets[1]);
     fdref_free (&sets[2]);

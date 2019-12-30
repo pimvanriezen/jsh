@@ -24,6 +24,7 @@
 #include "sys_misc.h"
 #include "sys_module.h"
 #include "sys_io.h"
+#include "sys_sock.h"
 
 // ============================================================================
 // FUNCTION mystrdup
@@ -52,6 +53,7 @@ void sys_init (duk_context *ctx) {
     duk_idx_t obj_idx;
     duk_idx_t chanobj_idx;
     duk_idx_t ioobj_idx;
+    duk_idx_t sockobj_idx;
     
     #define PROPFLAGS DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | \
             DUK_DEFPROP_SET_CONFIGURABLE
@@ -70,6 +72,11 @@ void sys_init (duk_context *ctx) {
         duk_push_string (ctx, #xxx); \
         duk_push_c_function (ctx, sys_io_##xxx, type); \
         duk_def_prop (ctx, ioobj_idx, PROPFLAGS);
+    
+    #define sockcall(xxx,type) \
+        duk_push_string (ctx, #xxx); \
+        duk_push_c_function (ctx, sys_sock_##xxx, type); \
+        duk_def_prop (ctx, sockobj_idx, PROPFLAGS);
     
     duk_push_global_object (ctx);
     duk_push_string (ctx, "sys");
@@ -135,6 +142,14 @@ void sys_init (duk_context *ctx) {
     iocall (select, DUK_VARARGS);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "sock");
+    sockobj_idx = duk_push_object (ctx);
+    
+    sockcall (tcp, DUK_VARARGS);
+    
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
     duk_def_prop (ctx, -3, PROPFLAGS);
     duk_pop (ctx);
     
