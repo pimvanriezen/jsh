@@ -17,7 +17,7 @@
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include "duktape.h"
-#include "quoting.h"
+#include "sugar.h"
 #include "sys_channel.h"
 #include "sys_fs.h"
 #include "sys_run.h"
@@ -178,7 +178,7 @@ void sys_init (duk_context *ctx) {
     }
 
     if (t) {
-        char *tbuffer = handle_quoting (t->alloc);
+        char *tbuffer = handle_sugar (t->alloc);
         duk_get_global_string (ctx, "sys");
         duk_get_prop_string (ctx, -1, "_modules");
         duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]

@@ -28,7 +28,7 @@
 #include "duk_console.h"
 #include "duk_module_duktape.h"
 #include "duktape.h"
-#include "quoting.h"
+#include "sigar.h"
 #include "textbuffer.h"
 
 extern void sys_init (duk_context *);
@@ -480,7 +480,7 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
         bufptr = strchr (bufptr, '\n');
     }
     
-    char *translated = handle_quoting (t->alloc);
+    char *translated = handle_sugar (t->alloc);
     textbuffer_free (t);
 
     duk_push_string(ctx, bytecode_filename);
@@ -615,7 +615,7 @@ static int handle_interactive(duk_context *ctx) {
             linenoiseHistoryAdd(buffer);
         }
         
-        char *translated = handle_quoting (buffer);
+        char *translated = handle_sugar (buffer);
 
         duk_push_pointer(ctx, (void *) translated);
         duk_push_uint(ctx, (duk_uint_t) strlen(translated));

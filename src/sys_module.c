@@ -18,7 +18,7 @@
 #include <sys/utsname.h>
 #include "duktape.h"
 #include "textbuffer.h"
-#include "quoting.h"
+#include "sugar.h"
 #include "sys_module.h"
 
 // ============================================================================
@@ -109,8 +109,8 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     struct textbuffer *t = textbuffer_load(full);
     if (! t) return 0;
 
-    // Translate inline quoting, and push the result to the stack.
-    char *translated = handle_quoting (t->alloc);
+    // Translate syntax sugar, and push the result to the stack.
+    char *translated = handle_sugar (t->alloc);
     duk_push_string (ctx, translated);
     free (translated);
     
@@ -146,7 +146,7 @@ duk_ret_t sys_eval (duk_context *ctx) {
     char *translated;
     src = duk_to_string (ctx, 0);
     if (duk_get_top (ctx) > 1) fname = duk_to_string (ctx, 1);
-    translated = handle_quoting (src);
+    translated = handle_sugar (src);
     duk_push_string (ctx, fname);
     if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
         duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "%s",
@@ -178,7 +178,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
                 modnam = duk_to_string (ctx, 2);
             }
         }
-        char *translated = handle_quoting (t->alloc);
+        char *translated = handle_sugar (t->alloc);
         duk_push_string (ctx, fnam);
         if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
             fprintf (stderr, "%% %s: %s\n",

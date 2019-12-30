@@ -12,7 +12,7 @@
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
 
-char *handle_quoting (const char *src) {
+char *handle_sugar (const char *src) {
     const char *hexdigits = "0123456789abcdef";
     char currentquote = 0;
     const char *c = src;
