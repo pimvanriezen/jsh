@@ -28,7 +28,7 @@
 #include "duk_console.h"
 #include "duk_module_duktape.h"
 #include "duktape.h"
-#include "sigar.h"
+#include "sugar.h"
 #include "textbuffer.h"
 
 extern void sys_init (duk_context *);
