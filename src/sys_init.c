@@ -49,6 +49,7 @@ void sys_init (duk_context *ctx) {
 
     sys_fs_init();
     sys_channel_init();
+    sys_sock_init();
 
     duk_idx_t obj_idx;
     duk_idx_t chanobj_idx;
@@ -147,6 +148,9 @@ void sys_init (duk_context *ctx) {
     sockobj_idx = duk_push_object (ctx);
     
     sockcall (tcp, DUK_VARARGS);
+    sockcall (tcp_listen, DUK_VARARGS);
+    sockcall (accept, 1);
+    sockcall (stat, 0);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     

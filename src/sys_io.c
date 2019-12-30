@@ -19,7 +19,7 @@
 #include <sys/utsname.h>
 #include <signal.h>
 #include "duktape.h"
-#include "sys_misc.h"
+#include "sys_sock.h"
 #include "textbuffer.h"
 
 #ifdef __linux__
@@ -85,6 +85,7 @@ duk_ret_t sys_io_close (duk_context *ctx) {
     int fd = duk_get_int (ctx, 0);
     if (fd<3) return 0;
     close (fd);
+    unregister_socket (fd);
     return 0;
 }
 

@@ -6,6 +6,7 @@ var File = function() {
     this.rdbuf = "";
     this.enc = new TextEncoder();
     this.dec = new TextDecoder();
+    this.eol = '\n';
 }
 
 File.help = function() {
@@ -177,7 +178,7 @@ setapi (File.read, "File.read");
 // ============================================================================
 File::readLine = function() {
     if (! this.fd) return null;
-    var nl = this.rdbuf.indexOf ('\n');
+    var nl = this.rdbuf.indexOf (this.eol);
     while (nl<0) {
         var inbuf = sys.io.read (this.fd, 256);
         if (! inbuf.length) {
@@ -194,7 +195,7 @@ File::readLine = function() {
         nl = this.rdbuf.indexOf ('\n');
     }
     var res = this.rdbuf.slice (0, nl);
-    this.rdbuf = this.rdbuf.substr (nl+1);
+    this.rdbuf = this.rdbuf.substr (nl+this.eol.length);
     return res;
 }
 
@@ -245,7 +246,7 @@ setapi (File.write, "File.write");
 // METHOD File::writeLine
 // ============================================================================
 File::writeLine = function(str) {
-    return this.write (str + '\n');
+    return this.write (str + this.eol);
 }
 
 File.writeLine = {help:function() {
