@@ -1,4 +1,4 @@
-var Socket = require("Socket");
+var Socket = require("socket");
 
 var ListenSocket = function() {
     this.fd = null;
