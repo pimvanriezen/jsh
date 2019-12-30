@@ -112,9 +112,9 @@ duk_ret_t sys_chan_close (duk_context *ctx) {
 }
 
 // ============================================================================
-// FUNCTION sys_chan_info
+// FUNCTION sys_chan_stat
 // ============================================================================
-duk_ret_t sys_chan_info (duk_context *ctx) {
+duk_ret_t sys_chan_stat (duk_context *ctx) {
     int i,j,pindex,cindex;
     struct channel *ch;
     struct channelmsg *msg;
@@ -141,6 +141,7 @@ duk_ret_t sys_chan_info (duk_context *ctx) {
             pindex = 0;
             for (j=0; j<ch->alloc; ++j) {
                 pipe = &ch->pipes[j];
+                if (pipe->pid == 0) continue;
                 pipe_idx = duk_push_object (ctx);
                 duk_push_number (ctx, pipe->pid);
                 duk_put_prop_string (ctx, pipe_idx, "pid");

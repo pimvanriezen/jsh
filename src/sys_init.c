@@ -125,7 +125,7 @@ void sys_init (duk_context *ctx) {
     chancall (recv, 1);
     chancall (exit, 1);
     chancall (close, 1);
-    chancall (info, 0);
+    chancall (stat, 0);
     chancall (available, 1);
     chancall (isempty, 1);
     chancall (senderror, 2);
@@ -148,11 +148,11 @@ void sys_init (duk_context *ctx) {
     sockobj_idx = duk_push_object (ctx);
     
     sockcall (tcp, DUK_VARARGS);
-    sockcall (tcp_listen, DUK_VARARGS);
+    sockcall (tcplisten, DUK_VARARGS);
     sockcall (accept, 1);
     sockcall (stat, 0);
     sockcall (unix, 1);
-    sockcall (unix_listen, 1);
+    sockcall (unixlisten, 1);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     

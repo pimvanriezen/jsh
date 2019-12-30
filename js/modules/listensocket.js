@@ -11,16 +11,16 @@ ListenSocket::listenTo = function (arg1, arg2) {
     }
     
     if (arg2) {
-        this.fd = sys.sock.tcp_listen (arg1, arg2);
+        this.fd = sys.sock.tcplisten (arg1, arg2);
         this.unix = false;
     }
     else {
         if (parseInt (arg1)) {
-            this.fd = sys.sock.tcp_listen (arg1);
+            this.fd = sys.sock.tcplisten (arg1);
             this.unix = false;
         }
         else {
-            this.fd = sys.sock.unix_listen (arg1);
+            this.fd = sys.sock.unixlisten (arg1);
             this.unix = true;
         }
     }

@@ -20,6 +20,8 @@ struct channel *channel_create (void) {
     res->pipes[0].flags = 0;
     res->pipes[0].fdread = 0;
     res->pipes[0].fdwrite = 0;
+    res->pipes[0].msgsent = 0;
+    res->pipes[0].msgrecv = 0;
     return res;
 }
 

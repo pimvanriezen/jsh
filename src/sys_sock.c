@@ -28,6 +28,9 @@
 
 sockdata SOCKINFO[1024];
 
+// ============================================================================
+// FUNCTION make_address
+// ============================================================================
 ipaddress *make_address (const char *str) {
     ipaddress *res = calloc (1, sizeof (ipaddress));
 
@@ -43,16 +46,25 @@ ipaddress *make_address (const char *str) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION ipaddress_valid
+// ============================================================================
 bool ipaddress_valid (ipaddress *addr) {
     int i;
     for (i=0; i<16; ++i) if (addr->d[i]) return true;
     return false;
 }
 
+// ============================================================================
+// FUNCTION ipaddress_to_string
+// ============================================================================
 void ipaddress_tostring (ipaddress *addr, char *into) {
     inet_ntop (AF_INET6, addr->d, into, INET6_ADDRSTRLEN);
 }
 
+// ============================================================================
+// FUNCTION register_socket
+// ============================================================================
 void register_socket (int sock, socktype tp, ipaddress *addr, int port) {
     if (sock<0) return;
     if (sock>1023) return;
@@ -63,6 +75,9 @@ void register_socket (int sock, socktype tp, ipaddress *addr, int port) {
     SOCKINFO[sock].port = port;
 }
 
+// ============================================================================
+// FUNCTION unregister_socket
+// ============================================================================
 void unregister_socket (int sock) {
     if (sock<0) return;
     if (sock>1023) return;
@@ -70,6 +85,9 @@ void unregister_socket (int sock) {
     SOCKINFO[sock].type = SOCK_FREE;
 }
 
+// ============================================================================
+// FUNCTION socket_type
+// ============================================================================
 socktype socket_type (int sock) {
     if (sock<0) return SOCK_FREE;
     if (sock>1023) return SOCK_FREE;
@@ -77,10 +95,16 @@ socktype socket_type (int sock) {
     return SOCKINFO[sock].type;
 }
 
+// ============================================================================
+// FUNCTION sys_sock_init
+// ============================================================================
 void sys_sock_init (void) {
     memset (SOCKINFO, 0, 1024 * sizeof(sockdata));
 }
 
+// ============================================================================
+// FUNCTION sys_sock_unix
+// ============================================================================
 duk_ret_t sys_sock_unix (duk_context *ctx) {
     const char *path = duk_to_string (ctx, 0);
     int sock;
@@ -107,6 +131,9 @@ duk_ret_t sys_sock_unix (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_sock_tcp
+// ============================================================================
 duk_ret_t sys_sock_tcp (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     const char *addrspec = duk_to_string (ctx, 0);
@@ -190,7 +217,10 @@ duk_ret_t sys_sock_tcp (duk_context *ctx) {
     return 1;
 }
 
-duk_ret_t sys_sock_unix_listen (duk_context *ctx) {
+// ============================================================================
+// FUNCTION sys_sock_unixlisten
+// ============================================================================
+duk_ret_t sys_sock_unixlisten (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     const char *path = duk_to_string (ctx, 0);
     int pram;
@@ -226,7 +256,10 @@ duk_ret_t sys_sock_unix_listen (duk_context *ctx) {
     return 1;
 }
 
-duk_ret_t sys_sock_tcp_listen (duk_context *ctx) {
+// ============================================================================
+// FUNCTION sys_sock_tcplisten
+// ============================================================================
+duk_ret_t sys_sock_tcplisten (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     
     const char *addrspec = NULL;
@@ -293,6 +326,9 @@ duk_ret_t sys_sock_tcp_listen (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_sock_accept
+// ============================================================================
 duk_ret_t sys_sock_accept (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     
@@ -331,6 +367,9 @@ duk_ret_t sys_sock_accept (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_sock_stat
+// ============================================================================
 duk_ret_t sys_sock_stat (duk_context *ctx) {
     char addrstr[INET6_ADDRSTRLEN+1];
     int numresult = 0;

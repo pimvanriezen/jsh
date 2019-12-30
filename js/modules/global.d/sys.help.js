@@ -623,6 +623,20 @@ sys.channel.error.help = function() {
 setapi (sys.channel.error, "sys.channel.error");
 
 // ============================================================================
+// sys.channel.stat
+// ============================================================================
+sys.channel.stat.help = function() {
+    setapi.helptext ({
+        name:"sys.channel.stat",
+        text:<<<
+            Returns information about the currently open channels.
+        >>>
+    });
+}
+
+setapi (sys.channel.stat, "sys.channel.stat");
+
+// ============================================================================
 // sys.go
 // ============================================================================
 sys.go.help = function() {
@@ -722,3 +736,116 @@ sys.io.write.help = function() {
 }
 
 setapi (sys.io.write, "sys.io.write");
+
+// ============================================================================
+// sys.sock.unix
+// ============================================================================
+sys.sock.unix.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.unix",
+        args:[
+            {name:"path",text:"Socket to connect to"},
+        ],
+        text:<<<
+            Creates and connects a unix domain socket. Returns the file
+            descriptor for the socket, or false if the connection failed.
+        >>>
+    });
+}
+
+setapi (sys.sock.unix, "sys.sock.unix");
+
+// ============================================================================
+// sys.sock.tcp
+// ============================================================================
+sys.sock.tcp.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.tcp",
+        args:[
+            {name:"addr",text:"IPv4 or IPv6 address to connect to"},
+            {name:"port",text:"TCP port to connect to"},
+            {name:"binadaddr",text:"[Optional] local address to bind to"}
+        ],
+        text:<<<
+            Creates and connects a TCP socket. Returns the file
+            descriptor for the socket, or false if the connection failed.
+        >>>
+    });
+}
+
+setapi (sys.sock.tcp, "sys.sock.tcp");
+
+// ============================================================================
+// sys.sock.unixlisten
+// ============================================================================
+sys.sock.unixlisten.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.unixlisten",
+        args:[
+            {name:"path",text:"Path of socket to set up"},
+        ],
+        text:<<<
+            Creates a listening a unix domain socket. Returns the file
+            descriptor for the socket, or false if the socket could
+            not be created (like if the file for the socket already
+            exists).
+        >>>
+    });
+}
+
+setapi (sys.sock.unixlisten, "sys.sock.unixlisten");
+
+// ============================================================================
+// sys.sock.tcplisten
+// ============================================================================
+sys.sock.tcplisten.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.tcplisten",
+        args:[
+            {name:"addr",text:"[Optional] IPv4 or IPv6 address to bind to"},
+            {name:"port",text:"TCP port to bind to"},
+        ],
+        text:<<<
+            Creates a listening a TCP socket. Returns the file
+            descriptor for the socket, or false if the socket could
+            not be created.
+        >>>
+    });
+}
+
+setapi (sys.sock.tcplisten, "sys.sock.tcplisten");
+
+// ============================================================================
+// sys.sock.accept
+// ============================================================================
+sys.sock.accept.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.accept",
+        args:[
+            {name:"fd",text:"Filedescriptor of a listening socket"}
+        ],
+        text:<<<
+            Waits for an incoming connection on the listening socket,
+            then returns the file descriptor of a socket associated
+            with this new connection.
+            
+            Returns false on failure.
+        >>>
+    });
+}
+
+setapi (sys.sock.accept, "sys.sock.accept");
+
+// ============================================================================
+// sys.sock.stat
+// ============================================================================
+sys.sock.stat.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.stat",
+        text:<<<
+            Returns information about the currently open channels.
+        >>>
+    });
+}
+
+setapi (sys.sock.stat, "sys.sock.stat");
