@@ -153,6 +153,10 @@ void sys_init (duk_context *ctx) {
     sockcall (stat, 0);
     sockcall (unix, 1);
     sockcall (unixlisten, 1);
+    sockcall (udp, 0);
+    sockcall (udpbind, DUK_VARARGS);
+    sockcall (send, 4);
+    sockcall (recv, 1);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     

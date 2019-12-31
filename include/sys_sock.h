@@ -41,5 +41,9 @@ duk_ret_t sys_sock_unixlisten (duk_context *);
 duk_ret_t sys_sock_tcplisten (duk_context *);
 duk_ret_t sys_sock_accept (duk_context *);
 duk_ret_t sys_sock_stat (duk_context *);
+duk_ret_t sys_sock_udp (duk_context *);
+duk_ret_t sys_sock_udpbind (duk_context *);
+duk_ret_t sys_sock_recv (duk_context *);
+duk_ret_t sys_sock_send (duk_context *);
 
 #endif

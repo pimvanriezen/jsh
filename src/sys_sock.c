@@ -368,6 +368,159 @@ duk_ret_t sys_sock_accept (duk_context *ctx) {
 }
 
 // ============================================================================
+// FUNCTION sys_sock_udp
+// ============================================================================
+duk_ret_t sys_sock_udp (duk_context *ctx) {
+    int sock = socket (AF_INET6, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not create socket");
+        return duk_throw (ctx);
+    }
+    register_socket (sock, SOCK_UDP, NULL, 0);
+    duk_push_int (ctx, sock);
+    return 1;
+}
+
+// ============================================================================
+// FUNCTION sys_sock_udpbind
+// ============================================================================
+duk_ret_t sys_sock_udpbind (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    int sock;
+    const char *addrspec = NULL;
+    ipaddress *addr = NULL;
+    struct sockaddr_in6 localv6;
+    int port;
+    int pram = 1;
+    
+    sock = duk_get_int (ctx, 0);
+    if (socket_type (sock) != SOCK_UDP) {
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Socket not UDP");
+        return duk_throw (ctx);
+    }
+    if (duk_get_top (ctx) == 2) {
+        port = duk_get_int (ctx, 1);
+    }
+    else {
+        addrspec = duk_to_string (ctx, 1);
+        port = duk_get_int (ctx, 2);
+    }
+    
+    memset (&localv6, 0, sizeof (localv6));
+    localv6.sin6_family = AF_INET6;
+    localv6.sin6_port = htons (port);
+    
+    if (addrspec) {
+        addr = make_address (addrspec);
+        if (! ipaddress_valid (addr)) {
+            free (addr);
+            duk_push_error_object (ctx, DUK_ERR_ERROR, "Invalid address");
+            return duk_throw (ctx);
+        }
+        memcpy (&localv6.sin6_addr, addr, sizeof(ipaddress));
+    }
+    else localv6.sin6_addr = in6addr_any;
+
+    setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, (char*) &pram, sizeof(int));
+
+#ifdef SO_REUSEPORT
+    setsockopt (sock, SOL_SOCKET, SO_REUSEPORT, (char *) &pram, sizeof(int));
+#endif
+
+    if (bind (sock, (struct sockaddr *) &localv6, sizeof(localv6)) < 0) {
+        if (addr) free (addr);
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    
+    register_socket (sock, SOCK_UDP, addr, port);
+    duk_push_boolean (ctx, 1);
+    return 1;
+}
+
+// ============================================================================
+// FUNCTION sys_sock_send
+// ============================================================================
+duk_ret_t sys_sock_send (duk_context *ctx) {
+    if (duk_get_top (ctx) < 4) return DUK_RET_TYPE_ERROR;
+    int sock = duk_get_int (ctx, 0);
+    const char *addrspec = duk_to_string (ctx, 1);
+    int port = duk_get_int (ctx, 2);
+    
+    if (socket_type (sock) != SOCK_UDP) {
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Socket is not UDP");
+        return duk_throw (ctx);
+    }
+    
+    void *buf = NULL;
+    size_t bufsz = 0;
+    ipaddress *addr = make_address (addrspec);
+    struct sockaddr_in6 remote;
+    
+    buf = duk_get_buffer_data (ctx, 3, &bufsz);
+    if (! buf) {
+        free (addr);
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Not a buffer");
+        return duk_throw (ctx);
+    }
+        
+    memset (&remote, 0, sizeof (remote));
+    remote.sin6_family = AF_INET6;
+    remote.sin6_port = htons (port);
+    memcpy (&remote.sin6_addr, addr, sizeof(ipaddress));
+    
+    free (addr);
+    
+    if (sendto (sock, buf, bufsz, 0,
+                (struct sockaddr*) &remote, sizeof(remote)) < 0) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    duk_push_boolean (ctx, 1);
+    return 1;
+}
+
+// ============================================================================
+// FUNCTION sys_sock_recv
+// ============================================================================
+duk_ret_t sys_sock_recv (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    int sock = duk_get_int (ctx, 0);
+
+    if (socket_type (sock) != SOCK_UDP) {
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Socket is not UDP");
+        return duk_throw (ctx);
+    }
+
+    ipaddress addr;
+    char addrstr[INET6_ADDRSTRLEN+1];
+    char buf[2048];
+    size_t sz;
+    struct sockaddr_storage remote_addr;
+    socklen_t addrsz = sizeof (remote_addr);
+    
+    sz = recvfrom (sock, buf, 2048, 0,
+                   (struct sockaddr*) &remote_addr, &addrsz);
+    
+    if (sz>0) {
+        duk_idx_t obj_idx = duk_push_object (ctx);
+        void *outbuf = duk_push_buffer (ctx, sz, 0);
+        memcpy (outbuf, buf, sz);
+        duk_put_prop_string (ctx, obj_idx, "data");
+        if (remote_addr.ss_family == AF_INET6) {
+            struct sockaddr_in6 *in = (struct sockaddr_in6 *) &remote_addr;
+            memcpy (&addr, &in->sin6_addr, sizeof(ipaddress));
+            ipaddress_tostring (&addr, addrstr);
+            duk_push_string (ctx, addrstr);
+            duk_put_prop_string (ctx, obj_idx, "from");
+        }
+        return 1;
+    }
+    duk_push_null (ctx);
+    return 1;
+}
+
+// ============================================================================
 // FUNCTION sys_sock_stat
 // ============================================================================
 duk_ret_t sys_sock_stat (duk_context *ctx) {
