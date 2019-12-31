@@ -53,6 +53,7 @@ Object.defineProperty (Array.prototype, 'remove', {
         else if (typeof(match) == "number") {
             this.splice (match,1);
         }
+        return this;
     }
 });
 
