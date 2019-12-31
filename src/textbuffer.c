@@ -25,8 +25,12 @@ void textbuffer_free (struct textbuffer *t) {
 struct textbuffer *textbuffer_load_fd (int filno) {
     char buffer[1024];
     struct textbuffer *t = textbuffer_alloc();
-    size_t rdsz = 0;
-    while ((rdsz = read (filno, buffer, 1024)) > 0) {
+    ssize_t rdsz = 0;
+    while ((rdsz = read (filno, buffer, 1024)) != 0) {
+        if (rdsz<0) {
+            if (errno == EAGAIN || errno == EINTR) continue;
+            break;
+        }
         textbuffer_add_data (t, buffer, rdsz);
     }
     return t;

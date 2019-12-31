@@ -124,7 +124,7 @@ duk_ret_t sys_run (duk_context *ctx) {
     
     // Now let's process the output
     int retstatus;
-    size_t rdsz;
+    ssize_t rdsz;
     size_t bufsz = 1024;
     size_t bufpos = 0;
     char *buf = (char *) malloc (1024);
@@ -138,7 +138,12 @@ duk_ret_t sys_run (duk_context *ctx) {
         }
         if (waitpid (pid, &retstatus, WNOHANG)) break;
         rdsz = read (fdin, buf+bufpos, 256);
-        if (rdsz<1) break;
+        if (rdsz == 0) break;
+        if (rdsz<0) {
+            if (errno == EAGAIN) continue;
+            if (errno == EINTR) continue;
+            break;
+        }
         bufpos += rdsz;
         buf[bufpos] = 0;
     }
