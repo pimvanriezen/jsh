@@ -136,6 +136,7 @@ duk_ret_t sys_run (duk_context *ctx) {
         if (waitpid (pid, &retstatus, WNOHANG)) break;
         rdsz = read (fdin, buf+bufpos, 256);
         if (rdsz<=0) {
+            fprintf (stderr, "run: rdsz=%i err=%s\n", rdsz, strerror(errno));
             if (errno == EAGAIN) continue;
             if (errno == EINTR) continue;
             break;
