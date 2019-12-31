@@ -24,6 +24,9 @@ File.help = function() {
     for (var i in File) {
         if (File[i].help) list.push("File."+i);
     }
+    for (var i in File.prototype) {
+        if (File.prototype[i].help) list.push("File::"+i);
+    }
 
     print (new TextGrid().setData(list).indent(4).format());
 }
@@ -40,7 +43,7 @@ File::openRead = function(fnam) {
     return true;
 }
 
-File.openRead = {help:function() {
+File::openRead.help = function() {
     setapi.helptext ({
         name:"f.openRead",
         args:[
@@ -51,9 +54,9 @@ File.openRead = {help:function() {
             file could not be opened.
         `>>>
     });
-}}
+}
 
-setapi (File.openRead, "File.openRead");
+setapi (File::openRead, "File::openRead");
 
 // ============================================================================
 // METHOD File::openWrite
@@ -67,7 +70,7 @@ File::openWrite = function(fnam,perm) {
     return true;
 }
 
-File.openWrite = {help:function() {
+File::openWrite.help = function() {
     setapi.helptext ({
         name:"f.openWrite",
         args:[
@@ -78,9 +81,9 @@ File.openWrite = {help:function() {
             file could not be opened.
         `>>>
     });
-}}
+}
 
-setapi (File.openWrite, "File.openWrite");
+setapi (File::openWrite, "File::openWrite");
 
 // ============================================================================
 // METHOD File::openAppend
@@ -95,7 +98,7 @@ File::openAppend = function(fnam,perm) {
     return true;
 }
 
-File.openAppend = {help:function() {
+File::openAppend.help = function() {
     setapi.helptext ({
         name:"f.openAppend",
         args:[
@@ -107,9 +110,9 @@ File.openAppend = {help:function() {
             file could not be opened.
         `>>>
     });
-}}
+}
 
-setapi (File.openAppend, "File.openAppend");
+setapi (File::openAppend, "File::openAppend");
 
 // ============================================================================
 // METHOD File::close
@@ -119,16 +122,16 @@ File::close = function() {
     sys.io.close (this.fd);
 }
 
-File.close = {help:function() {
+File::close.help = function() {
     setapi.helptext ({
         name:"f.close",
         text:<<<`
             Closes the associated file (if it is not already closed).
         `>>>
     });
-}}
+}
 
-setapi (File.close, "File.close");
+setapi (File::close, "File::close");
 
 // ============================================================================
 // METHOD File::canRead
@@ -138,7 +141,7 @@ File::canRead = function(timeout) {
     return (sys.io.select (this.fd,null,null,timeout)[0].length != 0);
 }
 
-File.canRead = {help:function() {
+File::canRead.help = function() {
     setapi.helptext ({
         name:"f.canRead",
         args:[
@@ -151,7 +154,9 @@ File.canRead = {help:function() {
             Returns true if there's data to be read on the file.
         `>>>
     });
-}}
+}
+
+setapi (File::canRead, "File::canRead");
 
 // ============================================================================
 // METHOD File::canWrite
@@ -161,7 +166,7 @@ File::canWrite = function(timeout) {
     return (sys.io.select (null,this.fd,null,timeout)[1].length != 0);
 }
 
-File.canWrite = {help:function() {
+File::canWrite.help = function() {
     setapi.helptext ({
         name:"f.canWrite",
         args:[
@@ -174,7 +179,9 @@ File.canWrite = {help:function() {
             Returns true if data can be written to the file.
         `>>>
     });
-}}
+}
+
+setapi (File::canWrite, "File::canWrite");
 
 // ============================================================================
 // METHOD File::read
@@ -203,7 +210,7 @@ File::read = function(sz) {
     return res;
 }
 
-File.read = {help:function() {
+File::read.help = function() {
     setapi.helptext ({
         name:"f.read",
         args:[
@@ -215,9 +222,9 @@ File.read = {help:function() {
             less are returned.
         `>>>
     });
-}}
+}
 
-setapi (File.read, "File.read");
+setapi (File::read, "File::read");
 
 // ============================================================================
 // METHOD File::readLine
@@ -245,7 +252,7 @@ File::readLine = function() {
     return res;
 }
 
-File.readLine = {help:function() {
+File::readLine.help = function() {
     setapi.helptext ({
         name:"f.readLine",
         text:<<<`
@@ -256,9 +263,9 @@ File.readLine = {help:function() {
             ran out of them (or some other error occured).
         `>>>
     });
-}}
+}
 
-setapi (File.readLine, "File.readLine");
+setapi (File::readLine, "File::readLine");
 
 // ============================================================================
 // METHOD File::write
@@ -273,7 +280,7 @@ File::write = function(str) {
     return true;
 }
 
-File.write = {help:function() {
+File::write.help = function() {
     setapi.helptext ({
         name:"f.write",
         args:[
@@ -284,9 +291,9 @@ File.write = {help:function() {
             could not be written.
         `>>>
     });
-}}
+}
 
-setapi (File.write, "File.write");
+setapi (File::write, "File::write");
 
 // ============================================================================
 // METHOD File::writeLine
@@ -295,7 +302,7 @@ File::writeLine = function(str) {
     return this.write (str + this.eol);
 }
 
-File.writeLine = {help:function() {
+File::writeLine.help = function() {
     setapi.helptext ({
         name:"f.writeLine",
         args:[
@@ -306,9 +313,9 @@ File.writeLine = {help:function() {
             false if the data could not be written.
         `>>>
     });
-}}
+}
 
-setapi (File.writeLine, "File.writeLine");
+setapi (File::writeLine, "File::writeLine");
 
 // ============================================================================
 // METHOD File::printf
@@ -317,7 +324,7 @@ File::printf = function() {
     return this.write (sprintf.apply (null, arguments));
 }
 
-File.printf = {help:function() {
+File::printf.help = function() {
     setapi.helptext ({
         name:"f.printf",
         args:[
@@ -329,9 +336,9 @@ File.printf = {help:function() {
             be written.
         `>>>
     });
-}}
+}
 
-setapi (File.printf, "File.printf");
+setapi (File::printf, "File::printf");
 
 // ============================================================================
 // METHOD File::printf
@@ -342,7 +349,7 @@ File::eof = function() {
     return false;
 }
 
-File.eof = {help:function() {
+File::eof.help = function() {
     setapi.helptext ({
         name:"f.eof",
         text:<<<`
@@ -350,8 +357,8 @@ File.eof = {help:function() {
             the file.
         `>>>
     });
-}}
+}
 
-setapi (File.eof, "File.eof");
+setapi (File::eof, "File::eof");
 
 module.exports = File;

@@ -925,3 +925,23 @@ sys.sock.stat.help = function() {
 }
 
 setapi (sys.sock.stat, "sys.sock.stat");
+
+// ============================================================================
+// sys.sock.stat
+// ============================================================================
+sys.gethostbyname.help = function() {
+    setapi.helptext ({
+        name:"sys.gethostbyname",
+        args:[
+            {name:"hostname",text:"The hostname to resolve"}
+        ],
+        text:<<<`
+            Uses the system resolver to look up the IPv4/IPv6 address
+            that a given hostname is mapped to. Returns an array
+            with one or more IPv4/IPv6 addresses. If the host could not
+            be resolved, an empty array is returned.
+        `>>>
+    })
+}
+
+setapi (sys.gethostbyname, "sys.gethostbyname");

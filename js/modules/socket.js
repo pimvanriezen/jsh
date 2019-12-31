@@ -19,13 +19,16 @@ Socket.help = function() {
             functionality with the File class, except for the parts
             where a connection is set up.
             
-            Available functions on constructed objects:
+            Documented functions/methods::
         `>>>
     });
     
     var list = [];
     for (var i in Socket) {
         if (Socket[i].help) list.push("Socket."+i);
+    }
+    for (var i in Socket.prototype) {
+        if (Socket.prototype[i].help) list.push("Socket::"+i);
     }
 
     print (new TextGrid().setData(list).indent(4).format());
@@ -45,6 +48,21 @@ Socket.resolve = function(name) {
     return res[0];
 }
 
+Socket.resolve.help = function() {
+    setapi.helptext ({
+        name:"Socket.resolve",
+        args:[
+            {name:"hostname",text:"Hostname to resolve"}
+        ],
+        text:<<<`
+            Resolves the hostname to the first convenient IP address
+            returned by the system resolver.
+        `>>>
+    });
+}
+
+setapi (Socket.resolve, "Socket.resolve");
+
 // ============================================================================
 // METHOD Socket::connect
 // ============================================================================
@@ -59,16 +77,17 @@ Socket::connect = function(addr,port) {
     }
 }
 
-Socket.connect = {help:function() {
+Socket::connect.help = function() {
     setapi.helptext ({
         name:"f.connect",
         args:[
             {name:"spec",text:<<<`
                 Either one or two arguments. If there are two, they are
-                taken to be an ip address and port number. If there's one,
+                taken to be a host address and port number. If there's one,
                 it is understood to be the path to a unix domain socket.
                 
-                IP addresses can be either IPv4 or IPv6.
+                The address can be either a hostname that can be resolved,
+                or an IPv4 or IPv6 literal.
             `>>>}
         ],
         text:<<<`
@@ -76,9 +95,9 @@ Socket.connect = {help:function() {
             success, false on failure.
         `>>>
     });
-}}
+}
 
-setapi (Socket.connect, "Socket.connect");
+setapi (Socket::connect, "Socket::connect");
 
 // ============================================================================
 // Inherit functions from File
@@ -90,13 +109,5 @@ Socket::read = File::read;
 Socket::readLine = File::readLine;
 Socket::write = File::write;
 Socket::writeLine = File::writeLine;
-
-Socket.close = File.close;
-Socket.canRead = File.canRead;
-Socket.canWrite = File.canWrite;
-Socket.read = File.read;
-Socket.readLine = File.readLine;
-Socket.write = File.write;
-Socket.writeLine = File.writeLine;
 
 module.exports = Socket;

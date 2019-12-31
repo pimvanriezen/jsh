@@ -15,13 +15,16 @@ ListenSocket.help = function() {
             A class for setting up a socket-based server, that can listen
             on a TCP or Unix Domain address for incoming connnections.
             
-            Available functions on constructed objects:
+            Documented functions/methods:
         `>>>
     });
     
     var list = [];
     for (var i in ListenSocket) {
         if (ListenSocket[i].help) list.push ("ListenSocket."+i);
+    }
+    for (var i in ListenSocket.prototype) {
+        if (ListenSocket.prototype[i].help) list.push ("ListenSocket::"+i);
     }
     
     print (new TextGrid().setData(list).indent(4).format());
@@ -54,7 +57,7 @@ ListenSocket::listenTo = function (arg1, arg2) {
     return (this.fd ? true : false);
 }
 
-ListenSocket.listenTo = {help:function() {
+ListenSocket::listenTo.help = function() {
     setapi.helptext ({
         name:"ls.listenTo",
         args:[
@@ -74,9 +77,9 @@ ListenSocket.listenTo = {help:function() {
             otherwise.
         `>>>
     })
-}}
+}
 
-setapi (ListenSocket.listenTo, "ListenSocket.listenTo");
+setapi (ListenSocket::listenTo, "ListenSocket::listenTo");
 
 // ============================================================================
 // METHOD ListenSocket::accept
@@ -91,7 +94,7 @@ ListenSocket::accept = function() {
     return res;
 }
 
-ListenSocket.accept = {help:function() {
+ListenSocket::accept.help = function() {
     setapi.helptext ({
         name:"ls.accept",
         text:<<<`
@@ -99,9 +102,9 @@ ListenSocket.accept = {help:function() {
             connection, or null if it failed.
         `>>>
     });
-}}
+}
 
-setapi (ListenSocket.accept,"ListenSocket.accept");
+setapi (ListenSocket::accept,"ListenSocket::accept");
 
 // ============================================================================
 // METHOD ListenSocket::close
@@ -112,15 +115,15 @@ ListenSocket::close = function() {
     this.fd = null;
 }
 
-ListenSocket.close = {help:function() {
+ListenSocket::close.help = function() {
     setapi.helptext ({
         name:"ls.close",
         text:<<<`
             Closes a listening socket.
         `>>>
     });
-}}
+}
 
-setapi (ListenSocket.close,"ListenSocket.close");
+setapi (ListenSocket::close,"ListenSocket::close");
 
 module.exports = ListenSocket;

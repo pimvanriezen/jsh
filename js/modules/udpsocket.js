@@ -15,8 +15,20 @@ UDPSocket.help = function() {
         text:<<<`
             Creats a socket for sending (and optionally receiving)
             UDP packets and decoding them into strings.
+            
+            Documented functions/methods:
         `>>>
     });
+    
+    var list = [];
+    for (var i in UDPSocket) {
+        if (UDPSocket[i].help) list.push ("UDPSocket."+i);
+    }
+    for (var i in UDPSocket.prototype) {
+        if (UDPSocket.prototype[i].help) list.push ("UDPSocket::"+i);
+    }
+    
+    print (new TextGrid().setData(list).indent(4).format());
 }
 
 setapi (UDPSocket,"UDPSocket");
@@ -29,6 +41,22 @@ UDPSocket::bind = function (arg1, arg2) {
     return sys.sock.udpbind (this.fd, arg1, arg2);
 }
 
+UDPSocket::bind.help = function() {
+    setapi.helptext ({
+        name:"us.bind",
+        args:[
+            {name:"address",text:"[Optional] address to bind to"},
+            {name:"port",text:"Port to bind to"}
+        ],
+        text:<<<`
+            Binds the socket to a specific port, and optionally address.
+            Returns true if the binding was successful.
+        `>>>
+    });
+}
+
+setapi (UDPSocket::bind,"UDPSocket::bind");
+
 // ============================================================================
 // METHOD UDPSocket::send
 // ============================================================================
@@ -38,6 +66,22 @@ UDPSocket::send = function (addr, port, msg) {
     var encmsg = this.enc.encode (msg);
     return sys.sock.send (this.fd, addr, port, encmsg);
 }
+
+UDPSocket::send.help = function() {
+    setapi.helptext ({
+        name:"us.send",
+        args:[
+            {name:"host",text:"Hostname or address to send to"},
+            {name:"port",text:"Port number"},
+            {name:"msg",text:"String to send"}
+        ],
+        text:<<<`
+            Sends a UDP packet to a remote host.
+        `>>>
+    });
+}
+
+setapi (UDPSocket::send,"UDPSocket::send");
 
 // ============================================================================
 // METHOD UDPSocket::receiveMessage
@@ -54,6 +98,20 @@ UDPSocket::receiveMessage = function(timeout_ms) {
     return res;
 }
 
+UDPSocket::receiveMessage.help = function() {
+    setapi.helptext ({
+        name:"us.receiveMessage",
+        text:<<<`
+            Waits for an incoming message, then returns an object
+            with the properties "data" (a string with the received
+            message), "from" (an IPv4 or IPv6 address string), and
+            "port" (a UDP port number).
+        `>>>
+    });
+}
+
+setapi (UDPSocket::receiveMessage,"UDPSocket::receiveMessage");
+
 // ============================================================================
 // METHOD UDPSocket::receive
 // ============================================================================
@@ -62,5 +120,17 @@ UDPSocket::receive = function(timeout_ms) {
     if (! res) return null;
     return res.data;
 }
+
+UDPSocket::receive.help = function() {
+    setapi.helptext ({
+        name:"us.receive",
+        text:<<<`
+            Waits for an incoming message, then returns only its
+            data as a string.
+        `>>>
+    })
+}
+
+setapi (UDPSocket::receive,"UDPSocket::receive");
 
 module.exports = UDPSocket;
