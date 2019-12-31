@@ -837,6 +837,82 @@ sys.sock.accept.help = function() {
 setapi (sys.sock.accept, "sys.sock.accept");
 
 // ============================================================================
+// sys.sock.udp
+// ============================================================================
+sys.sock.udp.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.udp",
+        text:<<<`
+            Creates a new socket for UDP communication. Returns the file
+            descriptor.
+        `>>>
+    });
+}
+
+setapi (sys.sock.udp, "sys.sock.udp");
+
+// ============================================================================
+// sys.sock.udpbind
+// ============================================================================
+sys.sock.udpbind.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.udpbind",
+        args:[
+            {name:"spec",text:<<<`
+                Either one or two arguments. If it is one, it specifies
+                the port number. In case of two arguments, we expect
+                the address followed by the port number.
+            `>>>}
+        ],
+        text:<<<`
+            Binds a UDP socket to a specific port (and optionally address),
+            so it can receive messages as well as send.
+        `>>>
+    });
+}
+
+setapi (sys.sock.udpbind, "sys.sock.udpbind");
+
+// ============================================================================
+// sys.sock.send
+// ============================================================================
+sys.sock.send.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.send",
+        args:[
+            {name:"sock",text:"A UDP socket filedescriptor"},
+            {name:"addr",text:"IPv4/IPv6 address to send to"},
+            {name:"port",text:"UDP port to send to"},
+            {name:"data",text:"A Uint8Array buffer with the data"}
+        ],
+        text:<<<`
+            Sends data to a remote UDP receiver.
+        `>>>
+    });
+}
+
+setapi (sys.sock.send, "sys.sock.send");
+
+// ============================================================================
+// sys.sock.recv
+// ============================================================================
+sys.sock.recv.help = function() {
+    setapi.helptext ({
+        name:"sys.sock.recv",
+        args:[
+            {name:"sock",text:"A UDP socket filedescriptor"}
+        ],
+        text:<<<`
+            Receives an incoming packet from the UDP socket. Returns
+            an object with a Uint8Array in the .data property, and
+            the address of the sender in the .from property.
+        `>>>
+    });
+}
+
+setapi (sys.sock.recv, "sys.sock.recv");
+
+// ============================================================================
 // sys.sock.stat
 // ============================================================================
 sys.sock.stat.help = function() {
