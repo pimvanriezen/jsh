@@ -30,7 +30,7 @@ ListenSocket.help = function() {
     print (new TextGrid().setData(list).indent(4).format());
 }
 
-setapi (ListenSocket,"ListenSocket");   
+setapi (ListenSocket,"ListenSocket");
 
 // ============================================================================
 // METHOD ListenSocket::listenTo
@@ -79,8 +79,6 @@ ListenSocket::listenTo.help = function() {
     })
 }
 
-setapi (ListenSocket::listenTo, "ListenSocket::listenTo");
-
 // ============================================================================
 // METHOD ListenSocket::accept
 // ============================================================================
@@ -104,8 +102,6 @@ ListenSocket::accept.help = function() {
     });
 }
 
-setapi (ListenSocket::accept,"ListenSocket::accept");
-
 // ============================================================================
 // METHOD ListenSocket::close
 // ============================================================================
@@ -123,7 +119,5 @@ ListenSocket::close.help = function() {
         `>>>
     });
 }
-
-setapi (ListenSocket::close,"ListenSocket::close");
 
 module.exports = ListenSocket;

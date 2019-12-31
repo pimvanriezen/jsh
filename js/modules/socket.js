@@ -34,7 +34,7 @@ Socket.help = function() {
     print (new TextGrid().setData(list).indent(4).format());
 }
 
-setapi (Socket, "Socket");
+setapi (Socket,"Socket");
 
 // ============================================================================
 // FUNCTION Socket.resolve
@@ -60,8 +60,6 @@ Socket.resolve.help = function() {
         `>>>
     });
 }
-
-setapi (Socket.resolve, "Socket.resolve");
 
 // ============================================================================
 // METHOD Socket::connect
@@ -96,8 +94,6 @@ Socket::connect.help = function() {
         `>>>
     });
 }
-
-setapi (Socket::connect, "Socket::connect");
 
 // ============================================================================
 // Inherit functions from File

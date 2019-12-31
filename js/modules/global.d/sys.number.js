@@ -7,12 +7,12 @@ Number.help = function() {
         class prototype. Type help(Number.function) for more specific
         information.
         
-        Available functions on constructed objects:
+        Documented methods:
     `>>>));
     
     var list = [];
-    for (i in Number) {
-        if (Number[i].help) list.push("Number."+i);
+    for (i in Number.prototype) {
+        if (Number.prototype[i].help) list.push("Number::"+i);
     }
     
     print (new TextGrid().setData(list).indent(4).format());
@@ -34,7 +34,7 @@ Number::toSize = function () {
     return "" + res.toFixed(0) + factor;
 }
 
-Number.toSize = {help:function() {
+Number::toSize.help = function() {
     setapi.helptext ({
         name:"num.toSize",
         text:<<<`
@@ -44,5 +44,4 @@ Number.toSize = {help:function() {
             (10001).toSize() = "10K".
         `>>>
     });
-}}
-
+}

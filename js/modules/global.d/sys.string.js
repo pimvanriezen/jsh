@@ -7,12 +7,12 @@ String.help = function() {
         class prototype. Type help(String.function) for a more
         specific list.
         
-        Available functions on constructed objects:
+        Documented methods:
     `>>>));
     
     var list = [];
-    for (i in String) {
-        if (String[i].help) list.push("String."+i);
+    for (i in String.prototype) {
+        if (String.prototype[i].help) list.push("String::"+i);
     }
     
     print (new TextGrid().setData(list).indent(4).format());
@@ -31,7 +31,7 @@ String::padStart = function(len,c) {
     return res;
 }
 
-String.padStart = {help:function() {
+String::padStart.help = function() {
     setapi.helptext ({
         name:"string.padStart",
         args:[
@@ -45,9 +45,7 @@ String.padStart = {help:function() {
             is returned, and the original is left untouched.
         `>>>
     });
-}}
-
-setapi (String.padStart, "String.padStart");
+}
 
 // ============================================================================
 // String::padEnd
@@ -60,7 +58,7 @@ String::padEnd = function(len,c) {
     return res;
 }
 
-String.padEnd = {help:function() {
+String::padEnd.help = function() {
     setapi.helptext ({
         name:"string.padEnd",
         args:[
@@ -74,9 +72,7 @@ String.padEnd = {help:function() {
             is returned, and the original is left untouched.
         `>>>
     });
-}}
-
-setapi (String.padEnd, "String.padEnd");
+}
 
 // ============================================================================
 // String::save
@@ -85,7 +81,7 @@ String::save = function(path) {
     sys.write (""+this, ""+path);
 }
 
-String.save = {help:function() {
+String::save.help = function() {
     setapi.helptext ({
         name:"string.save",
         args:[
@@ -95,9 +91,7 @@ String.save = {help:function() {
             Writes a string to disk.
         `>>>
     })
-}}
-
-setapi (String.save, "String.save");
+}
 
 // ============================================================================
 // String::summarize
@@ -114,7 +108,7 @@ String::summarize = function(sz) {
     return res;
 }
 
-String.summarize = {help:function() {
+String::summarize.help = function() {
     setapi.helptext ({
         name:"string.summarize",
         args:[
@@ -126,9 +120,7 @@ String.summarize = {help:function() {
             in the middle representing the excess characters.
         `>>>
     })
-}}
-
-setapi (String.summarize, "String.summarize");
+}
 
 // ============================================================================
 // String::grep
@@ -137,7 +129,7 @@ String::grep = function(re,srch,repl) {
     return this.split('\n').grep (re,srch,repl);
 }
 
-String.grep = {help:function() {
+String::grep.help = function() {
     setapi.helptext ({
         name:"string.grep",
         args:[
@@ -159,9 +151,7 @@ String.grep = {help:function() {
             matching the given pattern.
         `>>>
     })
-}}
-
-setapi (String.grep, "String.grep");
+}
 
 // ============================================================================
 // String::wrap
@@ -184,7 +174,7 @@ String::wrap = function (cols) {
     return res.join('\n');
 }
 
-String.wrap = {help:function() {
+String::wrap.help = function() {
     setapi.helptext ({
         name:"string.wrap",
         args:[
@@ -195,9 +185,7 @@ String.wrap = {help:function() {
             added for every time a line would exceed the width.
         `>>>
     })
-}}
-
-setapi (String.wrap, "String.wrap");
+}
 
 // ============================================================================
 // String::cut
@@ -211,7 +199,7 @@ String::cut = function (field, sep) {
     return splt[field];
 }
 
-String.cut = {help:function() {
+String::cut.help = function() {
     setapi.helptext ({
         name:"string.cut",
         args:[
@@ -232,9 +220,7 @@ String.cut = {help:function() {
             be split up by some kind of delimiter.
         `>>>
     });
-}}
-
-setapi (String.cut, "String.cut");
+}
 
 // ============================================================================
 // String::rewrap
@@ -255,7 +241,7 @@ String::rewrap = function (cols) {
     return res;   
 }
 
-String.rewrap = {help:function() {
+String::rewrap.help = function() {
     setapi.helptext ({
         name:"string.rewrap",
         args:[
@@ -268,9 +254,7 @@ String.rewrap = {help:function() {
             line between them for this to work.
         `>>>
     })
-}}
-
-setapi (String.rewrap, "String.rewrap");
+}
 
 // ============================================================================
 // String::colorMatch

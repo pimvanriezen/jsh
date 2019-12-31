@@ -55,8 +55,6 @@ UDPSocket::bind.help = function() {
     });
 }
 
-setapi (UDPSocket::bind,"UDPSocket::bind");
-
 // ============================================================================
 // METHOD UDPSocket::send
 // ============================================================================
@@ -80,8 +78,6 @@ UDPSocket::send.help = function() {
         `>>>
     });
 }
-
-setapi (UDPSocket::send,"UDPSocket::send");
 
 // ============================================================================
 // METHOD UDPSocket::receiveMessage
@@ -110,8 +106,6 @@ UDPSocket::receiveMessage.help = function() {
     });
 }
 
-setapi (UDPSocket::receiveMessage,"UDPSocket::receiveMessage");
-
 // ============================================================================
 // METHOD UDPSocket::receive
 // ============================================================================
@@ -130,7 +124,5 @@ UDPSocket::receive.help = function() {
         `>>>
     })
 }
-
-setapi (UDPSocket::receive,"UDPSocket::receive");
 
 module.exports = UDPSocket;

@@ -7,13 +7,11 @@ Array.help = function() {
         class prototype. Type help(Array.function) for more specific
         information.
         
-        Available functions on constructed objects:
+        Documented methods:
     `>>>));
     
-    var list = [];
-    for (var i in Array) {
-        if (Array[i].help) list.push("Array."+i);
-    }
+    var list = ["Array::contains","Array::remove","Array::sum",
+                "Array::cut","Array::grep","Array::intern"];
     
     print (new TextGrid().setData(list).indent(4).format());
 }
@@ -27,7 +25,7 @@ Object.defineProperty (Array.prototype, 'contains', {
     value: function(id) { return this.indexOf(id)>=0; }
 });
 
-Array.contains = {help:function() {
+Array::contains.help = function() {
     setapi.helptext ({
         name:"array.contains",
         args:[
@@ -38,9 +36,7 @@ Array.contains = {help:function() {
             the array.
         `>>>
     });
-}}
-
-setapi (Array.contains, "Array.contains");
+}
 
 // ============================================================================
 // Array::remove
@@ -60,7 +56,7 @@ Object.defineProperty (Array.prototype, 'remove', {
     }
 });
 
-Array.remove = {help:function() {
+Array::remove.help = function() {
     setapi.helptext ({
         name:"array.remove",
         args:[
@@ -73,9 +69,7 @@ Array.remove = {help:function() {
             Removes an element from the array, modifying it.
         `>>>
     });
-}}
-
-setapi (Array.remove, "Array.remove");
+}
 
 // ============================================================================
 // Array::sum
@@ -88,7 +82,7 @@ Object.defineProperty (Array.prototype, 'sum', {
     }
 });
 
-Array.sum = {help:function() {
+Array::sum.help = function() {
     setapi.helptext ({
         name:"array.sum",
         text:<<<`
@@ -96,9 +90,7 @@ Array.sum = {help:function() {
             they can be parsed as numbers. Will return NaN if not.
         `>>>
     });
-}}
-
-setapi (Array.sum, "Array.sum");
+}
 
 // ============================================================================
 // Array::cut
@@ -115,7 +107,7 @@ Object.defineProperty (Array.prototype, 'cut', {
     }
 });
 
-Array.cut = {help:function() {
+Array::cut.help = function() {
     setapi.helptext ({
         name:"array.cut",
         args:[
@@ -136,9 +128,7 @@ Array.cut = {help:function() {
             an array with the transformation applied.
         `>>>
     });
-}}
-
-setapi (Array.cut,"Array.cut");
+}
 
 // ============================================================================
 // Array::grep
@@ -160,7 +150,7 @@ Object.defineProperty (Array.prototype, 'grep', {
     }
 });
 
-Array.grep = {help:function() {
+Array::grep.help = function() {
     setapi.helptext ({
         name:"array.grep",
         args:[
@@ -182,9 +172,7 @@ Array.grep = {help:function() {
             with transformation optionally applied.
         `>>>
     })
-}}
-
-setapi (Array.grep,"Array.grep");
+}
 
 // ============================================================================
 // Array::intern
@@ -224,7 +212,7 @@ Object.defineProperty (Array.prototype, 'intern', {
     }
 });
 
-Array.intern = {help:function() {
+Array::intern.help = function() {
     setapi.helptext ({
         name:"array.intern",
         args:[
@@ -244,6 +232,4 @@ Array.intern = {help:function() {
             Returns a reference to the array itself (not a new copy).
         `>>>
     })
-}}
-
-setapi (Array.intern,"Array.intern");
+}
