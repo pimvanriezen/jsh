@@ -91,7 +91,7 @@ duk_ret_t sys_run (duk_context *ctx) {
             for (i=3; i<255;++i) close (i);
             execvp (command, args);
             printf ("Exec failed: %s", strerror (errno));
-            exit (0);
+            exit (1);
     }
     
     // Close the ends of the pipe that aren't ours.
@@ -142,7 +142,6 @@ duk_ret_t sys_run (duk_context *ctx) {
         if (rdsz<0) {
             if (errno == EAGAIN) continue;
             if (errno == EINTR) continue;
-            fprintf (stderr, "File error: %s\n", strerror (errno));
             break;
         }
         bufpos += rdsz;
