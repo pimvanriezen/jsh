@@ -96,11 +96,16 @@ duk_ret_t sys_io_read (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int fd = duk_get_int (ctx, 0);
     int wantsz = duk_get_int (ctx, 1);
-    int gotsz = 0;
+    ssize_t gotsz = 0;
     char *tbuf = malloc (wantsz+1);
-    gotsz = read (fd, tbuf, wantsz);
-    if (gotsz < 0) {
-        return 0;
+    
+    while (1) {
+        gotsz = read (fd, tbuf, wantsz);
+        if (gotsz>0) break;
+        if (gotsz == 0) return 0;
+        if (gotsz < 0) {
+            if (errno != EAGAIN && errno != EINTR) return 0;
+        }
     }
     void *buf = duk_push_buffer (ctx, gotsz, 0);
     memcpy (buf, tbuf, gotsz);
@@ -116,12 +121,21 @@ duk_ret_t sys_io_write (duk_context *ctx) {
     int fd = duk_get_int (ctx, 0);
     void *buf = NULL;
     size_t bufsz = 0;
-    int writesz = 0;
+    ssize_t writesz = 0;
     
     buf = duk_get_buffer_data (ctx, 1, &bufsz);
     if (! buf) return DUK_RET_TYPE_ERROR;
     
-    writesz = write (fd, buf, bufsz);
+    while (1) {
+        writesz = write (fd, buf, bufsz);
+        if (writesz<0) {
+            if (errno != EAGAIN && errno != EINTR) {
+                duk_push_boolean (ctx, 0);
+                return 1;
+            }
+        }
+        else break;
+    }
     if (writesz != bufsz) {
         duk_push_boolean (ctx, 0);
     }

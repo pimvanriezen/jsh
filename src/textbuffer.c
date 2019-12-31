@@ -6,6 +6,7 @@
 #include <stdint.h>  /* Assume C99/C++11 with linenoise. */
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/errno.h>
 #include "textbuffer.h"
 
 // ============================================================================
