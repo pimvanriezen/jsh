@@ -11,6 +11,27 @@ Channel = function() {
     });
 }
 
+Channel.help = function() {
+    setapi.helptext({
+        name:"c = new Channel",
+        text:<<<`
+            A class for communicating with coroutines. Read help(go) for
+            information about spawning coroutines.
+            
+            Documented methods:
+        `>>>
+    });
+    
+    var list = [];
+    for (var i in Channel.prototype) {
+        if (Channel.prototype[i].help) list.push ("Channel::"+i);
+    }
+    
+    print (new TextGrid().setData(list).indent(4).format());
+}
+
+setapi (Channel, "Channel");
+
 // ============================================================================
 // METHOD Channel::send
 // ============================================================================
@@ -22,6 +43,21 @@ Channel::send = function (data) {
     return sys.channel.send (this.ch, JSON.stringify (data));
 }
 
+Channel::send.help = function() {
+    setapi.helptext({
+        name:"c.send",
+        args:[
+            {name:"data",text:"The object/primitive to send"}
+        ],
+        text:<<<`
+            From a calling perspective, this sends the message to
+            the first available coroutine listening on this channel.
+            From a coroutine perspective, this sends the message to
+            the caller.
+        `>>>
+    })
+}
+
 // ============================================================================
 // METHOD Channel::senderror
 // ============================================================================
@@ -30,12 +66,33 @@ Channel::senderror = function (data) {
     sys.channel.senderror (this.ch, ""+data);
 }
 
+Channel::senderror.help = function() {
+    setapi.helptext({
+        name:"c.senderror",
+        args:[
+            {name:"error",text:"An error string"}
+        ],
+        text:<<<`
+            Allows a coroutine to push an error to the caller.
+        `>>>
+    })
+}
+
 // ============================================================================
 // METHOD Channel::isempty
 // ============================================================================
 Channel::isempty = function (data) {
     if (this.ch === null) return true;
     return sys.channel.isempty (this.ch);
+}
+
+Channel::isempty.help = function() {
+    setapi.helptext({
+        name:"c.isempty",
+        text:<<<`
+            Returns true if there are no other parties on this channel.
+        `>>>
+    })
 }
 
 // ============================================================================
@@ -51,12 +108,32 @@ Channel::recv = function() {
     else return JSON.parse (res);
 }
 
+Channel::recv.help = function() {
+    setapi.helptext({
+        name:"c.isempty",
+        text:<<<`
+            Waits for, then returns, a message on the channel.
+        `>>>
+    })
+}
+
 // ============================================================================
 // METHOD Channel::exit
 // ============================================================================
 Channel::exit = function() {
     if (this.ch === null) return;
     sys.channel.exit (this.ch);
+}
+
+Channel::isempty.help = function() {
+    setapi.helptext({
+        name:"c.exit",
+        text:<<<`
+            Communicates the intention to close the channel and send no
+            further messages. Most useful for the caller, to tell
+            Worker coroutines that they can exit.
+        `>>>
+    })
 }
 
 // ============================================================================
@@ -67,45 +144,15 @@ Channel::close = function() {
     sys.channel.close (this.ch);
 }
 
-// ============================================================================
-// DOCUMENTATION
-// ============================================================================
-Channel.help = function() {
+Channel::close.help = function() {
     setapi.helptext({
-        name:"c = new Channel",
+        name:"c.close",
         text:<<<`
-            Create a Channel object to communicate with co-routines.
-            The returned object has the following functions available:
+            Closes the channel completely. Still running coroutines will
+            be slaughtered like younglings.
         `>>>
-    });
-    echo("");
-    echo (TextTable.auto(<<<`
-        c.send(data)     Sends data to the channel, returns false if
-                         the channel is empty (except for us). Data sent
-                         is serialized as JSON, so you shouldn't have
-                         to worry about the type.
-        c.recv()         Receives data from the channel, returns null
-                         if the Channel is empty. Received data
-                         is always deserialized back from JSON, and
-                         should end up with the original type.
-        c.senderror(txt) From a coroutine, set channel to an error state.
-        c.error()        Returns error string, or false if the channel
-                         had no errors.
-        c.isempty()      Returns true if there are no listeners left on
-                         the channel.
-        c.exit()         Tells any other parties on the channel that this
-                         process will stop using it.
-        c.close()        Completely closes the channel. If there were still
-                         active coroutines spawned from it, they will be
-                         killed.
-    `>>>, 2).indent(4).boldColumn(0).format());
-    print (setapi.textformat(<<<`
-        See help(go) for information on how to spawn a coroutine that can
-        communicate through the channel.
-    `>>>));
+    })
 }
-
-setapi (Channel, "Channel");
 
 // ============================================================================
 // FUNCTION go
