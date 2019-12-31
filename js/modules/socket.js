@@ -34,9 +34,22 @@ Socket.help = function() {
 setapi (Socket, "Socket");
 
 // ============================================================================
+// FUNCTION Socket.resolve
+// ============================================================================
+Socket.resolve = function(name) {
+    if (name.match (/^::ffff:[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/)) return name;
+    if (name.match (/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/)) return name;
+    if (name.match (/^[0-9a-fA-F:]+:[0-9a-fA-F]+$/)) return name;
+    
+    var res = sys.gethostbyname (name);
+    return res[0];
+}
+
+// ============================================================================
 // METHOD Socket::connect
 // ============================================================================
 Socket::connect = function(addr,port) {
+    addr = Socket.resolve (addr);
     if (! port) {
         this.fd = sys.sock.unix (addr);
         this.eol = '\n';

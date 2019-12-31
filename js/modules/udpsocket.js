@@ -1,3 +1,5 @@
+var Socket = require("socket");
+
 // ============================================================================
 // CONSTRUCTOR
 // ============================================================================
@@ -31,6 +33,8 @@ UDPSocket::bind = function (arg1, arg2) {
 // METHOD UDPSocket::send
 // ============================================================================
 UDPSocket::send = function (addr, port, msg) {
+    addr = Socket.resolve (addr);
+
     var encmsg = this.enc.encode (msg);
     return sys.sock.send (this.fd, addr, port, encmsg);
 }

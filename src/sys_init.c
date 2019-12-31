@@ -116,6 +116,7 @@ void sys_init (duk_context *ctx) {
     defcall (getpid, 0);
     defcall (uname, 0);
     defcall (go, 2);
+    defcall (gethostbyname, 1);
     
     duk_push_string (ctx, "channel");
     chanobj_idx = duk_push_object (ctx);

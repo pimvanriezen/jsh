@@ -593,3 +593,48 @@ duk_ret_t sys_sock_stat (duk_context *ctx) {
     return 1;
 }
 
+duk_ret_t sys_gethostbyname (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    const char *name = duk_to_string (ctx, 0);
+    char addrstr[INET6_ADDRSTRLEN+1];
+    struct addrinfo *ainf;
+    struct addrinfo *crsr;
+    ipaddress a;
+    int rescnt = 0;
+    
+    duk_idx_t arr_idx = duk_push_array (ctx);
+    if (getaddrinfo (name, NULL, NULL, &ainf)) {
+        return 1;
+    }
+    
+    for (crsr = ainf; crsr; crsr = crsr->ai_next) {
+        if (crsr->ai_family != AF_INET && crsr->ai_family != AF_INET6) {
+            continue;
+        }
+        if (crsr->ai_socktype && (crsr->ai_socktype != SOCK_STREAM)) continue;
+        
+        if (crsr->ai_addr) {
+            if (crsr->ai_addr->sa_family == AF_INET) {
+                struct sockaddr_in *sa_in;
+                sa_in = (struct sockaddr_in *) crsr->ai_addr;
+                memset (a.d, 0, sizeof(ipaddress));
+                memcpy (a.d+12, &sa_in->sin_addr, 4);
+                a.d[10] = 0xff;
+                a.d[11] = 0xff;
+                ipaddress_tostring (&a, addrstr);
+                duk_push_string (ctx, addrstr);
+                duk_put_prop_index (ctx, arr_idx, rescnt++);
+            }
+            else {
+                struct sockaddr_in6 *sa_in;
+                sa_in = (struct sockaddr_in6 *) crsr->ai_addr;
+                memcpy (a.d, &sa_in->sin6_addr, sizeof(ipaddress));
+                ipaddress_tostring (&a, addrstr);
+                duk_push_string (ctx, addrstr);
+                duk_put_prop_index (ctx, arr_idx, rescnt++);
+            }
+        }
+    }
+    
+    return 1;
+}
