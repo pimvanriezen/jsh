@@ -45,3 +45,21 @@ Number::toSize.help = function() {
         `>>>
     });
 }
+
+Number::toHex = function(wid) {
+    if (! wid) return this.toString(16);
+    return this.toString(16).padStart(wid,'0');
+}
+
+Number::toHex.help = function() {
+    setapi.helptext ({
+        name:"num.toHex",
+        args:[
+            {name:"width",text:"[Optional] Desired width of the hex string"}
+        ],
+        text:<<<`
+            Converts the humber to a hexidecimal string. Returns said
+            string.
+        `>>>
+    })
+}
