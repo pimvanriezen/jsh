@@ -115,9 +115,6 @@ duk_ret_t sys_run (duk_context *ctx) {
         }
     }
     
-    // We're done with sending anything out
-    close (fdout);
-    
     // Free stuff we no longer need
     for (i=0; i<(numarg+1);++i) free (args[i]);
     free (args);
@@ -147,6 +144,8 @@ duk_ret_t sys_run (duk_context *ctx) {
         bufpos += rdsz;
         buf[bufpos] = 0;
     }
+    
+    close (fdout);
     close (fdin);
     
     // Clean up the process.
