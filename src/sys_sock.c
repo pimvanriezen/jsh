@@ -514,6 +514,17 @@ duk_ret_t sys_sock_recv (duk_context *ctx) {
             duk_push_string (ctx, addrstr);
             duk_put_prop_string (ctx, obj_idx, "from");
         }
+        else if (remote_addr.ss_family == AF_INET) {
+            struct sockaddr_in *in = (struct sockaddr_in *) &remote_addr;
+            memset (addr.d, 0, sizeof(ipaddress));
+            memcpy (addr.d + 12, &in->sin_addr, 4);
+            addr.d[10] = 0xff;
+            addr.d[11] = 0xff;
+            ipaddress_tostring (&addr, addrstr);
+            duk_push_string (ctx, addrstr);
+            duk_put_prop_string (ctx, obj_idx, "from");
+        }
+        
         return 1;
     }
     duk_push_null (ctx);
