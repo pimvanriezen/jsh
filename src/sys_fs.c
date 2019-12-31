@@ -307,12 +307,13 @@ void modestring (char *into, mode_t mode) {
 // ============================================================================
 duk_ret_t sys_stat (duk_context *ctx) {
     char modestr[16];
+    char linkbuf[256];
     if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
     const char *path = duk_to_string (ctx, 0);
     struct stat st;
     duk_idx_t obj_idx = duk_push_object (ctx);
     
-    if (stat (path, &st) != 0) return 0;
+    if (lstat (path, &st) != 0) return 0;
     duk_push_int (ctx, st.st_mode);
     duk_put_prop_string (ctx, obj_idx, "mode");
     modestring (modestr, st.st_mode);
@@ -356,8 +357,6 @@ duk_ret_t sys_stat (duk_context *ctx) {
         duk_push_boolean (ctx, 0);
     }
     duk_put_prop_string (ctx, obj_idx, "isDevice");
-    duk_push_boolean (ctx, S_ISLNK(st.st_mode)?1:0);
-    duk_put_prop_string (ctx, obj_idx, "isLink");
     duk_push_boolean (ctx, S_ISSOCK(st.st_mode)?1:0);
     duk_put_prop_string (ctx, obj_idx, "isSocket");
     uid_t myuid = geteuid();
@@ -378,6 +377,16 @@ duk_ret_t sys_stat (duk_context *ctx) {
         duk_push_boolean (ctx, 0);
     }
     duk_put_prop_string (ctx, obj_idx, "isExecutable");
+    duk_push_boolean (ctx, S_ISLNK(st.st_mode)?1:0);
+    duk_put_prop_string (ctx, obj_idx, "isLink");
+    
+    if (S_ISLNK(st.st_mode)) {
+        linkbuf[0] = linkbuf[255] = 0;
+        size_t sz = readlink (path, linkbuf, 255);
+        if (sz>0 && sz<256) linkbuf[sz] = 0;
+        duk_push_string (ctx, linkbuf);
+        duk_put_prop_string (ctx, obj_idx, "linkTarget");
+    }
     return 1;
 }
 

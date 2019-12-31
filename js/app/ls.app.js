@@ -12,7 +12,7 @@ var ls = function (path) {
         dir:"/",
         exe:"",
         sock:"$",
-        link:">",
+        link:" -> ",
         dev:""
     }
     if (env.TERM == "vt100") {
@@ -88,7 +88,7 @@ var ls = function (path) {
             if (o.isLink && ansi.link) {
                 fnstart = ansi.link;
                 fnend = ansi.end;
-                suffix = suffx.link;
+                suffix = suffx.link + o.linkTarget;
             }
             
             var outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+
