@@ -142,6 +142,7 @@ duk_ret_t sys_run (duk_context *ctx) {
         if (rdsz<0) {
             if (errno == EAGAIN) continue;
             if (errno == EINTR) continue;
+            fprintf (stderr, "File error: %s\n", strerror (errno));
             break;
         }
         bufpos += rdsz;
