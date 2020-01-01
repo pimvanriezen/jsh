@@ -12,6 +12,14 @@
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
 
+// ============================================================================
+// FUNCITON handle_sugar
+// ---------------------
+// Transforms input text with jsh syntactic sugar (indented quoting, and
+// the Class::protoFunction operator), trying to keep line numbering
+// equal to the original. Returns a newly allocated string that needs
+// to be freed by the caller when they're done with it.
+// ============================================================================
 char *handle_sugar (const char *src) {
     const char *hexdigits = "0123456789abcdef";
     char currentquote = 0;

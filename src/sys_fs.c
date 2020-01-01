@@ -359,6 +359,9 @@ duk_ret_t sys_stat (duk_context *ctx) {
     duk_put_prop_string (ctx, obj_idx, "isDevice");
     duk_push_boolean (ctx, S_ISSOCK(st.st_mode)?1:0);
     duk_put_prop_string (ctx, obj_idx, "isSocket");
+    
+    // The answer to 'isExecutable' is relative to the user asking that
+    // question. 
     uid_t myuid = geteuid();
     gid_t mygid = getegid();
     if (S_ISDIR(st.st_mode)) {
@@ -377,6 +380,8 @@ duk_ret_t sys_stat (duk_context *ctx) {
         duk_push_boolean (ctx, 0);
     }
     duk_put_prop_string (ctx, obj_idx, "isExecutable");
+    
+    // Handle softlinks
     duk_push_boolean (ctx, S_ISLNK(st.st_mode)?1:0);
     duk_put_prop_string (ctx, obj_idx, "isLink");
     

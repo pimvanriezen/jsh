@@ -1,6 +1,6 @@
-/*
- *  Adapted from the duk command line tool.
- */
+// ============================================================================
+// Command line shell implementation, freely after duk_cmdline.c
+// ============================================================================
 
 /* Helper define to enable a feature set; can also use separate defines. */
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || \
@@ -49,11 +49,20 @@ int duk_cmdline_stack_check(void);
  *  Misc helpers
  */
 
+// ============================================================================
+// FUNCTION print_greet_line
+// ============================================================================
 static void print_greet_line(void) {
     printf ("Entering interactive shell.\n"
             "Type \033[1mhelp()\033[0m for a list of commands.\n");
 }
 
+// ============================================================================
+// FUNCTION set_resource_limits
+// ----------------------------
+// This was available in the duktape cli, haven't had the heart to rip it
+// out yet, could be useful.
+// ============================================================================
 static void set_resource_limits(rlim_t mem_limit_value) {
     int rc;
     struct rlimit lim;
@@ -80,15 +89,32 @@ static void set_resource_limits(rlim_t mem_limit_value) {
     }
 }
 
+// ============================================================================
+// FUNCTION my_sighandler
+// ----------------------
+// Inherited from Duktape cli. Not sure if there's anything better we can
+// do with this, until we hook deeper into the parser for allowing timed
+// events, and perhaps even interrupts, to propagate.
+// ============================================================================
 static void my_sighandler(int x) {
     fprintf(stderr, "Got signal %d\n", x);
     fflush(stderr);
 }
+
+// ============================================================================
+// FUNCTION set_sigint_handler
+// ============================================================================
 static void set_sigint_handler(void) {
     (void) signal(SIGINT, my_sighandler);
     (void) signal(SIGPIPE, SIG_IGN);  /* avoid SIGPIPE killing process */
 }
 
+// ============================================================================
+// FUNCTION cmdline_fatal_handler
+// ------------------------------
+// The Duktape version would abort() and print a nastygram. Made it a bit
+// less drastic.
+// ============================================================================
 static void cmdline_fatal_handler(void *udata, const char *msg) {
     (void) udata;
     fprintf(stderr, "%% Fatal error: %s\n", msg ? msg : "no message");
@@ -96,29 +122,26 @@ static void cmdline_fatal_handler(void *udata, const char *msg) {
     exit (1);
 }
 
-/* Print error to stderr and pop error. */
+// ============================================================================
+// FUNCTION print_pop_error
+// ------------------------
+// Print an error to the provided FILE, and pop it off the stack.
+// ============================================================================
 static void print_pop_error(duk_context *ctx, FILE *f) {
     fprintf(f, "%s\n", duk_safe_to_stacktrace(ctx, -1));
     fflush(f);
     duk_pop(ctx);
 }
 
+// ============================================================================
+// FUNCTION wrapped_compile_execute
+// ============================================================================
 duk_ret_t wrapped_compile_execute(duk_context *ctx, void *udata) {
     const char *src_data;
     duk_size_t src_len;
     duk_uint_t comp_flags;
 
     (void) udata;
-
-    /* XXX: Here it'd be nice to get some stats for the compilation result
-     * when a suitable command line is given (e.g. code size, constant
-     * count, function count.  These are available internally but not through
-     * the public API.
-     */
-
-    /* Use duk_compile_lstring_filename() variant which avoids interning
-     * the source code.  This only really matters for low memory environments.
-     */
 
     /* [ ... bytecode_filename src_data src_len filename ] */
 
@@ -178,26 +201,6 @@ duk_ret_t wrapped_compile_execute(duk_context *ctx, void *udata) {
     duk_call_method(ctx, 0);
 
     if (interactive_mode) {
-        /*
-         *  In interactive mode, write to stdout so output won't
-         *  interleave as easily.
-         *
-         *  NOTE: the ToString() coercion may fail in some cases;
-         *  for instance, if you evaluate:
-         *
-         *    ( {valueOf: function() {return {}},
-         *       toString: function() {return {}}});
-         *
-         *  The error is:
-         *
-         *    TypeError: coercion to primitive failed
-         *            duk_api.c:1420
-         *
-         *  These are handled now by the caller which also has stack
-         *  trace printing support.  User code can print out errors
-         *  safely using duk_safe_to_string().
-         */
-
         if (! duk_is_undefined(ctx, -1)) {
             duk_push_global_object(ctx);
             duk_get_prop_string(ctx, -1, "jshFormat");
@@ -216,10 +219,14 @@ duk_ret_t wrapped_compile_execute(duk_context *ctx, void *udata) {
     return 0;  /* duk_safe_call() cleans up */
 }
 
-/*
- *  Minimal Linenoise completion support
- */
-
+// ============================================================================
+// DATA Linenoise-related data
+// ---------------------------
+// Partially inherited from Duktape-cli. Amended to do file-based autocomplete
+// within quoted strings, and to allow for the Class::method prototype
+// notation, and to get the Object default properties out of the autocomplete
+// list, since those are rarely needed and clutter up the namespace.
+// ============================================================================
 static duk_context *completion_ctx;
 
 static const char *linenoise_completion_script =
@@ -348,6 +355,9 @@ static const char *linenoise_hints_script =
     "    return { hints: res.join(''), color: 35, bold: 1 };\n"
     "})\n";
     
+// ============================================================================
+// FUNCTION linenoise_add_completion
+// ============================================================================
 static duk_ret_t linenoise_add_completion(duk_context *ctx) {
     linenoiseCompletions *lc;
 
@@ -359,6 +369,9 @@ static duk_ret_t linenoise_add_completion(duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION linenoise_hints
+// ============================================================================
 static char *linenoise_hints(const char *buf, int *color, int *bold) {
     duk_context *ctx;
     duk_int_t rc;
@@ -418,10 +431,16 @@ static char *linenoise_hints(const char *buf, int *color, int *bold) {
     return NULL;
 }
 
+// ============================================================================
+// FUNCTION linenoise_freehints
+// ============================================================================
 static void linenoise_freehints(void *ptr) {
     free(ptr);
 }
 
+// ============================================================================
+// FUNCTION linenoise_completion
+// ============================================================================
 static void linenoise_completion(const char *buf, linenoiseCompletions *lc) {
     duk_context *ctx;
     duk_int_t rc;
@@ -451,10 +470,9 @@ static void linenoise_completion(const char *buf, linenoiseCompletions *lc) {
     duk_pop_2(ctx);
 }
 
-/*
- *  Execute from file handle etc
- */
-
+// ============================================================================
+// FUNCTION handle_fh
+// ============================================================================
 static int handle_fh(duk_context *ctx, FILE *f, char *argv[], 
                      int argc, const char *filename, 
                      const char *bytecode_filename) {
@@ -517,6 +535,9 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
     goto cleanup;
 }
 
+// ============================================================================
+// FUNCTION handle_file
+// ============================================================================
 static int handle_file(duk_context *ctx, const char *filename,
                        char *argv[], int argc,
                        const char *bytecode_filename) {
@@ -548,6 +569,9 @@ static int handle_file(duk_context *ctx, const char *filename,
     return -1;
 }
 
+// ============================================================================
+// FUNCTION handle_eval
+// ============================================================================
 static int handle_eval(duk_context *ctx, char *code) {
     int rc;
     int retval = -1;
@@ -570,6 +594,9 @@ static int handle_eval(duk_context *ctx, char *code) {
     return retval;
 }
 
+// ============================================================================
+// FUNCTION handle_interactive
+// ============================================================================
 static int handle_interactive(duk_context *ctx) {
     const char *prompt = "jsh> ";
     char *buffer = NULL;
@@ -653,10 +680,9 @@ static int handle_interactive(duk_context *ctx) {
     return retval;
 }
 
-/*
- *  String.fromBufferRaw()
- */
-
+// ============================================================================
+// FUNCTION string_frombufferraw
+// ============================================================================
 static duk_ret_t string_frombufferraw(duk_context *ctx) {
     duk_buffer_to_string(ctx, 0);
     return 1;
@@ -672,6 +698,9 @@ static duk_ret_t string_frombufferraw(duk_context *ctx) {
 #define  ALLOC_HYBRID   3
 #define  ALLOC_LOWMEM   4
 
+// ============================================================================
+// FUNCTION create_duktape_heap
+// ============================================================================
 static duk_context *create_duktape_heap(int alloc_provider,
                                         int debugger, int lowmem_log) {
     duk_context *ctx;
@@ -735,6 +764,9 @@ static duk_context *create_duktape_heap(int alloc_provider,
     return ctx;
 }
 
+// ============================================================================
+// FUNCTION destroy_duktape_heap
+// ============================================================================
 static void destroy_duktape_heap(duk_context *ctx, int alloc_provider) {
     (void) alloc_provider;
 
@@ -743,10 +775,9 @@ static void destroy_duktape_heap(duk_context *ctx, int alloc_provider) {
     }
 }
 
-/*
- *  Main
- */
-
+// ============================================================================
+// FUNCTION main
+// ============================================================================
 int main(int argc, char *argv[]) {
     duk_context *ctx = NULL;
     int retval = 0;
