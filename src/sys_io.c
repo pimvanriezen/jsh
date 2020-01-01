@@ -50,6 +50,10 @@ duk_ret_t sys_io_open (duk_context *ctx) {
     
     int flags = 0;
     
+    // I'm 99.85% sure that on any sane OS implementation, the value
+    // of O_RDWR is equal to O_RDONLY|O_WRONLY, but I'm not going to
+    // waste time verifying that. I'm pretty sure the compiler will
+    // turn these checks into efficient cheese anyway.
     flags |= O_CREAT;
     if (fl_read && fl_write) {
         flags |= O_RDWR;
@@ -99,6 +103,8 @@ duk_ret_t sys_io_read (duk_context *ctx) {
     ssize_t gotsz = 0;
     char *tbuf = malloc (wantsz+1);
     
+    // Do a little loop to allow a retry when we get the theoretically
+    // rare EINTR sent our way.
     while (1) {
         gotsz = read (fd, tbuf, wantsz);
         if (gotsz>0) break;
@@ -126,6 +132,7 @@ duk_ret_t sys_io_write (duk_context *ctx) {
     buf = duk_get_buffer_data (ctx, 1, &bufsz);
     if (! buf) return DUK_RET_TYPE_ERROR;
     
+    // As with read, retry errors that we should retry.
     while (1) {
         writesz = write (fd, buf, bufsz);
         if (writesz<0) {
@@ -229,25 +236,20 @@ int duk_get_fd (duk_context *ctx, int argidx, int arrayidx) {
     int popcnt = 0;
     int res = -1;
     if (! duk_is_array (ctx, argidx)) {
-        fprintf (stderr, "getfd: notarray(%i)\n",arrayidx);
         if (arrayidx != 0) return -1;
         duk_dup (ctx, argidx);
         popcnt++;
     }
     else {
-        fprintf (stderr, "getfd: isarray\n");
         duk_get_prop_index (ctx, argidx, arrayidx);
         popcnt++;
     }
     if (duk_is_object (ctx, -1)) {
-        fprintf (stderr, "getfd: isobject\n");
         duk_get_prop_string (ctx, -1, "fd");
         popcnt++;
     }
     if (duk_is_number (ctx, -1)) {
-        fprintf (stderr, "getfd: isnumber\n");
         res = duk_get_int (ctx, -1);
-        fprintf (stderr, "     : => %i\n", res);
     }
     for (int i=0; i<popcnt; ++i) duk_pop (ctx);
     return res;
