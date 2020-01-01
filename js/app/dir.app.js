@@ -29,9 +29,11 @@ dir.help = function() {
         args:[
             {name:"path",text:"Path of the directory, or a glob matchstring"}
         ],
-        text:"Gets directory information. Returns An object with stat "+
-             "data, indexed by file name. See help(stat) for information "+
-             "about the return data."
+        text:<<<`
+			Gets directory information. Returns An object with stat
+            data, indexed by file name. See help(stat) for information
+            about the return data.
+		`>>>
     });
 }
 
