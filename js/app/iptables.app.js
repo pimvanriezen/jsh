@@ -10,7 +10,7 @@ if (which ("iptables")) {
             {literal:"iptables"},
             {setarg:"chain"},
             {opt:{"table":"-t"},helptext:"Table (filter,nat,mangle)"},
-            {literal:"-a"},
+            {literal:"-A"},
             {arg:"chain",helptext:"Chain to use (e.g. INPUT,FORWARD,...)"},
             // ----------------------------------------------------------------
             // matching options
@@ -85,7 +85,7 @@ if (which ("iptables")) {
             {literal:"iptables"},
             {setarg:"chain"},
             {opt:{"table":"-t"},helptext:"Table (filter,nat,mangle)"},
-            {literal:"-d"},
+            {literal:"-D"},
             {arg:"chain",helptext:"Chain to use (e.g. INPUT,FORWARD,...)"},
             // ----------------------------------------------------------------
             // matching options
