@@ -161,7 +161,7 @@ var setapi = function(arg1,arg2) {
                     if (dt.constructor == Array) {
                         for (var dti in dt) argv.push (dt[dti]);
                     }
-                    else argv.push (dt);
+                    else if (dt !== undefined) argv.push (dt);
                 }
                 else argv.push (def.literal);
                 continue;
