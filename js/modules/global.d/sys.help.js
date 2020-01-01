@@ -388,6 +388,54 @@ sys.getpwuid.help = function() {
 setapi (sys.getpwuid, "sys.getpwuid");
 
 // ============================================================================
+// sys.getgrnam
+// ============================================================================
+sys.getgrnam.help = function() {
+    setapi.helptext ({
+        name:"sys.getgrnam",
+        args:[
+            {name:"groupname",text:"Requested groupname"}
+        ],
+        text:<<<`
+            Gets information about a unix group.
+        `>>>
+    });
+}
+
+setapi (sys.getgrnam, "sys.getgrnam");
+
+// ============================================================================
+// sys.getgrgid
+// ============================================================================
+sys.getgrgid.help = function() {
+    setapi.helptext ({
+        name:"sys.getgrgid",
+        args:[
+            {name:"gid",text:"Requested groupid (number)"}
+        ],
+        text:<<<`
+            Gets information about a unix group.
+        `>>>
+    });
+}
+
+setapi (sys.getgrgid, "sys.getgrgid");
+
+// ============================================================================
+// sys.getgroups
+// ============================================================================
+sys.getgroups.help = function() {
+    setapi.helptext ({
+        name:"sys.getgroups",
+        text:<<<`
+            Returns an array of groupids the current user is a member of.
+        `>>>
+    });
+}
+
+setapi (sys.getgroups, "sys.getgroups");
+
+// ============================================================================
 // sys.hostname
 // ============================================================================
 sys.hostname.help = function() {
