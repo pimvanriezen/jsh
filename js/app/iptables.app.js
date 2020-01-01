@@ -160,7 +160,7 @@ if (which ("iptables")) {
             {literal:"iptables"},
             {setarg:"chain"},
             {opt:{"table":"-t"},helptext:"Table to use (filter,nat,mangle)"},
-            {literal:"-C"},
+            {literal:"-N"},
             {arg:"chain",helptext:"Name of the new chain"},
             {helptext:"Creates a chain."}
         ])

@@ -259,6 +259,7 @@ var setapi = function(arg1,arg2) {
             res = f(args);
         }
         else {
+            if (DEBUGAPI) dump(argv);
             var cmd = argv.splice (0,1);
             if (cmd) cmd = cmd[0];
             if (cmd) cmd = which(cmd);
