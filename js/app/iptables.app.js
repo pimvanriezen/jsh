@@ -90,7 +90,7 @@ if (which ("iptables")) {
             // ----------------------------------------------------------------
             // matching options
             // ----------------------------------------------------------------
-            {opt:{"proto":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
+            {opt:{"protocol":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
             {opt:{"inputInterface":"-i"},helptext:"Input interface"},
             {opt:{"srcAddress":"--source"},helptext:"Source address"},
             {opt:{"srcPort":"--sport"},helptext:"Source port"},
