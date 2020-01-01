@@ -2,6 +2,9 @@ if (which ("iptables")) {
     var iptables = {
         help:function(){echo ("Usage: iptables.add | iptables.remove | "+
                               "iptables.create");},
+        // ====================================================================
+        // FUNCTION iptables.add
+        // ====================================================================
         add:setapi ([
             {name:"iptables.add"},
             {literal:"iptables"},
@@ -9,6 +12,9 @@ if (which ("iptables")) {
             {opt:{"table":"-t"},helptext:"Table (filter,nat,mangle)"},
             {literal:"-a"},
             {arg:"chain",helptext:"Chain to use (e.g. INPUT,FORWARD,...)"},
+            // ----------------------------------------------------------------
+            // matching options
+            // ----------------------------------------------------------------
             {opt:{"protocol":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
             {opt:{"inputInterface":"-i"},helptext:"Input device"},
             {opt:{"srcAddress":"--source"},helptext:"Source address"},
@@ -16,8 +22,7 @@ if (which ("iptables")) {
             {opt:{"outputInterface":"-o"},helptext:"Output interface"},
             {opt:{"dstAddress":"--destination"},helptext:"Destination address"},
             {opt:{"dstPort":"--dport"},helptext:"Destination port"},
-            {opt:{"state":["-m","state","--state"]},helptext:"State match"},
-            {opt:{"ctstate":["-m","conntrack","--ctstate"]},helptext:<<<`
+            {opt:{"state":["-m","conntrack","--ctstate"]},helptext:<<<`
                 Conntrack state match
             `>>>},
             {opt:{"dstAddressType":["-m","addrtype","--dst-type"]},helptext:<<<`
@@ -27,41 +32,54 @@ if (which ("iptables")) {
                 Source Address type match
             `>>>},
             {opt:{"srcMatchSet":["-m","set","--match-set"]},helptext:<<<`
-                Match against a set
+                Match against an ipset
             `>>>},
-            {literal:function(args) {
-                if (args.saveMark) {
+            {opt:{"comment":["-m","comment","--comment"]},helptext:"Comment"},
+            // ----------------------------------------------------------------
+            // target options
+            // ----------------------------------------------------------------
+            {
+                opt:"saveMark",
+                f:function(args) {
                     return ["-j","CONNMARK","--save-mark","--nfmask",
-                            args.saveMark,"--ctmask",args.saveMark];
-                }
-                else if (args.restoreMark) {
+                                args.saveMark,"--ctmask",args.saveMark];
+                },
+                helptext:<<<`
+                    Save mark with mask provided in value.
+                `>>>
+            },
+            {
+                opt:"restoreMark",
+                f:function(args) {
                     return ["-j","CONNMARK","--restore-mark","--nfmask",
                             args.restoreMark,"--ctmask",args.restoreMark];
-                }
-                else if (args.setMark) {
+                },
+                helptext:<<<`
+                    Restore mark with mask provided as value.
+                `>>>
+            },
+            {
+                opt:"setMark",
+                f:function(args) {
                     return ["-j","CONNMARK","--set-xmark",args.setMark];
-                }
-                return;
-            }},
-            {silentopt:"saveMark",helptext:<<<`
-                Save mark with mask provided as value
-            `>>>},
-            {silentopt:"restoreMark",helptext:<<<`
-                Restore mark with mask provided as value
-            `>>>},
-            {silentopt:"setMark",helptext:<<<`
-                Set mark with value mask provided as string "value/mask"
-            `>>>},
+                },
+                helptext:<<<`
+                    Set mark with value mask provided as string "value/mask".
+                `>>>
+            },
             {opt:{"dnat":["-j","DNAT","--to-destination"]},helptext:<<<`
                 Set target to DNAT with a destination
             `>>>},
             {opt:{"snat":["-j","SNAT","--to-source"]},helptext:<<<`
                 Set target with SNAT to a source
             `>>>},
-            {opt:{"comment":["-m","comment","--comment"]},helptext:"Comment"},
             {opt:{"target":"-j"},helptext:"Target chain"},
             {helptext:"Adds a rule to a chain."}
         ]),
+        
+        // ====================================================================
+        // FUNCTION iptables.remove
+        // ====================================================================
         remove:setapi ([
             {name:"iptables.remove"},
             {literal:"iptables"},
@@ -69,6 +87,9 @@ if (which ("iptables")) {
             {opt:{"table":"-t"},helptext:"Table (filter,nat,mangle)"},
             {literal:"-d"},
             {arg:"chain",helptext:"Chain to use (e.g. INPUT,FORWARD,...)"},
+            // ----------------------------------------------------------------
+            // matching options
+            // ----------------------------------------------------------------
             {opt:{"proto":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
             {opt:{"inputInterface":"-i"},helptext:"Input interface"},
             {opt:{"srcAddress":"--source"},helptext:"Source address"},
@@ -76,8 +97,7 @@ if (which ("iptables")) {
             {opt:{"outputInterface":"-o"},helptext:"Output interface"},
             {opt:{"dstAddress":"--destination"},helptext:"Destination address"},
             {opt:{"dstPort":"--dport"},helptext:"Destination port"},
-            {opt:{"state":["-m","state","--state"]},helptext:"State match"},
-            {opt:{"ctstate":["-m","conntrack","--ctstate"]},helptext:<<<`
+            {opt:{"state":["-m","conntrack","--ctstate"]},helptext:<<<`
                 Conntrack state match
             `>>>},
             {opt:{"dstAddressType":["-m","addrtype","--dst-type"]},helptext:<<<`
@@ -89,39 +109,52 @@ if (which ("iptables")) {
             {opt:{"srcMatchSet":["-m","set","--match-set"]},helptext:<<<`
                 Match against a set
             `>>>},
-            {literal:function(args) {
-                if (args.saveMark) {
+            {opt:{"comment":["-m","comment","--comment"]},helptext:"Comment"},
+            // ----------------------------------------------------------------
+            // target options
+            // ----------------------------------------------------------------
+            {
+                opt:"saveMark",
+                f:function(args) {
                     return ["-j","CONNMARK","--save-mark","--nfmask",
-                            args.saveMark,"--ctmask",args.saveMark];
-                }
-                else if (args.restoreMark) {
+                                args.saveMark,"--ctmask",args.saveMark];
+                },
+                helptext:<<<`
+                    Save mark with mask provided in value.
+                `>>>
+            },
+            {
+                opt:"restoreMark",
+                f:function(args) {
                     return ["-j","CONNMARK","--restore-mark","--nfmask",
                             args.restoreMark,"--ctmask",args.restoreMark];
-                }
-                else if (args.setMark) {
+                },
+                helptext:<<<`
+                    Restore mark with mask provided as value.
+                `>>>
+            },
+            {
+                opt:"setMark",
+                f:function(args) {
                     return ["-j","CONNMARK","--set-xmark",args.setMark];
-                }
-                return;
-            }},
-            {silentopt:"saveMark",helptext:<<<`
-                Save mark with mask provided as value
-            `>>>},
-            {silentopt:"restoreMark",helptext:<<<`
-                Restore mark with mask provided as value
-            `>>>},
-            {silentopt:"setMark",helptext:<<<`
-                Set mark with value mask provided as string "value/mask"
-            `>>>},
+                },
+                helptext:<<<`
+                    Set mark with value mask provided as string "value/mask".
+                `>>>
+            },
             {opt:{"dnat":["-j","DNAT","--to-destination"]},helptext:<<<`
                 Set target to DNAT with a destination
             `>>>},
             {opt:{"snat":["-j","SNAT","--to-source"]},helptext:<<<`
                 Set target with SNAT to a source
             `>>>},
-            {opt:{"comment":["-m","comment","--comment"]},helptext:"Comment"},
             {opt:{"target":"-j"},helptext:"Target chain"},
             {helptext:"Removes a rule from a chain."}
         ]),
+        
+        // ====================================================================
+        // FUNCTION iptables.create
+        // ====================================================================
         create:setapi ([
             {name:"iptables.create"},
             {literal:"iptables"},

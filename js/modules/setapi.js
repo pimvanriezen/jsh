@@ -109,7 +109,7 @@ var setapi = function(arg1,arg2) {
             $apidb[defarr[k].name] = true;
         }
         if (defarr[k].process) processf = defarr[k].process;
-        if (defarr[k].f) f=defarr[k].f;
+        if (defarr[k].f && !defarr[k].opt) f=defarr[k].f;
     }
 
     // The actual function that will be returned
@@ -168,18 +168,40 @@ var setapi = function(arg1,arg2) {
             }
             
             // {opt:{"wibble":"-f"}} adds ["-f",argv.wibble] to argv[]
-            // The flag value can be an array.
+            // The flag value can be an array, or a function that
+            // returns either an array or a single value.
+            // In all cases, except for the function, the option-value
+            // is added as an argv-argument as well.
+            //
+            // Also allow an alternative format:
+            // {opt:"wibble",prepend:"-f"}, or
+            // {opt:"wibble",f:function(args){...}}
             if (def.opt) {
+                var dopt = def.opt;
+                if (typeof (dopt) == "string") {
+                    dopt = {};
+                    if (def.f) dopt[def.opt] = def.f
+                    else dopt[def.opt] = def.prepend;
+                }
                 for (var k in args) {
-                    if (def.opt[k]) {
-                        var val = def.opt[k];
+                    if (dopt[k]) {
+                        var val = dopt[k];
                         if (typeof (val) == "string") {
-                            val = [val];
+                            argv.push (val);
+                            argv.push (args[k]);
                         }
-                        for (var i in val) {
-                            argv.push (val[i]);
+                        else if (typeof (val) == "function") {
+                            var tval = val(args);
+                            if (tval) {
+                                argv.intern (tval);
+                            }
                         }
-                        argv.push (args[k]);
+                        else {
+                            for (var i in val) {
+                                argv.push (val[i]);
+                            }
+                            argv.push (args[k]);
+                        }
                     }
                 }
                 continue;
@@ -329,7 +351,13 @@ var setapi = function(arg1,arg2) {
             if (def.arg) {
             }
             else if (def.opt) {
-                for (var oi in def.opt) {
+                var dopt = def.opt;
+                if (typeof (dopt) == "string") {
+                    dopt = {};
+                    if (def.f) dopt[def.opt] = def.f
+                    else dopt[def.opt] = def.prepend;
+                }
+                for (var oi in dopt) {
                     var txt = def.helptext;
                     if (!txt) txt = "Option";
                     t.addRow (printhdr,"",oi,txt);
