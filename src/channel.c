@@ -8,6 +8,9 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+// ============================================================================
+// FUNCTION channel_create
+// ============================================================================
 struct channel *channel_create (void) {
     struct channel *res;
     res = malloc (2 * sizeof (struct channelpipe));
@@ -25,10 +28,13 @@ struct channel *channel_create (void) {
     return res;
 }
 
-/* Adds a pipe to the channel. Typically called in the parent process
-   context of a goroutine. Finds a closed pipe in the channel, or
-   increases the pool of channelpipes.
-*/
+// ============================================================================
+// FUNCTION channel_add_pipe
+// -------------------------
+// Adds a pipe to the channel. Typically called in the parent process
+// context of a goroutine. Finds a closed pipe in the channel, or
+// increases the pool of channelpipes.
+// ============================================================================
 void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     unsigned int crsr = 0;
     unsigned int newalloc = 0;
@@ -70,9 +76,13 @@ void channel_add_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     c->alloc = newalloc;
 }
 
-/* If a goroutine is created, the child process closes all filedescriptors
-   except its own end of the pipe. The channel in the forked context
-   should only contain *its* end of the pipe. */
+// ============================================================================
+// FUNCTION channel_fork_pipe
+// --------------------------
+// If a goroutine is created, the child process closes all filedescriptors
+// except its own end of the pipe. The channel in the forked context
+// should only contain *its* end of the pipe.
+// ============================================================================
 void channel_fork_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     int i=0;
     for (i=0; i<c->alloc; ++i) {
@@ -93,20 +103,23 @@ void channel_fork_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     c->alloc = 1;
 }
 
-/* If there's a pipe in state PIPE_LISTENING, get the first one available,
-   set its state to PIPE_BUSY and send it our own message. If none
-   are currently listening, go into the handle loop that will wait for
-   messages from any pipe before returning, then try again to see if
-   a pipe became available, otherwise rinse and repeat. 
-   
-   Regardless of available pipes, the handle function needs to be called
-   to allow for PIPE_EXIT messages to flow in.
-   
-   Parent processes will normally be automatically in PIPE_LISTENING state,
-   since if it's busy it can't send any new messages, so the coroutine
-   might as well sleep at this point if its writing data to the parent
-   blocks.
-*/
+// ============================================================================
+// FUNCTION channel_send
+// ---------------------
+// If there's a pipe in state PIPE_LISTENING, get the first one available,
+// set its state to PIPE_BUSY and send it our own message. If none
+// are currently listening, go into the handle loop that will wait for
+// messages from any pipe before returning, then try again to see if
+// a pipe became available, otherwise rinse and repeat. 
+// 
+// Regardless of available pipes, the handle function needs to be called
+// to allow for PIPE_EXIT messages to flow in.
+// 
+// Parent processes will normally be automatically in PIPE_LISTENING state,
+// since if it's busy it can't send any new messages, so the coroutine
+// might as well sleep at this point if its writing data to the parent
+// blocks.
+// ============================================================================
 int channel_send (struct channel *c, const char *msg) {
     int i=0;
     int found=0;
@@ -143,6 +156,9 @@ int channel_send (struct channel *c, const char *msg) {
     }
 }
 
+// ============================================================================
+// FUNCTION channel_senderror
+// ============================================================================
 void channel_senderror (struct channel *c, const char *msg) {
     size_t msgsz = strlen (msg)+1; /* include nul-byte */
     size_t szsz = sizeof (size_t);
@@ -160,11 +176,17 @@ void channel_senderror (struct channel *c, const char *msg) {
     }
 }
 
+// ============================================================================
+// FUNCTION channel_hasdata
+// ============================================================================
 bool channel_hasdata (struct channel *c) {
     channel_handle (c, true);
     return (c->firstmsg ? true : false);
 }
 
+// ============================================================================
+// FUNCTION channel_empty
+// ============================================================================
 bool channel_empty (struct channel *c) {
     for (int i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) return false;
@@ -172,13 +194,14 @@ bool channel_empty (struct channel *c) {
     return true;
 }
 
-/* This one is a bit tricky. Channel pipes can be busy, and we have to hand-
-   deliver them all a message. The function goes over all the open
-   channel pipes. If they're free, the message is delivered immediately.
-   Otherwise, we have no choice but to spend time in channel_handle(),
-   queueing up any messages that come in from any of the pipes in the
-   meantime, until the pipe becomes available (or closed). */
-
+// ============================================================================
+// FUNCTION channel_broadcast
+// --------------------------
+// Sends a message to *everybody*. Does not take busy state into account,
+// so theoretically it could block for a bit, depending on how big a queue
+// the coroutine has built up on its channel, and what the maximum buffer
+// size is the OS keeps for pipes.
+// ============================================================================
 int channel_broadcast (struct channel *c, const char *msg) {
     int i=0;
     int found=0;
@@ -202,12 +225,16 @@ int channel_broadcast (struct channel *c, const char *msg) {
     return found;
 }
 
-/* Will do a non-blocking run past the handle function. Then it will
-   pick up the first message from the receive queue, and return it.
-   If the receive queue is empty, the handle function is called in
-   blocking mode to wait for messages. If there are no open pipes,
-   returns NULL immediately. Otherwise returns an allocated string
-   that the receiver should free(). */
+// ============================================================================
+// FUNCTION channel_receive
+// ------------------------
+// Will do a non-blocking run past the handle function. Then it will
+// pick up the first message from the receive queue, and return it.
+// If the receive queue is empty, the handle function is called in
+// blocking mode to wait for messages. If there are no open pipes,
+// returns NULL immediately. Otherwise returns an allocated string
+// that the receiver should free().
+// ============================================================================
 struct channelmsg *channel_receive (struct channel *c) {
     /* If we have a parent pipe, we need to send it a PIPEMSG_FREE,
        then wait for a message. If we get a PIPEMSG_EXIT, we
@@ -251,17 +278,26 @@ struct channelmsg *channel_receive (struct channel *c) {
     return msg;
 }
 
+// ============================================================================
+// FUNCTION msg_create
+// ============================================================================
 struct channelmsg *msg_create (size_t len) {
     struct channelmsg *res = calloc (sizeof(struct channelmsg),1);
     res->data = calloc (len+1,1);
     return res;
 }
 
+// ============================================================================
+// FUNCTION msg_free
+// ============================================================================
 void msg_free (struct channelmsg *msg) {
     if (msg->data) free (msg->data);
     free (msg);
 }
 
+// ============================================================================
+// FUNCTION channel_handle
+// ============================================================================
 int channel_handle (struct channel *c, bool nonblock) {
     /* Make a select-loop over all the readfds of the channel's
        pipes, either blocking or nonblocking. For every readfd
@@ -287,6 +323,7 @@ int channel_handle (struct channel *c, bool nonblock) {
     struct channelmsg *msg = NULL;
     char *errstr = NULL;
     
+    // Collect all the relevant filedescriptors to select on
     FD_ZERO (&fds);
     for (i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) {
@@ -300,27 +337,31 @@ int channel_handle (struct channel *c, bool nonblock) {
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     
-    if (select (max+1, &fds, NULL, NULL, nonblock?&tv:0) > 0) {
+    if (select (max+1, &fds, NULL, NULL, nonblock ? &tv : NULL) > 0) {
+        // Now go over all the pipes again and find a match from select
         for (i=0; i<c->alloc; ++i) {
             if (c->pipes[i].st == PIPE_CLOSED) continue;
+            
             if (FD_ISSET (c->pipes[i].fdread, &fds)) {
+                // A match. First read in the message type.
                 char msgtype = 0;
                 sz = read (c->pipes[i].fdread, &msgtype, 1);
                 if (sz == 0) msgtype = MSGID_EXIT;
+                
                 switch (msgtype) {
-                    case MSGID_BUSY:
+                    case MSGID_BUSY: // Propagate to status
                         c->pipes[i].st = PIPE_BUSY; break;
                     
-                    case MSGID_FREE:
+                    case MSGID_FREE: // Propagate to status
                         c->pipes[i].st = PIPE_LISTENING; break;
                         
-                    case MSGID_EXIT:
+                    case MSGID_EXIT: // Mark connection as ended
                         c->pipes[i].st = PIPE_CLOSED;
                         close (c->pipes[i].fdread);
                         close (c->pipes[i].fdwrite);
                         break;
                     
-                    case MSGID_DATA:
+                    case MSGID_DATA: // A message, oh boy
                         sz = read (c->pipes[i].fdread, &msgsz, szsz);
                         if (sz) {
                             msg = msg_create (msgsz);
@@ -333,13 +374,17 @@ int channel_handle (struct channel *c, bool nonblock) {
                             c->pipes[i].msgrecv++;
                             msg = NULL;
                         }
-                        if (msg) {
+                        else {
+                            // Discard empty message. Yeah, theoretically
+                            // a message of absolutely nothing still conveys
+                            // information, but on the other hand, don't be
+                            // a jerk.
                             msg_free (msg);
                             msg = NULL;
                         }
                         break;
                         
-                    case MSGID_ERROR:
+                    case MSGID_ERROR: // An error event, boo, hiss.
                         sz = read (c->pipes[i].fdread, &msgsz, szsz);
                         if (sz) {
                             errstr = malloc (msgsz);
@@ -357,6 +402,9 @@ int channel_handle (struct channel *c, bool nonblock) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION channel_exit
+// ============================================================================
 void channel_exit (struct channel *c) {
     if (! c) return;
     /* Send a PIPEMSG_EXIT to all open pipes */
@@ -368,6 +416,9 @@ void channel_exit (struct channel *c) {
     }
 }
 
+// ============================================================================
+// FUNCTION channel_fork
+// ============================================================================
 pid_t channel_fork (struct channel *c) {
     int togopipe[2];
     int fromgopipe[2];
@@ -403,6 +454,9 @@ pid_t channel_fork (struct channel *c) {
     }
 }
 
+// ============================================================================
+// FUNCTION channel_destroy
+// ============================================================================
 void channel_destroy (struct channel *c) {
     if (! c) return;
     struct channelmsg *msg, *nextmsg;
@@ -434,12 +488,21 @@ void channel_destroy (struct channel *c) {
     free (c);
 }
 
+// ============================================================================
+// FUNCTION channel_seterror
+// ============================================================================
 void channel_seterror (struct channel *c, const char *err) {
     if (! c) return;
     if (c->error) free ((void *) c->error);
     c->error = err;
 }
 
+// ============================================================================
+// FUNCTION clist_create
+// ---------------------
+// The clist struct is around to give userland a simple numeric 'channel
+// descriptor' to pass along with any channel-related calls.
+// ============================================================================
 struct clist *clist_create (void) {
     struct clist *res = calloc (sizeof (struct clist), 1);
     res->alloc = 1;
@@ -448,11 +511,17 @@ struct clist *clist_create (void) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION clist_get
+// ============================================================================
 struct channel *clist_get (struct clist *c, int idx) {
     if (idx >= c->alloc) return NULL;
     return c->list[idx];
 }
 
+// ============================================================================
+// FUNCTION clist_open
+// ============================================================================
 int clist_open (struct clist *c) {
     int i;
     for (i=0; i<c->alloc; ++i) {
@@ -466,6 +535,9 @@ int clist_open (struct clist *c) {
     return i;
 }
 
+// ============================================================================
+// FUNCTION clist_close
+// ============================================================================
 void clist_close (struct clist *c, int idx) {
     if (idx >= c->alloc) return;
     if (! c->list[idx]) return;
