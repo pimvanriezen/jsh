@@ -344,17 +344,15 @@ duk_ret_t sys_getgrgid (duk_context *ctx) {
 // FUNCTION sys_getgroups
 // ============================================================================
 duk_ret_t sys_getgroups (duk_context *ctx) {
-    gid_t *list;
+    gid_t list[NGROUPS_MAX];
     int count;
     
-    list = calloc (NGROUPS_MAX+2, sizeof(gid_t));
     count = getgroups (NGROUPS_MAX, list);
     duk_idx_t arridx = duk_push_array (ctx);
     for (int i=0; i<count; ++i) {
         duk_push_int (ctx, list[i]);
         duk_put_prop_index (ctx, arridx, i);
     }
-    free (list);
     return 1;
 }
 
