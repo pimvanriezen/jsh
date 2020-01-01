@@ -110,7 +110,7 @@ Channel::recv = function() {
 
 Channel::recv.help = function() {
     setapi.helptext({
-        name:"c.isempty",
+        name:"c.recv",
         text:<<<`
             Waits for, then returns, a message on the channel.
         `>>>
@@ -125,7 +125,7 @@ Channel::exit = function() {
     sys.channel.exit (this.ch);
 }
 
-Channel::isempty.help = function() {
+Channel::exit.help = function() {
     setapi.helptext({
         name:"c.exit",
         text:<<<`
