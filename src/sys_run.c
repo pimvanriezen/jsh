@@ -162,6 +162,9 @@ duk_ret_t sys_run (duk_context *ctx) {
             duk_push_string (ctx, buf);
         }
         else {
+            if (bufpos) {
+                fprintf (stderr, "nul on buf, non-empty bufpos\n");
+            }
             duk_push_boolean (ctx, 1);
         }
     }
