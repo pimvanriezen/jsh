@@ -347,7 +347,7 @@ duk_ret_t sys_getgroups (duk_context *ctx) {
     gid_t *list;
     int count;
     
-    list = malloc (NGROUPS_MAX+2 * sizeof(gid_t));
+    list = calloc (NGROUPS_MAX+2, sizeof(gid_t));
     count = getgroups (NGROUPS_MAX, list);
     free (list);
     return 0;
