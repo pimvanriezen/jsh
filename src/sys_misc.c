@@ -349,9 +349,6 @@ duk_ret_t sys_getgroups (duk_context *ctx) {
     
     list = calloc (NGROUPS_MAX+2, sizeof(gid_t));
     count = getgroups (NGROUPS_MAX, list);
-    free (list);
-    return 0;
-    
     duk_idx_t arridx = duk_push_array (ctx);
     for (int i=0; i<count; ++i) {
         duk_push_int (ctx, list[i]);
