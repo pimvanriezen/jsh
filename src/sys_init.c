@@ -108,6 +108,9 @@ void sys_init (duk_context *ctx) {
     defcall (chown, 3);
     defcall (getpwnam, 1);
     defcall (getpwuid, 1);
+    defcall (getgrnam, 1);
+    defcall (getgrgid, 1);
+    defcall (getgroups, 0);
     defcall (hostname, DUK_VARARGS);
     defcall (winsize, 0);
     defcall (stat, 1);

@@ -14,6 +14,9 @@ duk_ret_t sys_loadavg (duk_context *ctx);
 duk_ret_t sys_kill (duk_context *ctx);
 duk_ret_t sys_getpwnam (duk_context *ctx);
 duk_ret_t sys_getpwuid (duk_context *ctx);
+duk_ret_t sys_getgrnam (duk_context *ctx);
+duk_ret_t sys_getgrgid (duk_context *ctx);
+duk_ret_t sys_getgroups (duk_context *ctx);
 duk_ret_t sys_hostname (duk_context *ctx);
 void sys_fs_init (void);
 

@@ -298,6 +298,70 @@ duk_ret_t sys_getpwuid (duk_context *ctx) {
 }
 
 // ============================================================================
+// FUNCTION pushgrp
+// ----------------
+// Pushes an object onto the duktape stack with details from a group entry
+// ============================================================================
+void pushgrp (duk_context *ctx, struct group *grp) {
+    duk_idx_t obj_idx = duk_push_object (ctx);
+    duk_push_string (ctx, grp->gr_name);
+    duk_put_prop_string (ctx, obj_idx, "name");
+    duk_push_int (ctx, grp->gr_gid);
+    duk_put_prop_string (ctx, obj_idx, "gid");
+    duk_idx_t arr_idx = duk_push_array (ctx);
+    for (int i=0; grp->gr_mem[i]; ++i) {
+        duk_push_string (ctx, grp->gr_mem[i]);
+        duk_put_prop_index (ctx, arr_idx, i);
+    }
+    duk_put_prop_string (ctx, obj_idx, "members");
+}
+
+// ============================================================================
+// FUNCTION sys_getgrnam
+// ============================================================================
+duk_ret_t sys_getgrnam (duk_context *ctx) {
+    if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
+    const char *grnam = duk_to_string (ctx, 0);
+    struct group *group = getgrnam (grnam);
+    if (! group) return 0;
+    pushgrp (ctx, group);
+    return 1;
+}
+
+// ============================================================================
+// FUNCTION sys_getgrgid
+// ============================================================================
+duk_ret_t sys_getgrgid (duk_context *ctx) {
+    if (duk_get_top (ctx) == 0) return DUK_RET_TYPE_ERROR;
+    gid_t gid = duk_get_int (ctx, 0);
+    struct group *group = getgrgid (gid);
+    if (! group) return 0;
+    pushgrp (ctx, group);
+    return 1;
+}    
+
+// ============================================================================
+// FUNCTION sys_getgroups
+// ============================================================================
+duk_ret_t sys_getgroups (duk_context *ctx) {
+    gid_t *list;
+    int count;
+    
+    list = malloc (NGROUPS_MAX+2 * sizeof(gid_t));
+    count = getgroups (NGROUPS_MAX, list);
+    free (list);
+    return 0;
+    
+    duk_idx_t arridx = duk_push_array (ctx);
+    for (int i=0; i<count; ++i) {
+        duk_push_int (ctx, list[i]);
+        duk_put_prop_index (ctx, arridx, i);
+    }
+    free (list);
+    return 1;
+}
+
+// ============================================================================
 // FUNCTION sys_hostname
 // ============================================================================
 duk_ret_t sys_hostname (duk_context *ctx) {

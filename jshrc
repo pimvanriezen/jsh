@@ -21,6 +21,7 @@ defaults({
 // ============================================================================
 $               = require("fquery");
 userdb          = require("userdb");
+groupdb         = require("groupdb");
 proc            = require("proc");
 run             = require("run");
 setapi          = require("setapi");
@@ -34,6 +35,7 @@ File            = require("file");
 Socket          = require("socket");
 UDPSocket       = require("udpsocket");
 ListenSocket    = require("listensocket");
+
 // ============================================================================
 // Set up the result formatter for the interactive shell
 // ============================================================================
