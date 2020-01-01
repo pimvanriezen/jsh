@@ -22,6 +22,33 @@ if (which ("iptables")) {
             {opt:{"outputInterface":"-o"},helptext:"Output interface"},
             {opt:{"dstAddress":"--destination"},helptext:"Destination address"},
             {opt:{"dstPort":"--dport"},helptext:"Destination port"},
+            {
+                opt:"probability",
+                preface:[
+                    "-m",
+                    "statistic",
+                    "--mode",
+                    "random",
+                    "--probability"
+                ],
+                helptext:<<<`
+                    Does a random sampling of packets, and only matches
+                    a subset, with the given probability.
+                `>>>
+            },
+            {
+                opt:"every",
+                preface:[
+                    "-m",
+                    "statistic",
+                    "--mode",
+                    "nth",
+                    "--every"
+                ],
+                helptext:<<<`
+                    Only matches every nth packet.
+                `>>>
+            },
             {opt:{"state":["-m","conntrack","--ctstate"]},helptext:<<<`
                 Conntrack state match
             `>>>},
@@ -31,9 +58,24 @@ if (which ("iptables")) {
             {opt:{"srcAddressType":["-m","addrtype","--src-type"]},helptext:<<<`
                 Source Address type match
             `>>>},
-            {opt:{"srcMatchSet":["-m","set","--match-set"]},helptext:<<<`
-                Match against an ipset
-            `>>>},
+            {
+                opt:"srcMatchSet",
+                f:function(args) {
+                    return ["-m","set","--match-set",srcMatchSet,"src"];
+                },
+                helptext:<<<`
+                    Match source address against a 1-column ipset
+                `>>>
+            },
+            {
+                opt:"dstMatchSet",
+                f:function(args) {
+                    return ["-m","set","--match-set",dstMatchSet,"dst"];
+                },
+                helptext:<<<`
+                    Match destination address against a 1-column ipset
+                `>>>
+            },
             {opt:{"comment":["-m","comment","--comment"]},helptext:"Comment"},
             // ----------------------------------------------------------------
             // target options
@@ -67,6 +109,9 @@ if (which ("iptables")) {
                     Set mark with value mask provided as string "value/mask".
                 `>>>
             },
+            {opt:{"netmap":["-j","NETMAP","--to"]},text:<<<`
+                Maps matching IPv6 to another range (address/mask).
+            `>>>},
             {opt:{"dnat":["-j","DNAT","--to-destination"]},helptext:<<<`
                 Set target to DNAT with a destination
             `>>>},
@@ -91,12 +136,40 @@ if (which ("iptables")) {
             // matching options
             // ----------------------------------------------------------------
             {opt:{"protocol":"-p"},helptext:"Protocol (tcp,udp,icmp,ip)"},
+            {flag:"tcpSYN",helptext:"Only match TCP SYN packets"},
             {opt:{"inputInterface":"-i"},helptext:"Input interface"},
             {opt:{"srcAddress":"--source"},helptext:"Source address"},
             {opt:{"srcPort":"--sport"},helptext:"Source port"},
             {opt:{"outputInterface":"-o"},helptext:"Output interface"},
             {opt:{"dstAddress":"--destination"},helptext:"Destination address"},
             {opt:{"dstPort":"--dport"},helptext:"Destination port"},
+            {
+                opt:"probability",
+                preface:[
+                    "-m",
+                    "statistic",
+                    "--mode",
+                    "random",
+                    "--probability"
+                ],
+                helptext:<<<`
+                    Does a random sampling of packets, and only matches
+                    a subset, with the given probability.
+                `>>>
+            },
+            {
+                opt:"every",
+                preface:[
+                    "-m",
+                    "statistic",
+                    "--mode",
+                    "nth",
+                    "--every"
+                ],
+                helptext:<<<`
+                    Only matches every nth packet.
+                `>>>
+            },
             {opt:{"state":["-m","conntrack","--ctstate"]},helptext:<<<`
                 Conntrack state match
             `>>>},
@@ -106,9 +179,24 @@ if (which ("iptables")) {
             {opt:{"srcAddressType":["-m","addrtype","--src-type"]},helptext:<<<`
                 Source Address type match
             `>>>},
-            {opt:{"srcMatchSet":["-m","set","--match-set"]},helptext:<<<`
-                Match against a set
-            `>>>},
+            {
+                opt:"srcMatchSet",
+                f:function(args) {
+                    return ["-m","set","--match-set",srcMatchSet,"src"];
+                },
+                helptext:<<<`
+                    Match source address against a 1-column ipset
+                `>>>
+            },
+            {
+                opt:"dstMatchSet",
+                f:function(args) {
+                    return ["-m","set","--match-set",dstMatchSet,"dst"];
+                },
+                helptext:<<<`
+                    Match destination address against a 1-column ipset
+                `>>>
+            },
             {opt:{"comment":["-m","comment","--comment"]},helptext:"Comment"},
             // ----------------------------------------------------------------
             // target options
@@ -142,6 +230,9 @@ if (which ("iptables")) {
                     Set mark with value mask provided as string "value/mask".
                 `>>>
             },
+            {opt:{"netmap":["-j","NETMAP","--to"]},text:<<<`
+                Maps matching IPv6 to another range (address/mask).
+            `>>>},
             {opt:{"dnat":["-j","DNAT","--to-destination"]},helptext:<<<`
                 Set target to DNAT with a destination
             `>>>},
