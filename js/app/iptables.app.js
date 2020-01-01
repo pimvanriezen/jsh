@@ -43,13 +43,13 @@ if (which ("iptables")) {
                 }
                 return;
             }},
-            {silentopt:"saveMark",text:<<<`
+            {silentopt:"saveMark",helptext:<<<`
                 Save mark with mask provided as value
             `>>>},
-            {silentopt:"restoreMark",text:<<<`
+            {silentopt:"restoreMark",helptext:<<<`
                 Restore mark with mask provided as value
             `>>>},
-            {silentopt:"saveMark",text:<<<`
+            {silentopt:"setMark",helptext:<<<`
                 Set mark with value mask provided as string "value/mask"
             `>>>},
             {opt:{"dnat":["-j","DNAT","--to-destination"]},helptext:<<<`
@@ -103,13 +103,13 @@ if (which ("iptables")) {
                 }
                 return;
             }},
-            {silentopt:"saveMark",text:<<<`
+            {silentopt:"saveMark",helptext:<<<`
                 Save mark with mask provided as value
             `>>>},
-            {silentopt:"restoreMark",text:<<<`
+            {silentopt:"restoreMark",helptext:<<<`
                 Restore mark with mask provided as value
             `>>>},
-            {silentopt:"saveMark",text:<<<`
+            {silentopt:"setMark",helptext:<<<`
                 Set mark with value mask provided as string "value/mask"
             `>>>},
             {opt:{"dnat":["-j","DNAT","--to-destination"]},helptext:<<<`
