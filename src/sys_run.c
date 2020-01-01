@@ -144,7 +144,7 @@ duk_ret_t sys_run (duk_context *ctx) {
         buf[bufpos] = 0;
     }
     
-    waitpid (pid, &retstatus, WNOHANG);
+    waitpid (pid, &retstatus, 0);
     close (fdout);
     close (fdin);
     
