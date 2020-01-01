@@ -8,7 +8,6 @@ var md5sum = setapi ([
     {arg:"path",helptext:"File to checksum"},
     {process:function(dat) {
         if (dat === true || dat === false) {
-            printerr ("weird return: "+dat);
             return null;
         }
         dat = dat.replace('\n','');
