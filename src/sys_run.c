@@ -133,12 +133,9 @@ duk_ret_t sys_run (duk_context *ctx) {
             buf = (char *) realloc (buf, bufsz);
             if (! buf) break;
         }
-        if (waitpid (pid, &retstatus, WNOHANG)) break;
         rdsz = read (fdin, buf+bufpos, 256);
-        if (rdsz<=0) {
-            if (! bufpos) {
-                fprintf (stderr, "run: rdsz=%i err=%s\n", rdsz, strerror(errno));
-            }
+        if (rdsz == 0) break;
+        if (rdsz<0) {
             if (errno == EAGAIN) continue;
             if (errno == EINTR) continue;
             break;
@@ -147,6 +144,7 @@ duk_ret_t sys_run (duk_context *ctx) {
         buf[bufpos] = 0;
     }
     
+    waitpid (pid, &retstatus, WNOHANG);
     close (fdout);
     close (fdin);
     
@@ -162,9 +160,6 @@ duk_ret_t sys_run (duk_context *ctx) {
             duk_push_string (ctx, buf);
         }
         else {
-            if (bufpos) {
-                fprintf (stderr, "nul on buf, non-empty bufpos\n");
-            }
             duk_push_boolean (ctx, 1);
         }
     }
