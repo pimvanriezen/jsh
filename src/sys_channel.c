@@ -251,9 +251,8 @@ duk_ret_t sys_go (duk_context *ctx) {
     int cid = duk_get_int (ctx, 0);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        fprintf (stderr, "%% Channel %i not found\n", cid);
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel not found");
+        return duk_throw (ctx);
     }
     
     switch (pid = channel_fork (c)) {
