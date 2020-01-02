@@ -9,7 +9,7 @@ unsigned char FDTABLE_open[(LIMIT_FDT_MAX) / 8];
 unsigned char FDTABLE_retain[(LIMIT_FDT_MAX) / 8];
 
 #define FDT_SET(tt,xx) {FDTABLE_##tt[xx/8] |= (1 << (xx&7));}
-#define FDT_CLR(tt,xx) {FDTABLE_##tt[xx/8] &= !(1 >> (xx&7));}
+#define FDT_CLR(tt,xx) {FDTABLE_##tt[xx/8] &= (0xff^(1 << (xx&7)));}
 #define FDT_ISSET(tt,xx) (FDTABLE_##tt[xx/8] & (1 << (xx&7)))
 
 void fd_init (void) {
@@ -112,4 +112,38 @@ int fd_accept (int sock, struct sockaddr *addr, socklen_t *addrlen) {
         FDT_SET(open,res);
     }
     return res;
+}
+
+duk_ret_t sys_io_retain (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    int fd = duk_get_int (ctx, 0);
+    fd_retain (fd);
+    return 0;
+}
+
+duk_ret_t sys_io_stat (duk_context *ctx) {
+    duk_idx_t objidx = duk_push_object (ctx);
+    duk_idx_t arridx;
+    int count;
+    
+    arridx = duk_push_array (ctx);
+    count = 0;
+    for (int i=0; i<LIMIT_FDT_MAX; ++i) {
+        if (FDT_ISSET(open,i)) {
+            duk_push_int (ctx, i);
+            duk_put_prop_index (ctx, arridx, count++);
+        }
+    }
+    duk_put_prop_string (ctx, objidx, "open");
+
+    arridx = duk_push_array (ctx);
+    count = 0;
+    for (int i=0; i<LIMIT_FDT_MAX; ++i) {
+        if (FDT_ISSET(retain,i)) {
+            duk_push_int (ctx, i);
+            duk_put_prop_index (ctx, arridx, count++);
+        }
+    }
+    duk_put_prop_string (ctx, objidx, "retain");
+    return 1;
 }

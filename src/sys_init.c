@@ -25,6 +25,7 @@
 #include "sys_module.h"
 #include "sys_io.h"
 #include "sys_sock.h"
+#include "fd.h"
 
 // ============================================================================
 // FUNCTION mystrdup
@@ -47,6 +48,7 @@ char *mystrdup (const char *orig) {
 void sys_init (duk_context *ctx) {
     const char *osglobal;
 
+    fd_init();
     sys_fs_init();
     sys_channel_init();
     sys_sock_init();
@@ -145,6 +147,8 @@ void sys_init (duk_context *ctx) {
     iocall (read, 2);
     iocall (write, 2);
     iocall (select, DUK_VARARGS);
+    iocall (stat, 0);
+    iocall (retain, 1);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     

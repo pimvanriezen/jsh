@@ -81,7 +81,7 @@ Channel::senderror.help = function() {
 // ============================================================================
 // METHOD Channel::isempty
 // ============================================================================
-Channel::isempty = function (data) {
+Channel::isempty = function() {
     if (this.ch === null) return true;
     return sys.channel.isempty (this.ch);
 }
@@ -93,6 +93,10 @@ Channel::isempty.help = function() {
             Returns true if there are no other parties on this channel.
         `>>>
     })
+}
+
+Channel::available = function() {
+    return sys.channel.available (this.ch);
 }
 
 // ============================================================================
