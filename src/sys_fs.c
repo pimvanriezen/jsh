@@ -120,7 +120,7 @@ duk_ret_t sys_read (duk_context *ctx) {
     
     if (stat (path, &st)) return 0;
     
-    filno = open (path, O_RDONLY);
+    filno = fd_open (path, O_RDONLY);
     if (filno < 0) {
         return 0;
     }
@@ -139,7 +139,7 @@ duk_ret_t sys_read (duk_context *ctx) {
         }
     }
     
-    close (filno);
+    fd_close (filno);
     duk_push_string (ctx, t->alloc);
     textbuffer_free (t);
     return 1;
@@ -184,7 +184,7 @@ duk_ret_t sys_write (duk_context *ctx) {
         rdoffs += wrsz;
         if (rdoffs >= sz) break;
     }
-    close (filno);
+    fd_close (filno);
     
     if (wrsz == sz) {
         if (rename (tmpname, fname) == 0) {

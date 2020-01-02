@@ -1,4 +1,5 @@
 #include "channel.h"
+#include "fd.h"
 #include <sys/select.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,8 +88,8 @@ void channel_fork_pipe (struct channel *c, pid_t pid, int fdread, int fdwrite) {
     int i=0;
     for (i=0; i<c->alloc; ++i) {
         if (c->pipes[i].st != PIPE_CLOSED) {
-            close (c->pipes[i].fdread);
-            close (c->pipes[i].fdwrite);
+            fd_close (c->pipes[i].fdread);
+            fd_close (c->pipes[i].fdwrite);
         }
     }
     free (c->pipes);
@@ -140,8 +141,8 @@ int channel_send (struct channel *c, const char *msg) {
                     if (wsz) wsz = write (c->pipes[i].fdwrite, msg, msgsz);
                     if (wsz == 0) {
                         c->pipes[i].st = PIPE_CLOSED;
-                        close (c->pipes[i].fdread);
-                        close (c->pipes[i].fdwrite);
+                        fd_close (c->pipes[i].fdread);
+                        fd_close (c->pipes[i].fdwrite);
                     }
                     else {
                         c->pipes[i].msgsent++;
@@ -171,8 +172,8 @@ void channel_senderror (struct channel *c, const char *msg) {
     if (wsz) wsz = write (c->pipes[0].fdwrite, msg, msgsz);
     if (wsz == 0) {
         c->pipes[0].st = PIPE_CLOSED;
-        close (c->pipes[0].fdread);
-        close (c->pipes[0].fdwrite);
+        fd_close (c->pipes[0].fdread);
+        fd_close (c->pipes[0].fdwrite);
     }
 }
 
@@ -216,8 +217,8 @@ int channel_broadcast (struct channel *c, const char *msg) {
             if (wsz) wsz = write (c->pipes[i].fdwrite, msg, msgsz);
             if (wsz == 0) {
                 c->pipes[i].st = PIPE_CLOSED;
-                close (c->pipes[i].fdread);
-                close (c->pipes[i].fdwrite);
+                fd_close (c->pipes[i].fdread);
+                fd_close (c->pipes[i].fdwrite);
             }
         }
     }
@@ -357,8 +358,8 @@ int channel_handle (struct channel *c, bool nonblock) {
                         
                     case MSGID_EXIT: // Mark connection as ended
                         c->pipes[i].st = PIPE_CLOSED;
-                        close (c->pipes[i].fdread);
-                        close (c->pipes[i].fdwrite);
+                        fd_close (c->pipes[i].fdread);
+                        fd_close (c->pipes[i].fdwrite);
                         break;
                     
                     case MSGID_DATA: // A message, oh boy
@@ -426,20 +427,19 @@ pid_t channel_fork (struct channel *c) {
     pid_t pid;
     int i;
     
-    pipe (togopipe);
-    pipe (fromgopipe);
+    fd_pipe (togopipe);
+    fd_pipe (fromgopipe);
+    fd_retain (togopipe[0]);
+    fd_retain (fromgopipe[1]);
     
-    switch ((pid = fork())) {
+    switch ((pid = fd_fork())) {
         case 0:
-            close (0);
-            close (1);
-            close (2);
-            open ("/dev/null",O_RDONLY);
-            open ("/dev/null",O_WRONLY);
-            open ("/dev/null",O_WRONLY);
-            for (i=3; i<1023; ++i) {
-                if ((i!=togopipe[0])&&(i!=fromgopipe[1])) close (i);
-            }
+            fd_close (0);
+            fd_close (1);
+            fd_close (2);
+            fd_open ("/dev/null",O_RDONLY);
+            fd_open ("/dev/null",O_WRONLY);
+            fd_open ("/dev/null",O_WRONLY);
             channel_fork_pipe (c, parentpid, togopipe[0], fromgopipe[1]);
             return 0;
             
@@ -447,8 +447,8 @@ pid_t channel_fork (struct channel *c) {
             return -1;
             
         default:
-            close (togopipe[0]);
-            close (fromgopipe[1]);
+            fd_close (togopipe[0]);
+            fd_close (fromgopipe[1]);
             channel_add_pipe (c, pid, fromgopipe[0], togopipe[1]);
             return pid;
     }
@@ -470,8 +470,8 @@ void channel_destroy (struct channel *c) {
                     waitpid (c->pipes[i].pid, &st, 0);
                 }
             }
-            close (c->pipes[i].fdread);
-            close (c->pipes[i].fdwrite);
+            fd_close (c->pipes[i].fdread);
+            fd_close (c->pipes[i].fdwrite);
         }
     }
     

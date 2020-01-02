@@ -21,6 +21,7 @@
 #include "duktape.h"
 #include "sys_sock.h"
 #include "textbuffer.h"
+#include "fd.h"
 
 #ifdef __linux__
 #include <sys/sysinfo.h>
@@ -72,7 +73,7 @@ duk_ret_t sys_io_open (duk_context *ctx) {
     if (fl_append) flags |= O_APPEND;
     if (fl_trunc) flags |= O_TRUNC;
     
-    int fd = open (path, flags);
+    int fd = fd_open (path, flags);
     if (fd<0) {
         duk_push_boolean (ctx, 0);
         return 1;
@@ -88,7 +89,7 @@ duk_ret_t sys_io_close (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int fd = duk_get_int (ctx, 0);
     if (fd<3) return 0;
-    close (fd);
+    fd_close (fd);
     unregister_socket (fd);
     return 0;
 }

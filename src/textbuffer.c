@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include "textbuffer.h"
+#include "fd.h"
 
 // ============================================================================
 // FUNCTION textbuffer_free
@@ -44,13 +45,13 @@ struct textbuffer *textbuffer_load_fd (int filno) {
 // ============================================================================
 struct textbuffer *textbuffer_load (const char *fname) {
     int filno;
-    filno = open (fname, O_RDONLY);
+    filno = fd_open (fname, O_RDONLY);
     if (filno<0) {
         return NULL;
     }
     
     struct textbuffer *t = textbuffer_load_fd (filno);
-    close (filno);
+    fd_close (filno);
     return t;
 }
 

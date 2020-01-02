@@ -66,37 +66,38 @@ duk_ret_t sys_run (duk_context *ctx) {
     if (duk_get_top (ctx) > 2) senddata = duk_to_string (ctx, 2);
     
     // Set up unix pipes
-    pipe (tocmdpipe);
-    pipe (fromcmdpipe);
+    fd_pipe (tocmdpipe);
+    fd_pipe (fromcmdpipe);
+    fd_retain (tocmdpipe[0]);
+    fd_retain (fromcmdpipe[1]);
     
     // Spawn
-    switch (pid = fork()) {
+    switch (pid = fd_fork()) {
         case -1:
-            close (tocmdpipe[0]);
-            close (tocmdpipe[1]);
-            close (fromcmdpipe[0]);
-            close (fromcmdpipe[1]);
+            fd_close (tocmdpipe[0]);
+            fd_close (tocmdpipe[1]);
+            fd_close (fromcmdpipe[0]);
+            fd_close (fromcmdpipe[1]);
             for (i=0; i<(numarg+1);++i) free (args[i]);
             free (args);
             return 0;
             
         case 0:
             // We're the new process here.
-            close (0);
-            close (1);
-            close (2);
-            dup2 (tocmdpipe[0], 0);
-            dup2 (fromcmdpipe[1], 1);
-            dup2 (fromcmdpipe[1], 2);
-            for (i=3; i<255;++i) close (i);
+            fd_close (0);
+            fd_close (1);
+            fd_close (2);
+            fd_dup2 (tocmdpipe[0], 0);
+            fd_dup2 (fromcmdpipe[1], 1);
+            fd_dup2 (fromcmdpipe[1], 2);
             execvp (command, args);
             printf ("Exec failed: %s", strerror (errno));
             exit (1);
     }
     
     // Close the ends of the pipe that aren't ours.
-    close (fromcmdpipe[1]);
-    close (tocmdpipe[0]);
+    fd_close (fromcmdpipe[1]);
+    fd_close (tocmdpipe[0]);
     
     // For clarity
     fdout = tocmdpipe[1];
@@ -106,8 +107,8 @@ duk_ret_t sys_run (duk_context *ctx) {
     if (senddata) {
         if (write (fdout, senddata, strlen(senddata)) != strlen(senddata)) {
             // write error, bail out.
-            close (fdout);
-            close (fdin);
+            fd_close (fdout);
+            fd_close (fdin);
             for (i=0; i<(numarg+1);++i) free (args[i]);
             free (args);
             duk_push_boolean (ctx, 0);
@@ -145,8 +146,8 @@ duk_ret_t sys_run (duk_context *ctx) {
     }
     
     waitpid (pid, &retstatus, 0);
-    close (fdout);
-    close (fdin);
+    fd_close (fdout);
+    fd_close (fdin);
     
     // Clean up the process.
     waitpid (pid, &retstatus, 0);
@@ -193,14 +194,13 @@ duk_ret_t sys_runconsole (duk_context *ctx) {
     }
     args[i+1] = NULL;
     
-    switch (pid = fork()) {
+    switch (pid = fd_fork()) {
         case -1:
             for (i=0; i<(numarg+1);++i) free (args[i]);
             free (args);
             return 0;
             
         case 0:
-            for (i=3; i<255;++i) close (i);
             execvp (command, args);
             fprintf (stderr, "Exec failed: %s", strerror (errno));
             exit (1);

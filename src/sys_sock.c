@@ -25,6 +25,7 @@
 #include "duktape.h"
 #include "sys_sock.h"
 #include "textbuffer.h"
+#include "fd.h"
 
 sockdata SOCKINFO[1024];
 
@@ -114,14 +115,14 @@ duk_ret_t sys_sock_unix (duk_context *ctx) {
     remote.sun_family = AF_UNIX;
     strncpy (remote.sun_path, path, 100);
     
-    sock = socket (PF_UNIX, SOCK_STREAM, 0);
+    sock = fd_socket (PF_UNIX, SOCK_STREAM, 0);
     if (sock < 0) {
         duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not create socket");
         return duk_throw (ctx);
     }
     
     if (connect (sock, (struct sockaddr *) &remote, sizeof(remote)) != 0) {
-        close (sock);
+        fd_close (sock);
         duk_push_boolean (ctx, 0);
         return 1;
     }
@@ -168,7 +169,7 @@ duk_ret_t sys_sock_tcp (duk_context *ctx) {
         }
     }
     
-    sock = socket (PF_INET6, SOCK_STREAM, 0);
+    sock = fd_socket (PF_INET6, SOCK_STREAM, 0);
     if (sock < 0) {
         free (addr);
         if (bindaddr) free (bindaddr);
@@ -193,7 +194,7 @@ duk_ret_t sys_sock_tcp (duk_context *ctx) {
         if (bind (sock, (struct sockaddr *) &localv6, sizeof(localv6))) {
             free (addr);
             if (bindaddr) free (bindaddr);
-            close (sock);
+            fd_close (sock);
             duk_push_error_object (ctx, DUK_ERR_ERROR,
                                    "Could not bind to local address");
             return duk_throw(ctx);
@@ -203,7 +204,7 @@ duk_ret_t sys_sock_tcp (duk_context *ctx) {
     if (connect (sock, (struct sockaddr*) &remotev6, sizeof(remotev6))) {
         free (addr);
         if (bindaddr) free (bindaddr);
-        close (sock);
+        fd_close (sock);
         duk_push_boolean (ctx, 0);
         return 1;
     }
@@ -228,7 +229,7 @@ duk_ret_t sys_sock_unixlisten (duk_context *ctx) {
     
     memset (&local, 0, sizeof (local));
     
-    int sock = socket (PF_UNIX, SOCK_STREAM, 0);
+    int sock = fd_socket (PF_UNIX, SOCK_STREAM, 0);
     if (sock < 0) {
         duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not create socket");
         return duk_throw (ctx);
@@ -240,13 +241,13 @@ duk_ret_t sys_sock_unixlisten (duk_context *ctx) {
     setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, (char *) &pram, sizeof(pram));
     
     if (bind (sock, (struct sockaddr*) &local, sizeof(local)) < 0) {
-        close (sock);
+        fd_close (sock);
         duk_push_boolean (ctx, 0);
         return 1;
     }
     
     if (listen (sock, 16) != 0) {
-        close (sock);
+        fd_close (sock);
         duk_push_boolean (ctx, 0);
         return 1;
     }
@@ -293,7 +294,7 @@ duk_ret_t sys_sock_tcplisten (duk_context *ctx) {
     localv6.sin6_family = AF_INET6;
     localv6.sin6_port = htons (port);
     
-    int sock = socket (PF_INET6, SOCK_STREAM, 0);
+    int sock = fd_socket (PF_INET6, SOCK_STREAM, 0);
     if (sock<0) {
         if (addr) free (addr);
         duk_push_boolean (ctx, 0);
@@ -307,14 +308,14 @@ duk_ret_t sys_sock_tcplisten (duk_context *ctx) {
 #endif
 
     if (bind (sock, (struct sockaddr *) &localv6, sizeof(localv6)) < 0) {
-        close (sock);
+        fd_close (sock);
         if (addr) free (addr);
         duk_push_boolean (ctx, 0);
         return 1;
     }
     
     if (listen (sock, 16) != 0) {
-        close (sock);
+        fd_close (sock);
         if (addr) free (addr);
         duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not listen");
         return duk_throw (ctx);
@@ -346,7 +347,7 @@ duk_ret_t sys_sock_accept (duk_context *ctx) {
     memset (&remote, 0, sizeof (remote));
     memset (&peer, 0, sizeof (peer));
     
-    int sock = accept (lsock, (struct sockaddr *) &remote, &anint);
+    int sock = fd_accept (lsock, (struct sockaddr *) &remote, &anint);
     
     if (sock < 0) {
         duk_push_boolean (ctx, 0);
@@ -371,7 +372,7 @@ duk_ret_t sys_sock_accept (duk_context *ctx) {
 // FUNCTION sys_sock_udp
 // ============================================================================
 duk_ret_t sys_sock_udp (duk_context *ctx) {
-    int sock = socket (AF_INET6, SOCK_DGRAM, 0);
+    int sock = fd_socket (AF_INET6, SOCK_DGRAM, 0);
     if (sock < 0) {
         duk_push_error_object (ctx, DUK_ERR_ERROR, "Could not create socket");
         return duk_throw (ctx);
