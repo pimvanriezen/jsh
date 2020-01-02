@@ -230,8 +230,8 @@ duk_ret_t sys_kill (duk_context *ctx) {
             }
         }
         if (! sigid) {
-            duk_push_boolean (ctx, 0);
-            return 1;
+            duk_push_error_object (ctx, DUK_ERR_ERROR, "Unknown signal");
+            return duk_throw (ctx);
         }
     }
     if (kill (pid,sigid) == 0) duk_push_boolean (ctx, 1);

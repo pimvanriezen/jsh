@@ -46,8 +46,8 @@ duk_ret_t sys_chan_send (duk_context *ctx) {
     const char *data = duk_to_string (ctx, 1);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
+        return duk_throw (ctx);
     }
     
     if (! channel_send (c, data)) {
@@ -68,8 +68,8 @@ duk_ret_t sys_chan_recv (duk_context *ctx) {
     struct channelmsg *msg = NULL;
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
+        return duk_throw (ctx);
     }
     
     msg = channel_receive (c);
@@ -91,8 +91,8 @@ duk_ret_t sys_chan_exit (duk_context *ctx) {
     int cid = duk_get_int (ctx, 0);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
+        return duk_throw (ctx);
     }
     channel_exit (c);
     while (channel_handle (c, false));
@@ -184,8 +184,8 @@ duk_ret_t sys_chan_available (duk_context *ctx) {
     int cid = duk_get_int (ctx, 0);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
+        return duk_throw (ctx);
     }
     if (channel_hasdata (c)) duk_push_boolean (ctx, 1);
     else duk_push_boolean (ctx, 0);
@@ -200,8 +200,8 @@ duk_ret_t sys_chan_isempty (duk_context *ctx) {
     int cid = duk_get_int (ctx, 0);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
+        return duk_throw (ctx);
     }
     if (channel_empty (c)) duk_push_boolean (ctx, 1);
     else duk_push_boolean (ctx, 0);
@@ -231,8 +231,8 @@ duk_ret_t sys_chan_error (duk_context *ctx) {
     int cid = duk_get_int (ctx, 0);
     struct channel *c = clist_get (CHANNELS, cid);
     if (! c) {
-        duk_push_boolean (ctx, 0);
-        return 1;
+        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
+        return duk_throw (ctx);
     }
     if (c->error == NULL) {
         duk_push_boolean (ctx, 0);
