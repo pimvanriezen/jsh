@@ -32,7 +32,9 @@ struct clist *CHANNELS;
 // FUNCTION sys_chan_open
 // ============================================================================
 duk_ret_t sys_chan_open (duk_context *ctx) {
+    channel_lock();
     int cid = clist_open (CHANNELS);
+    channel_unlock();
     duk_push_int (ctx, cid);
     return 1;
 }
@@ -44,18 +46,22 @@ duk_ret_t sys_chan_send (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
     const char *data = duk_to_string (ctx, 1);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
-        return duk_throw (ctx);
-    }
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
     
-    if (! channel_send (c, data)) {
-        duk_push_boolean (ctx, 0);
-        return 1;
-    }
-    
-    duk_push_boolean (ctx, 1);
+        if (! channel_send (c, data)) {
+            duk_push_boolean (ctx, 0);
+        }
+        else {
+            duk_push_boolean (ctx, 1);
+        }
+    channel_unlock();
     return 1;
 }
 
@@ -66,13 +72,17 @@ duk_ret_t sys_chan_recv (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
     struct channelmsg *msg = NULL;
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
-        return duk_throw (ctx);
-    }
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
     
-    msg = channel_receive (c);
+        msg = channel_receive (c);
+    channel_unlock();
     if (! msg) {
         duk_push_boolean (ctx, 0);
         return 1;
@@ -89,13 +99,17 @@ duk_ret_t sys_chan_recv (duk_context *ctx) {
 duk_ret_t sys_chan_exit (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
-        return duk_throw (ctx);
-    }
-    channel_exit (c);
-    while (channel_handle (c, false));
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
+        channel_exit (c);
+        while (channel_handle (c, false));
+    channel_unlock();
     duk_push_boolean (ctx, 1);
     return 1;
 }
@@ -106,7 +120,9 @@ duk_ret_t sys_chan_exit (duk_context *ctx) {
 duk_ret_t sys_chan_close (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
+    channel_lock();
     clist_close (CHANNELS, cid);
+    channel_unlock();
     duk_push_boolean (ctx, 1);
     return 1;
 }
@@ -124,6 +140,7 @@ duk_ret_t sys_chan_stat (duk_context *ctx) {
     duk_idx_t pipe_idx;
     duk_idx_t arr_idx = duk_push_array (ctx);
     
+    channel_lock();
     cindex = 0;
     for (i=0; i<CHANNELS->alloc; ++i) {
         if (CHANNELS->list[i]) {
@@ -173,6 +190,7 @@ duk_ret_t sys_chan_stat (duk_context *ctx) {
             duk_put_prop_index (ctx, arr_idx, cindex++);
         }
     }
+    channel_unlock();
     return 1;
 }
 
@@ -182,13 +200,17 @@ duk_ret_t sys_chan_stat (duk_context *ctx) {
 duk_ret_t sys_chan_available (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
-        return duk_throw (ctx);
-    }
-    if (channel_hasdata (c)) duk_push_boolean (ctx, 1);
-    else duk_push_boolean (ctx, 0);
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
+        if (channel_hasdata (c)) duk_push_boolean (ctx, 1);
+        else duk_push_boolean (ctx, 0);
+    channel_unlock();
     return 1;
 }
 
@@ -198,13 +220,17 @@ duk_ret_t sys_chan_available (duk_context *ctx) {
 duk_ret_t sys_chan_isempty (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
-        return duk_throw (ctx);
-    }
-    if (channel_empty (c)) duk_push_boolean (ctx, 1);
-    else duk_push_boolean (ctx, 0);
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
+        if (channel_empty (c)) duk_push_boolean (ctx, 1);
+        else duk_push_boolean (ctx, 0);
+    channel_unlock();
     return 1;
 }
 
@@ -214,12 +240,17 @@ duk_ret_t sys_chan_isempty (duk_context *ctx) {
 duk_ret_t sys_chan_senderror (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        return 0;
-    }
-    const char *errstr = duk_to_string (ctx, 1);
-    channel_senderror (c, errstr);
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
+        const char *errstr = duk_to_string (ctx, 1);
+        channel_senderror (c, errstr);
+    channel_unlock();
     return 0;
 }
 
@@ -229,16 +260,21 @@ duk_ret_t sys_chan_senderror (duk_context *ctx) {
 duk_ret_t sys_chan_error (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel does not exist");
-        return duk_throw (ctx);
-    }
-    if (c->error == NULL) {
-        duk_push_boolean (ctx, 0);
-        return 1;
-    }
-    duk_push_string (ctx, c->error);
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
+        if (c->error == NULL) {
+            duk_push_boolean (ctx, 0);
+        }
+        else {
+            duk_push_string (ctx, c->error);
+        }
+    channel_unlock();
     return 1;
 }
 
@@ -249,25 +285,31 @@ duk_ret_t sys_go (duk_context *ctx) {
     pid_t pid;
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int cid = duk_get_int (ctx, 0);
-    struct channel *c = clist_get (CHANNELS, cid);
-    if (! c) {
-        duk_push_error_object (ctx, DUK_ERR_ERROR, "Channel not found");
-        return duk_throw (ctx);
-    }
+    channel_lock();
+        struct channel *c = clist_get (CHANNELS, cid);
+        if (! c) {
+            channel_unlock();
+            duk_push_error_object (ctx, DUK_ERR_ERROR,
+                                   "Channel does not exist");
+            return duk_throw (ctx);
+        }
     
-    switch (pid = channel_fork (c)) {
-        case 0:
-            strcpy (main_argv[0], "jsh-coroutine");
-            duk_call (ctx, 0);
-            exit (0);
+        switch (pid = channel_fork (c)) {
+            case 0:
+                channel_unlock();
+                strcpy (main_argv[0], "jsh-coroutine");
+                duk_call (ctx, 0);
+                exit (0);
         
-        case -1:
-            fprintf (stderr, "%% Fork error\n");
-            duk_push_boolean (ctx, 0);
-            return 1;
-    }
-    duk_push_int (ctx, pid);
-    return 1;
+            case -1:
+                channel_unlock();
+                fprintf (stderr, "%% Fork error\n");
+                duk_push_boolean (ctx, 0);
+                return 1;
+        }
+        channel_unlock();
+        duk_push_int (ctx, pid);
+        return 1;
 }
 
 // ============================================================================
@@ -275,4 +317,5 @@ duk_ret_t sys_go (duk_context *ctx) {
 // ============================================================================
 void sys_channel_init (void) {
     CHANNELS = clist_create();
+    channel_init();
 }

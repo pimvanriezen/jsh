@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <pthread.h>
 
 enum pipestatus {
     PIPE_CLOSED = 0,
@@ -58,6 +59,9 @@ struct clist {
 
 struct channelmsg   *msg_create (size_t);
 void                 msg_free (struct channelmsg *);
+void                 channel_init (void);
+void                 channel_lock (void);
+void                 channel_unlock (void);
 struct channel      *channel_create (void);
 void                 channel_add_pipe (struct channel *, pid_t, int, int);
 void                 channel_fork_pipe (struct channel *, pid_t, int, int);

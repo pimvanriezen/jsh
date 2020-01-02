@@ -16,9 +16,36 @@
 #include <strings.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
+#include <pthread.h>
 #include "duktape.h"
 #include "sys_fs.h"
 #include "textbuffer.h"
+#include "fd.h"
+
+// ============================================================================
+// DATA username/groupname cache for stat data
+// ============================================================================
+struct xidcache {
+    unsigned int id;
+    char name[64];
+};
+
+static struct xidcache uidcache[16];
+static struct xidcache gidcache[16];
+static int uidcpos;
+static int gidcpos;
+
+static pthread_mutex_t uidgidlock;
+
+// ============================================================================
+// FUNCTION sys_fs_init
+// ============================================================================
+void sys_fs_init (void) {
+    bzero (uidcache, 16 * sizeof (struct xidcache));
+    bzero (gidcache, 16 * sizeof (struct xidcache));
+    uidcpos = gidcpos = 0;
+    pthread_mutex_init (&uidgidlock, NULL);
+}
 
 // ============================================================================
 // FUNCTION sys_cd
@@ -201,19 +228,6 @@ duk_ret_t sys_write (duk_context *ctx) {
 }
 
 // ============================================================================
-// DATA username/groupname cache for stat data
-// ============================================================================
-struct xidcache {
-    unsigned int id;
-    char name[64];
-};
-
-static struct xidcache uidcache[16];
-static struct xidcache gidcache[16];
-static int uidcpos;
-static int gidcpos;
-
-// ============================================================================
 // FUNCTION cgetuid
 // ----------------
 // Resolves a uid to a username.
@@ -314,6 +328,9 @@ duk_ret_t sys_stat (duk_context *ctx) {
     duk_idx_t obj_idx = duk_push_object (ctx);
     
     if (lstat (path, &st) != 0) return 0;
+    
+    pthread_mutex_lock (&uidgidlock);
+    
     duk_push_int (ctx, st.st_mode);
     duk_put_prop_string (ctx, obj_idx, "mode");
     modestring (modestr, st.st_mode);
@@ -392,6 +409,8 @@ duk_ret_t sys_stat (duk_context *ctx) {
         duk_push_string (ctx, linkbuf);
         duk_put_prop_string (ctx, obj_idx, "linkTarget");
     }
+    
+    pthread_mutex_unlock (&uidgidlock);
     return 1;
 }
 

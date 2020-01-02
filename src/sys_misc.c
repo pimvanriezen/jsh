@@ -240,19 +240,6 @@ duk_ret_t sys_kill (duk_context *ctx) {
 }
 
 // ============================================================================
-// DATA username/groupname cache for stat data
-// ============================================================================
-struct xidcache {
-    unsigned int id;
-    char name[64];
-};
-
-static struct xidcache uidcache[16];
-static struct xidcache gidcache[16];
-static int uidcpos;
-static int gidcpos;
-
-// ============================================================================
 // FUNCTION pushpasswd
 // -------------------
 // Pushes an object onto the duktape stack with details from a passwd entry.
@@ -375,13 +362,4 @@ duk_ret_t sys_hostname (duk_context *ctx) {
         duk_push_boolean (ctx, 0);
     }
     return 1;
-}
-
-// ============================================================================
-// FUNCTION sys_fs_init
-// ============================================================================
-void sys_fs_init (void) {
-    bzero (uidcache, 16 * sizeof (struct xidcache));
-    bzero (gidcache, 16 * sizeof (struct xidcache));
-    uidcpos = gidcpos = 0;
 }

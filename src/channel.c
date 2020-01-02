@@ -9,6 +9,20 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+static pthread_mutex_t MUT;
+
+void channel_init (void) {
+    pthread_mutex_init (&MUT, NULL);
+}
+
+void channel_lock (void) {
+    pthread_mutex_lock (&MUT);
+}
+
+void channel_unlock (void) {
+    pthread_mutex_unlock (&MUT);
+}
+
 // ============================================================================
 // FUNCTION channel_create
 // ============================================================================
