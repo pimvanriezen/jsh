@@ -12,12 +12,9 @@ sys.app.load = function(appname, apppath) {
         name:appname,
     }
     
-    var pre = <<<`
-        (function(){
-            return function(module) {
-    `>>>;
-    
+    var pre = "(function(){ return function(module) {"
     var post = "}})()";
+    
     var wrapped = pre + src + post;
     try {
         sys.eval (wrapped, apppath)(module);
