@@ -11,6 +11,7 @@
 #include "duk_module_duktape.h"
 #include "textbuffer.h"
 #include "sugar.h"
+#include "version.h"
 
 extern void sys_init (void);
 extern void sys_init_heap (duk_context *);
@@ -142,7 +143,13 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
     (void) duk_pcall(ctx, 1);
     duk_pop(ctx);
     
-    duk_console_init(ctx, DUK_CONSOLE_FLUSH /*flags*/);
+    duk_eval_string(ctx,
+        "console={log:function() {\n"
+        "  arguments = Array.prototype.slice.call(arguments);\n"
+        "  print((''+new Date()).substr(0,19)+': '+\n"
+        "        arguments.join(' ')+'\\n');\n"
+        "}}\n");
+        
     duk_module_duktape_init (ctx);
     sys_init_heap (ctx);
     
@@ -248,6 +255,8 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
     /* if the connection has no context data yet, acquire a heapstore
        item and initialize its request object */
     if (item == NULL) {
+        char serverstr[256];
+        sprintf (serverstr, "JSHTTPd/%s (%s)", JSH_VERSION, JSH_PLATFORM);
         item = heapstore_acquire();
         ctx = item->ctx;
         duk_push_global_object (ctx);
@@ -259,6 +268,8 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
         duk_push_object (ctx);
         duk_push_string (ctx, "text/html");
         duk_put_prop_string (ctx, -2, "Content-Type");
+        duk_push_string (ctx, serverstr);
+        duk_put_prop_string (ctx, -2, "Server");
         duk_put_prop_string (ctx, -2, "_outhdr");
         duk_push_string (ctx, "");
         duk_put_prop_string (ctx, -2, "_returndata");

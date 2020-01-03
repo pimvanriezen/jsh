@@ -8,6 +8,8 @@ globalStorage.initialize ({
     }
 });
 
+console.log ("[INFO] Thread started");
+
 var APIHandler = {};
 
 // ============================================================================
@@ -67,6 +69,14 @@ APIHandler.userInfo = function (req) {
 }
 
 // ============================================================================
+// FUNCTION APIHandler.logRequest
+// ============================================================================
+APIHandler.logRequest = function (req) {
+    console.log ("[HTTP]",req.peer,req.method,req.url);
+    return 0;
+}
+
+// ============================================================================
 // FUNCTION APIHandler.notFound
 // ============================================================================
 APIHandler.notFound = function (req) {
@@ -102,6 +112,7 @@ APIHandler.internalError = function (req) {
 var Map = new URLMap({
     404:APIHandler.notFound,
     500:APIHandler.internalError,
+    access:APIHandler.logRequest,
     get:APIHandler.root,
     "/sysinfo":{
         get:APIHandler.sysInfo
