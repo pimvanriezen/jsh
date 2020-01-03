@@ -1,0 +1,18 @@
+#!/bin/sh
+version=$(git describe --tags)
+tag=$(git log -n 1 --format=%h)
+cat > include/version.h << _EOF_
+#ifndef _VERSION_H
+#define _VERSION_H 1
+
+#ifdef _VERSION_IMPL
+  const char *JSH_VERSION = "$version";
+  const char *JSH_TAG = "$tag";
+#else
+  extern const char *JSH_VERSION;
+  extern const char *JSH_TAG;
+#endif
+
+#endif
+_EOF_
+
