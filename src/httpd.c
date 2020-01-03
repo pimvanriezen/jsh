@@ -11,7 +11,8 @@
 #include "textbuffer.h"
 #include "sugar.h"
 
-extern void sys_init (duk_context *);
+extern void sys_init (void);
+extern void sys_init_heap (duk_context *);
 
 typedef struct heapstore_item {
     struct heapstore_item   *next;
@@ -142,7 +143,7 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
     
     duk_console_init(ctx, DUK_CONSOLE_FLUSH /*flags*/);
     duk_module_duktape_init (ctx);
-    sys_init (ctx);
+    sys_init_heap (ctx);
     
     duk_eval_string(ctx,
         "request={\n"
@@ -154,12 +155,20 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
         "  postbody:'',\n"
         "  method:'GET',\n"
         "  setHandler:function(fn){\n"
-        "    request.f=function() {return fn(request)};\n"
+        "    request.f=function() {return fn.resolve ? "
+                                    "fn.resolve(request) : fn(request)};\n"
         "  },\n"
         "  getHeader:function(nam) {return request._inhdr[nam];},\n"
         "  setHeader:function(nam,val) {request._outhdr[nam] = val;},\n"
         "  getPeer:function() {return request._peer;},\n"
-        "  send:function(d) {request._returndata += d},\n"
+        "  send:function(d) {\n"
+        "    if (typeof(d) == 'object') {\n"
+        "      request._returndata = JSON.stringify(d);\n"
+        "      request._outhdr['Content-type'] = 'application/json';\n"
+        "    }\n"
+        "    else request._returndata += d;\n"
+        "  },\n"
+        "  clear:function() {request._returndata = ''},\n"
         "  print:function() {request.send(arguments.join(' ')+'\\n');},\n"
         "  f:function(){\n"
         "    request.send ('Service not implemented\\n');\n"
@@ -412,16 +421,33 @@ int main (int argc, char *argv[]) {
         return 0;
     }
     
+    sys_init();
     heapstore_init (optScript);
     
     struct MHD_Daemon *daemon;
     unsigned int flags = MHD_USE_THREAD_PER_CONNECTION;
-    daemon = MHD_start_daemon (flags, optPort, NULL, NULL, &answer_to_connection,
-                               NULL, MHD_OPTION_CONNECTION_LIMIT,
-                               (unsigned int) optMaxConnections,
-                               MHD_OPTION_PER_IP_CONNECTION_LIMIT,
-                               (unsigned int) optMaxConnectionsPerIP,
-                               MHD_OPTION_END);
+    
+    if (optUseSSL) {
+        flags |= MHD_USE_SSL;
+        daemon = MHD_start_daemon (flags, optPort, NULL, NULL,
+                                   &answer_to_connection,
+                                   NULL, MHD_OPTION_CONNECTION_LIMIT,
+                                   (unsigned int) optMaxConnections,
+                                   MHD_OPTION_PER_IP_CONNECTION_LIMIT,
+                                   (unsigned int) optMaxConnectionsPerIP,
+                                   MHD_OPTION_HTTPS_MEM_KEY, sslServerKey,
+                                   MHD_OPTION_HTTPS_MEM_CERT, sslServerCert,
+                                   MHD_OPTION_END);
+    }
+    else {
+        daemon = MHD_start_daemon (flags, optPort, NULL, NULL,
+                                   &answer_to_connection,
+                                   NULL, MHD_OPTION_CONNECTION_LIMIT,
+                                   (unsigned int) optMaxConnections,
+                                   MHD_OPTION_PER_IP_CONNECTION_LIMIT,
+                                   (unsigned int) optMaxConnectionsPerIP,
+                                   MHD_OPTION_END);
+    }
     
     while (1) sleep (60);
     return 0;

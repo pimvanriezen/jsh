@@ -10,12 +10,12 @@ OBJS_DUKTAPE = \
 OBJS_CLI = \
 	src/cli.o src/sugar.o src/textbuffer.o src/channel.o src/sys_init.o \
 	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
-	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o
+	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o src/sys_global.o
 
 OBJS_HTTPD = \
 	src/httpd.o src/sugar.o src/textbuffer.o src/channel.o src/sys_init.o \
 	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
-	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o
+	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o src/sys_global.o
 
 CC = gcc
 CCOPTS += -std=c99 -Wall -I./include

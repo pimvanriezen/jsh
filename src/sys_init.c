@@ -25,6 +25,7 @@
 #include "sys_module.h"
 #include "sys_io.h"
 #include "sys_sock.h"
+#include "sys_global.h"
 #include "fd.h"
 
 // ============================================================================
@@ -39,24 +40,30 @@ char *mystrdup (const char *orig) {
 
 // ============================================================================
 // FUNCTION sys_init
-// -----------------
-// Initializes all global data, and hooks into the Duktape heap with all
-// the system functions.
-//
-// Finally, the path to global.js is resolved to bootstrap the system.
 // ============================================================================
-void sys_init (duk_context *ctx) {
-    const char *osglobal;
-
+void sys_init (void) {
     fd_init();
     sys_fs_init();
     sys_channel_init();
     sys_sock_init();
+    global_init();
+}
+
+// ============================================================================
+// FUNCTION sys_init_heap
+// ----------------------
+// Hooks into the Duktape heap with all the system functions.
+//
+// Finally, the path to global.js is resolved to bootstrap the system.
+// ============================================================================
+void sys_init_heap (duk_context *ctx) {
+    const char *osglobal;
 
     duk_idx_t obj_idx;
     duk_idx_t chanobj_idx;
     duk_idx_t ioobj_idx;
     duk_idx_t sockobj_idx;
+    duk_idx_t globalobj_idx;
     
     #define PROPFLAGS DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | \
             DUK_DEFPROP_SET_CONFIGURABLE
@@ -81,6 +88,11 @@ void sys_init (duk_context *ctx) {
         duk_push_c_function (ctx, sys_sock_##xxx, type); \
         duk_def_prop (ctx, sockobj_idx, PROPFLAGS);
     
+    #define globalcall(xxx,type) \
+        duk_push_string (ctx, #xxx); \
+        duk_push_c_function (ctx, sys_global_##xxx, type); \
+        duk_def_prop (ctx, globalobj_idx, PROPFLAGS);
+
     duk_push_global_object (ctx);
     duk_push_string (ctx, "sys");
     obj_idx = duk_push_object (ctx);
@@ -165,6 +177,13 @@ void sys_init (duk_context *ctx) {
     sockcall (udpbind, DUK_VARARGS);
     sockcall (send, 4);
     sockcall (recv, 1);
+    
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "global");
+    globalobj_idx = duk_push_object (ctx);
+    globalcall (get, DUK_VARARGS);
+    globalcall (set, 3);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
     

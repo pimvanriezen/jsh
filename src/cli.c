@@ -31,7 +31,8 @@
 #include "sugar.h"
 #include "textbuffer.h"
 
-extern void sys_init (duk_context *);
+extern void sys_init (void);
+extern void sys_init_heap (duk_context *);
 
 #define  MEM_LIMIT_NORMAL   (128*1024*1024)   /* 128 MB */
 #define  MEM_LIMIT_HIGH     (2047*1024*1024)  /* ~2 GB */
@@ -759,7 +760,8 @@ static duk_context *create_duktape_heap(int alloc_provider,
     duk_put_prop_string(ctx, -2, "jshFormat");
     duk_pop(ctx);
 
-    sys_init (ctx);
+    sys_init ();
+    sys_init_heap (ctx);
 
     if (debugger) {
         fprintf(stderr, "Warning: option --debugger ignored, "
