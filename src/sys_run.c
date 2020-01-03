@@ -19,6 +19,7 @@
 #include "duktape.h"
 #include "sys_run.h"
 #include "textbuffer.h"
+#include "fd.h"
 
 extern char *mystrdup (const char *);
 
