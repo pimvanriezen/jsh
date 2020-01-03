@@ -465,12 +465,6 @@ int main (int argc, char *argv[]) {
     struct MHD_Daemon *daemon;
     unsigned int flags = MHD_USE_THREAD_PER_CONNECTION;
 
-#ifdef __linux__
-    flags |= MHD_USE_EPOLL_LINUX_ONLY;
-#else
-    flags |= MHD_USE_POLL;
-#endif
-    
     if (optUseSSL) {
         flags |= MHD_USE_SSL;
         daemon = MHD_start_daemon (flags, optPort, NULL, NULL,
