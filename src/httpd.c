@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <ctype.h>
 #include "duktape.h"
 #include "duk_console.h"
 #include "duk_module_duktape.h"
@@ -147,24 +148,38 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
     
     duk_eval_string(ctx,
         "request={\n"
-        "  _outhdr:{'Content-type':'text/html'},\n"
+        "  _outhdr:{'Content-Type':'text/html'},\n"
         "  _inhdr:{},\n"
         "  _returndata:'',\n"
         "  peer:'::',\n"
         "  url:'',\n"
         "  postbody:'',\n"
         "  method:'GET',\n"
+        "  canonizeHeaderName:function(hdr){\n"
+        "    var splt = hdr.split('-');\n"
+        "    for (var i=0; i<splt.length; ++i) {\n"
+        "      splt[i] = splt[i][0].toUpperCase() + "
+                            "splt[i].substr(1).toLowerCase();\n"
+        "    }\n"
+        "    return splt.join('-');\n"
+        "  },\n"
         "  setHandler:function(fn){\n"
         "    request.f=function() {return fn.resolve ? "
                                     "fn.resolve(request) : fn(request)};\n"
         "  },\n"
-        "  getHeader:function(nam) {return request._inhdr[nam];},\n"
-        "  setHeader:function(nam,val) {request._outhdr[nam] = val;},\n"
+        "  getHeader:function(nam) {\n"
+        "    var key = this.canonizeHeaderName(nam);\n"
+        "    return request._inhdr[key];\n"
+        "  },\n"
+        "  setHeader:function(nam,val) {\n"
+        "    var key = this.canonizeHeaderName(nam);\n"
+        "    request._outhdr[key] = val;\n"
+        "  },\n"
         "  getPeer:function() {return request._peer;},\n"
         "  send:function(d) {\n"
         "    if (typeof(d) == 'object') {\n"
         "      request._returndata = JSON.stringify(d);\n"
-        "      request._outhdr['Content-type'] = 'application/json';\n"
+        "      request._outhdr['Content-Type'] = 'application/json';\n"
         "    }\n"
         "    else request._returndata += d;\n"
         "  },\n"
@@ -193,15 +208,27 @@ int enumerate_header (void *cls, enum MHD_ValueKind kind, const char *key,
                       const char *value) {
     heapstore_item *item = (heapstore_item *) cls;
     duk_context *ctx = item->ctx;
+    char *keydup = strdup (key);
+    if (*keydup) {
+        keydup[0] = toupper (keydup[0]);
+        for (int i=1; keydup[i]; ++i) {
+            if (keydup[i] == '-') {
+                i++;
+                if (keydup[i]) keydup[i] = toupper (keydup[i]);
+            }
+            else keydup[i] = tolower (keydup[i]);
+        }
+    }
     
     duk_push_global_object (ctx);
     duk_get_prop_string (ctx, -1, "request");
     duk_get_prop_string (ctx, -1, "_inhdr");
     duk_push_string (ctx, value);
-    duk_put_prop_string (ctx, -2, key);
+    duk_put_prop_string (ctx, -2, keydup);
     duk_pop(ctx);
     duk_pop(ctx);
     duk_pop(ctx);
+    free (keydup);
     return MHD_YES;
 }
 
@@ -231,7 +258,7 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
         duk_put_prop_string (ctx, -2, "method");
         duk_push_object (ctx);
         duk_push_string (ctx, "text/html");
-        duk_put_prop_string (ctx, -2, "Content-type");
+        duk_put_prop_string (ctx, -2, "Content-Type");
         duk_put_prop_string (ctx, -2, "_outhdr");
         duk_push_string (ctx, "");
         duk_put_prop_string (ctx, -2, "_returndata");

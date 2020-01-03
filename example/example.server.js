@@ -17,20 +17,23 @@ APIHandler.sysInfo = function (req) {
     req.setHeader ("X-Moose","meese");
     req.setHeader ("Content-type","application/json");
     var counter = 0;
+    
+    // Locks default.counter in global storage, increases its value
+    // and stores it back.
     globalStorage.withLocked ("counter",function(c) {
         counter = c+1;
         return counter;
     });
-    
-    var res = {
+
+    // Send out the results    
+    req.send ({
         counter:counter,
         you:req.peer,
         id:whoami(),
         system:sys.uname(),
         modules:sys.module.list(true),
         app:sys.app.list(true)
-    }
-    req.send (JSON.stringify (res));
+    });
     return 200;
 }
 
