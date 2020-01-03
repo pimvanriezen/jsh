@@ -218,10 +218,10 @@ echo ("Total sum: "+totalsum);
 ## Embedded web server
 
 To make the inevitable confusion with Node even bigger, the jsh runtime also
-ships with a separate http service that interacts with a javascript program
-of your making. But instead of the asynchronous structure of Node, jshttpd
-runs the script in multiple threads that don't share a common heap. This
-allows the entire flow to be regular easy-to-follow synchronous code. To
+ships with a separate http service 'jshttpd' that interacts with a javascript
+program of your making. But instead of the asynchronous structure of Node,
+jshttpd runs the script in multiple threads that don't share a common heap.
+This allows the entire flow to be regular easy-to-follow synchronous code. To
 accommodate shared state, a globalStorage object allows multiple threads
 to store state information, with optional locked access. See the
 [example code](example/example.server.js) to see how that works out.
