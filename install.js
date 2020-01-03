@@ -7,9 +7,8 @@ if (argv.length>1) {
     basedir = argv[1];
 }
 else if (env.PREFIX) basedir = env.PREFIX;
-if (basedir == "/") {
+if (basedir == "/usr") {
     etcdir = "/etc";
-    basedir = "/usr";
 }
 else {
     etcdir = basedir + "/etc";
@@ -110,6 +109,7 @@ dirmode = false;
 printBanner ("Copying base files");
 installFile ("jshrc",f("lib/jsh/jshrc"));
 installFile ("bin/jsh",f("bin/jsh"));
+installFile ("bin/jsh",f("sbin/jsh"));
 dumpCopied();
 
 // ----------------------------------------------------------------------------
