@@ -1,3 +1,9 @@
+// ============================================================================
+// JSHTTPd Example
+// ---------------
+// Spawn this program with jshttpd, i.e.:
+//     $ jshttpd -p 8888 example.server.js
+// ============================================================================
 var globalStorage = require("globalstorage");
 var URLMap = require("urlmap");
 
