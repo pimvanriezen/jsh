@@ -11,13 +11,13 @@ OBJS_CLI = \
 	src/cli.o src/sugar.o src/textbuffer.o src/channel.o src/sys_init.o \
 	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
 	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o \
-	src/sys_global.o src/version.o
+	src/sys_global.o
 
 OBJS_HTTPD = \
 	src/httpd.o src/sugar.o src/textbuffer.o src/channel.o src/sys_init.o \
 	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
 	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o \
-	src/sys_global.o src/version.o
+	src/sys_global.o
 
 CC = gcc
 CCOPTS += -std=c99 -Wall -I./include
@@ -42,12 +42,12 @@ clean:
 bin/jsh: bin $(OBJS_DUKTAPE) $(OBJS_CLI)
 	@rm src/version.o
 	$(CC) $(CCOPTS) -o src/version.o -c src/version.c
-	$(CC) $(CCOPTS) -o bin/jsh $(OBJS_DUKTAPE) $(OBJS_CLI) $(CCLIBS)
+	$(CC) $(CCOPTS) -o bin/jsh src/version.o $(OBJS_DUKTAPE) $(OBJS_CLI) $(CCLIBS)
 
 bin/jshttpd: bin $(OBJS_DUKTAPE) $(OBJS_HTTPD)
 	@rm src/version.o
 	$(CC) $(CCOPTS) -o src/version.o -c src/version.c
-	$(CC) $(CCOPTS) -o bin/jshttpd $(OBJS_DUKTAPE) $(OBJS_HTTPD) $(CCLIBS) -lmicrohttpd
+	$(CC) $(CCOPTS) -o bin/jshttpd src/version.o $(OBJS_DUKTAPE) $(OBJS_HTTPD) $(CCLIBS) -lmicrohttpd
 
 .SUFFIXES: .c.o
 .c.o:
