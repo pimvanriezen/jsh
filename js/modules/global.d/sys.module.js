@@ -3,7 +3,7 @@ sys.module = {}
 // ============================================================================
 // FUNCTION sys.module.list
 // ============================================================================
-sys.module.list = function() {
+sys.module.list = function(asJSON) {
     var t = new TextTable(4);
     t.boldColumn(0);
     t.marginRight(0);
@@ -18,6 +18,15 @@ sys.module.list = function() {
         if (a.loadtime < b.loadtime) return -1;
         return 0;
     });
+    
+    if (asJSON) {
+        var res = [];
+        for (var k in rows) {
+            if (rows[k].type != "app") res.push (rows[k]);
+        }
+        return res;
+    }
+    
     for (var k in rows) {
         var mod = rows[k];
         if (mod.type!="app") {

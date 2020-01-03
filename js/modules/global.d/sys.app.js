@@ -117,7 +117,7 @@ sys.app.scan.help = function() {
 // ============================================================================
 // FUNCTION sys.app.list
 // ============================================================================
-sys.app.list = function() {
+sys.app.list = function(asJSON) {
     var t = new TextTable(5);
     t.boldColumn(0);
     t.marginRight(0);
@@ -130,6 +130,21 @@ sys.app.list = function() {
         if (a.id > b.id) return 1;
         return 0;
     });
+
+    if (asJSON) {
+        var res = [];
+        for (var k in mods) {
+            var mod = mods[k];
+            if (mod.type == "app") {
+                if (globalThis[mod.id].app) vers = globalThis[mod.id].app.version;
+                if (! vers) vers = "n/a";
+                mod.version = vers;                
+                res.push (mod);
+            }
+        }
+        return res;
+    }
+    
     for (var k in mods) {
         var mod = mods[k];
         if (mod.type=="app") {
