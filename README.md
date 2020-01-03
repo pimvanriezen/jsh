@@ -1,6 +1,6 @@
 ![Screenshot](doc/img/ss1.png "JSH in action")
 
-# JSH - A cleaner environment for your dirty jobs
+# JSH - A cleaner environment for your dirty low-end jobs
 
 A lot of work on a typical Unix system still gets performed by the system
 shell interpreter. Look under the hood of your average system, and you will
@@ -26,6 +26,9 @@ but it's actually a pretty terrible environment for exactly the problem
 domain of the do-this-with-that-then-that kind of linear batch
 jobs you typically want to solve in the shell environment. So the
 answer to that is no.
+
+JSH is also aimed more at embedded linux platforms, where the resource
+usage of a typical NodeJS install is less than desirable.
 
 JSH has its own runtime, built on top of Duktape, a small footprint
 javacript interpreter that doesn't eat half of your system just to start
@@ -212,11 +215,34 @@ while (m = c.recv()) {
 echo ("Total sum: "+totalsum);
 ```
 
+## Embedded web server
+
+To make the inevitable confusion with Node even bigger, the jsh runtime also
+ships with a separate http service that interacts with a javascript program
+of your making. But instead of the asynchronous structure of Node, jshttpd
+runs the script in multiple threads that don't share a common heap. This
+allows the entire flow to be regular easy-to-follow synchronous code. To
+accommodate shared state, a globalStorage object allows multiple threads
+to store state information, with optional locked access. See the
+[example code](example/example.server.js) to see how that works out.
+
 # Getting Started
 
-Just clone the repository and run 'make'. There are currently no external library
-dependencies, and the project should build cleanly on both Linux and macOS.
-You can give the install a try by running ./jsh from within the build-dir,
-or you can install to /usr/local using Make install.
+The only dependency for jsh is GNU libmicrohttpd, which is available on most
+sane platforms. To get it installed on macOS using homebrew, type:
 
-Once you're in the shell, use help() to get a feel of the land.
+> brew install libmicrohttpd
+
+On RedHat-derived distros, you can install through yum:
+
+> yum install libmicrohttpd-devel
+
+I'm not sure about the proper package-name for debian/ubuntu, so good luck
+there!
+
+After you took care of the dependency, building should be as simple as
+running a 'make', possibly followed by a 'make install'. The install
+defaults to /usr/local. You can also test out the jsh binary without doing
+a full install by running ./jsh in the build directory, this little shell
+script will set up all the proper environment variables that allow
+jsh to find the necessary module files.
