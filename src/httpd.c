@@ -320,16 +320,107 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
 
 char **main_argv;
 
+int checkflag (const char *arg, const char *opt1, const char *opt2) {
+    if (strcmp (arg, opt1) == 0) return 1;
+    if (strcmp (arg, opt2) == 0) return 1;
+    return 0;
+}
+
 int main (int argc, char *argv[]) {
     main_argv = argv;
-    heapstore_init ("server.js");
+    int optPort = 0;
+    int optMaxConnections = 32;
+    int optMaxConnectionsPerIP = 4;
+    bool optUseSSL = false;
+    
+    const char *sslServerKey = NULL;
+    const char *sslServerCert = NULL;
+    const char *optScript = NULL;
+    struct textbuffer *tb;
+    
+    for (int i=1;i<argc; ++i) {
+        const char *arg = argv[i];
+        const char *narg = NULL;
+        if (i<argc-1) narg = argv[i+1];
+        
+        if (checkflag (arg,"-p","--port")) {
+            if (narg) {
+                optPort = atoi(narg);
+                i++;
+            }
+        }
+        else if (checkflag (arg, "-m","--max-connections")) {
+            if (narg) {
+                optMaxConnections = atoi (narg);
+                i++;
+            }
+        }
+        else if (checkflag (arg, "-i","--max-connections-per-ip")) {
+            if (narg) {
+                optMaxConnectionsPerIP = atoi (narg);
+                i++;
+            }
+        }
+        else if (checkflag (arg, "-s","--ssl")) {
+            optUseSSL = true;
+        }
+        else if (checkflag (arg, "-k","--ssl-key")) {
+            if (narg) {
+                tb = textbuffer_load (narg);
+                if (! tb) {
+                    fprintf (stderr, "%% File '%s' not found\n", narg);
+                    return 1;
+                }
+                sslServerKey = tb->alloc;
+                tb->alloc = NULL;
+                textbuffer_free (tb);
+            }
+        }
+        else if (checkflag (arg, "-c","--ssl-certificate")) {
+            if (narg) {
+                tb = textbuffer_load (narg);
+                if (! tb) {
+                    fprintf (stderr, "%% File '%s' not found\n", narg);
+                    return 1;
+                }
+                sslServerCert = tb->alloc;
+                tb->alloc = NULL;
+                textbuffer_free (tb);
+            }
+        }   
+        else if (arg[0] == '-') {
+            fprintf (stderr, "%% Unknown flag '%s'\n", arg);
+            return 1;
+        }
+        else optScript = arg;
+    }
+    
+    if (! optPort || ! optScript) {
+        fprintf (stderr, "%% Usage: %s --port <port> [options] <script>\n"
+                         "  -p --port <nr>                   "
+                                "TCP listening port number\n"
+                         "  -s --ssl                         "
+                                "Use SSL\n"
+                         "  -c --ssl-certificate <path>      "
+                                "Location of cert file\n"
+                         "  -k --ssl-key <path>              "
+                                "Location of key file\n"
+                         "  -m --max-connections <nr>        "
+                                "Thread limit\n"
+                         "  -i --max-connections-per-ip <nr> "
+                                "Client connection limit\n", argv[0]);
+        return 0;
+    }
+    
+    heapstore_init (optScript);
+    
     struct MHD_Daemon *daemon;
     unsigned int flags = MHD_USE_THREAD_PER_CONNECTION;
-    daemon = MHD_start_daemon (flags, 8765, NULL, NULL, &answer_to_connection,
+    daemon = MHD_start_daemon (flags, optPort, NULL, NULL, &answer_to_connection,
                                NULL, MHD_OPTION_CONNECTION_LIMIT,
-                               (unsigned int) 64,
+                               (unsigned int) optMaxConnections,
                                MHD_OPTION_PER_IP_CONNECTION_LIMIT,
-                               (unsigned int) 4,
+                               (unsigned int) optMaxConnectionsPerIP,
                                MHD_OPTION_END);
     
     while (1) sleep (60);
