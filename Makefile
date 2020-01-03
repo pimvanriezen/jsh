@@ -27,10 +27,8 @@ CCLIBS = -lm
 all: version bin/jsh bin/jshttpd
 
 version:
+	@mkdir -p bin
 	@./mkversion
-
-bin:
-	mkdir bin
 
 install: all
 	@JSHRC=./jshrc JSH_GLOBAL=./js/modules/global.js \
@@ -42,10 +40,10 @@ clean:
 src/version.o: include/version.h
 	$(CC) $(CCOPTS) -o src/version.o -c src/version.c
 
-bin/jsh: bin $(OBJS_DUKTAPE) $(OBJS_CLI)
+bin/jsh: $(OBJS_DUKTAPE) $(OBJS_CLI)
 	$(CC) $(CCOPTS) -o bin/jsh $(OBJS_DUKTAPE) $(OBJS_CLI) $(CCLIBS)
 
-bin/jshttpd: bin $(OBJS_DUKTAPE) $(OBJS_HTTPD)
+bin/jshttpd: $(OBJS_DUKTAPE) $(OBJS_HTTPD)
 	$(CC) $(CCOPTS) -o bin/jshttpd $(OBJS_DUKTAPE) $(OBJS_HTTPD) $(CCLIBS) -lmicrohttpd
 
 .SUFFIXES: .c.o
