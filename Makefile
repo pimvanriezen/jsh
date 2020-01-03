@@ -39,14 +39,13 @@ install: all
 clean:
 	rm -f $(OBJS_DUKTAPE) $(OBJS_CLI) $(OBJS_HTTPD) bin/jsh bin/jshttpd
 
-bin/jsh: bin $(OBJS_DUKTAPE) $(OBJS_CLI)
-	@rm src/version.o
+src/version.o: include/version.h
 	$(CC) $(CCOPTS) -o src/version.o -c src/version.c
+
+bin/jsh: bin $(OBJS_DUKTAPE) $(OBJS_CLI)
 	$(CC) $(CCOPTS) -o bin/jsh src/version.o $(OBJS_DUKTAPE) $(OBJS_CLI) $(CCLIBS)
 
 bin/jshttpd: bin $(OBJS_DUKTAPE) $(OBJS_HTTPD)
-	@rm src/version.o
-	$(CC) $(CCOPTS) -o src/version.o -c src/version.c
 	$(CC) $(CCOPTS) -o bin/jshttpd src/version.o $(OBJS_DUKTAPE) $(OBJS_HTTPD) $(CCLIBS) -lmicrohttpd
 
 .SUFFIXES: .c.o

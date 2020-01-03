@@ -2,7 +2,7 @@
 version=$(git describe --tags)
 tag=$(git log -n 1 --format=%h)
 platform=$(uname)
-cat > include/version.h << _EOF_
+cat > include/version.h.new << _EOF_
 #ifndef _VERSION_H
 #define _VERSION_H 1
 
@@ -19,3 +19,14 @@ cat > include/version.h << _EOF_
 #endif
 _EOF_
 
+if [ ! -e include/version.h ]; then
+  mv include/version.h.new include/version.h
+  exit 0
+fi
+
+diff include/version.h.new include/version.h >/dev/null
+if [ "$?" = "1" ]; then
+  mv include/version.h.new include/version.h
+else
+  rm -f include/version.h.new
+fi
