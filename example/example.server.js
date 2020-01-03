@@ -50,6 +50,8 @@ APIHandler.root = function (req) {
             <body>
                 <h1>Example page from jshttpd</h1>
                 Your advertisement could be here. Thank God it isn't.
+                <br>
+                Your browser is ${req.getHeader("user-agent")}
             </body>
         </html>
     `>>>);
