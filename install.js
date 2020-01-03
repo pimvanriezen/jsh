@@ -109,7 +109,7 @@ dirmode = false;
 printBanner ("Copying base files");
 installFile ("jshrc",f("lib/jsh/jshrc"));
 installFile ("bin/jsh",f("bin/jsh"));
-installFile ("bin/jsh",f("sbin/jsh"));
+installFile ("bin/jshttpd",f("sbin/jshttpd"));
 dumpCopied();
 
 // ----------------------------------------------------------------------------
