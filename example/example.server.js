@@ -119,21 +119,42 @@ APIHandler.internalError = function (req) {
 // ============================================================================
 var Map = new URLMap({
     options:{
+        // Turns on directory indexing for the file server. If a function
+        // is provided instead of a boolean, the function will be called
+        // with the request object and the path relative to the fileserver
+        // root as arguments.
         directoryIndex:true
     },
+    // Maps standard output handlers for specific HTTP status values if
+    // they arise from the Map doing its work. With the exception of a
+    // 500 error that arises when parsing a handler, these do not get
+    // called if an error status is returned from the handler. They
+    // can still be used by calling Map.errorReturn (req, code).
     404:APIHandler.notFound,
     500:APIHandler.internalError,
+    // The 'access' url always gets called, even if we're not at the end
+    // of resolving the url path. This can be useful to inject stuff like
+    // access control, or, in this case, logging.
     access:APIHandler.logRequest,
+    // The get/post/put/delete handlers are specific for the point in the
+    // tree we're at, so in this case, the handler only gets called when
+    // there's a GET /
     get:APIHandler.root,
+    // Sub-paths with its own handlers
     "/sysinfo":{
         get:APIHandler.sysInfo
     },
     "/userinfo":{
+        // This means the name of the next element is arbitrary, and should
+        // be put into req.parameters.
         "/:id":{
             get:APIHandler.userInfo
         }
     },
     "/modules":{
+        // If set to a string instead of a function, it is assumed to be
+        // set to the path that should act as the root for the fileserver
+        // while serving files from this point down.
         access:"js/modules"
     }
 });
