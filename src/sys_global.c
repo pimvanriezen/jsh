@@ -24,6 +24,9 @@
 
 static gs_root *GROOT;
 
+// ============================================================================
+// FUNCTION gs_root_create
+// ============================================================================
 gs_root *gs_root_create (void) {
     gs_root *res = malloc (sizeof (gs_root));
     res->first = NULL;
@@ -31,6 +34,9 @@ gs_root *gs_root_create (void) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_root_find
+// ============================================================================
 gs_rootnode *gs_root_find (gs_root *root, const char *key) {
     uint32_t khash = hash_token (key);
     gs_rootnode *res = root->first;
@@ -55,6 +61,9 @@ gs_rootnode *gs_root_find (gs_root *root, const char *key) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_rootnode_create
+// ============================================================================
 gs_rootnode *gs_rootnode_create (const char *key) {
     gs_rootnode *res = malloc (sizeof (gs_rootnode));
     res->hash = hash_token (key);
@@ -66,6 +75,9 @@ gs_rootnode *gs_rootnode_create (const char *key) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_rootnode_find_node
+// ============================================================================
 gs_node *gs_rootnode_find_node (gs_rootnode *p, const char *key) {
     uint32_t khash = hash_token (key);
     gs_node *res = p->first;
@@ -90,12 +102,18 @@ gs_node *gs_rootnode_find_node (gs_rootnode *p, const char *key) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_rootnode_lock_node
+// ============================================================================
 gs_node *gs_rootnode_lock_node (gs_rootnode *p, const char *key) {
     gs_node *res = gs_rootnode_find_node (p, key);
     pthread_mutex_lock (&res->lck);
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_node_create
+// ============================================================================
 gs_node *gs_node_create (const char *key) {
     gs_node *res = malloc (sizeof (gs_node));
     res->next = NULL;
@@ -108,6 +126,9 @@ gs_node *gs_node_create (const char *key) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_node_value_copy
+// ============================================================================
 char *gs_node_value_copy (gs_node *self) {
     char *res;
     if (! self->value) return NULL;
@@ -117,6 +138,9 @@ char *gs_node_value_copy (gs_node *self) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION gs_node_set_value
+// ============================================================================
 void gs_node_set_value (gs_node *self, const char *value) {
     pthread_mutex_lock (&self->vlck);
     if (self->value) free (self->value);
@@ -124,14 +148,23 @@ void gs_node_set_value (gs_node *self, const char *value) {
     pthread_mutex_unlock (&self->vlck);
 }
 
+// ============================================================================
+// FUNCTION gs_node_unlock
+// ============================================================================
 void gs_node_unlock (gs_node *self) {
     pthread_mutex_unlock (&self->lck);
 }
 
+// ============================================================================
+// FUNCTION global_init
+// ============================================================================
 void global_init (void) {
     GROOT = gs_root_create();
 }
 
+// ============================================================================
+// FUNCTION sys_global_get
+// ============================================================================
 duk_ret_t sys_global_get (duk_context *ctx) {
     // sys.global.get ("root","key")
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
@@ -160,6 +193,9 @@ duk_ret_t sys_global_get (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_global_set
+// ============================================================================
 duk_ret_t sys_global_set (duk_context *ctx) {
     if (duk_get_top (ctx) < 3) return DUK_RET_TYPE_ERROR;
     const char *rootkey = duk_to_string (ctx, 0);
@@ -175,10 +211,9 @@ duk_ret_t sys_global_set (duk_context *ctx) {
 
 static uint32_t IHASH = 0;
 
-/** Generic hash-function nicked from grace.
-  * \param str The string to hash
-  * \return A 32 bit hashed guaranteed not 0.
-  */
+// ============================================================================
+// FUNCTION hash_token
+// ============================================================================
 uint32_t hash_token (const char *str) {
     uint32_t hash = 0;
     uint32_t i    = 0;
@@ -196,6 +231,8 @@ uint32_t hash_token (const char *str) {
             close (sdf);
         }
         if (! IHASH) IHASH = 5138; /* fair dice roll */
+        IHASH ^= time(NULL);
+        IHASH ^= getpid();
     }
 
     hash = IHASH;
@@ -223,4 +260,3 @@ uint32_t hash_token (const char *str) {
     if (hash == 0) hash = 154004;
     return hash;
 }
-
