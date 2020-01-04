@@ -1,8 +1,20 @@
+// ============================================================================
+// CLASS URLMap
+// ------------
+// Creates a convenient way to define how an incoming HTTP url path should
+// be handled.
+// ============================================================================
 var URLMap = function(data) {
     this.map = data ? data : {};
     return this;
 }
 
+// ============================================================================
+// STATIC MEMBER: mimedb
+// ---------------------
+// Defines a default mapping of file extensions to mime-types for the
+// fileserver.
+// ============================================================================
 URLMap.mimedb = {
     "js":"application/javascript",
     "html":"text/html",
@@ -15,15 +27,25 @@ URLMap.mimedb = {
     "json":"application/json"
 }
 
+// ============================================================================
+// METHOD URLMap::call
+// -------------------
+// Takes an object defined as a handler. It it's a handler function, call
+// it. If it's a fileserver path, do the fileserver thing.
+// ============================================================================
 URLMap::call = function(req,path,obj) {
     if (typeof (obj) == "function") return obj(req, path);
     if (typeof (obj) == "string") {
+        // Reject path traversal
         if (req.url.split('/').contains("..")) {
             return this.errorReturn (req, 404);
         }
+        
+        // See if there's anything at the provided path
         var fn = obj + '/' + path;
         var st = stat(fn);
         if (st && (! st.isDir)) {
+            // Resolve the MIME type
             var mime = "application/octet-stream";
             if (this.map.options && this.map.options.mimeMap) {
                 mime = this.map.options.mimeMap (fn);
@@ -34,15 +56,22 @@ URLMap::call = function(req,path,obj) {
                     mime = URLMap.mimedb[ext];
                 }
             }
+            // Send out the result
             req.setHeader ("Content-type", mime);
             req.sendFile (fn);
             return 200;
         }
         else if (st && st.isDir) {
+            // Is the directoryIndex option set? If not, we disallow
+            // them.
             if (this.map.options && this.map.options.directoryIndex) {
+                // If the directoryIndex option is a function, call it
+                // instead of auto-generating one.
                 if (typeof (this.map.options.directoryIndex) == "function") {
                     return this.map.options.directoryIndex (req, fn);
                 }
+                
+                // Create a generic boring directory listing
                 var urldir = req.url;
                 if (! urldir.endsWith('/')) urldir = urldir+'/';
 
@@ -74,9 +103,17 @@ URLMap::call = function(req,path,obj) {
     }
 }
 
+// ============================================================================
+// METHOD URLMap::perform
+// ----------------------
+// Takes a singular handler, or an array of handlers, and runs through them
+// all until a non-zero return is detected.
+// ============================================================================
 URLMap::perform = function(req,path,obj) {
     try {
         var res = 0;
+        
+        // If it's an array, go over each one
         if (Array.isArray (obj)) {
             for (var i=0; i<obj.length; ++i) {
                 res = this.call (req, path, obj[i]);
@@ -84,16 +121,25 @@ URLMap::perform = function(req,path,obj) {
             }
             return 0;
         }
+        
+        // Just a single handler
         res = this.call (req, path, obj);
         return res;
     }
     catch (e) {
+        // Uncaught exception within the handler, spit out a 500 error.
         req.error = e.msg ? e.msg : e;
         req.clear();
         return this.errorReturn (req, 500);
     }
 }
 
+// ============================================================================
+// METHOD URLMap::errorReturn
+// --------------------------
+// Either calls a top-level error code handle, or generates a very simple
+// template.
+// ============================================================================
 URLMap::errorReturn = function(req, code) {
     if (this.map[code]) {
         this.map[code](req);
@@ -113,12 +159,23 @@ URLMap::errorReturn = function(req, code) {
     return code;
 }
 
+// ============================================================================
+// METHOD URLMap::resolveHandler
+// -----------------------------
+// Function that recurses over the tree until a match is met that generates
+// a non-zero status return.
+// ============================================================================
 URLMap::resolveHandler = function(obj,urlsplit,idx,req) {
     var pathleft = urlsplit.slice(idx).join('/');
+    
+    // Access handlers are performed regardless of whether we're at the
+    // leaf end of a tree path.
     if (obj.access) {
         var res = this.perform (req,pathleft,obj.access);
         if (res) return res;
     }
+    
+    // Are we at a leaf node?
     if (idx == urlsplit.length) {
         var method = req.method.toLowerCase();
         if (obj[method]) {
@@ -128,8 +185,11 @@ URLMap::resolveHandler = function(obj,urlsplit,idx,req) {
         return this.errorReturn (req, 404);
     }
     else if (obj['/'+urlsplit[idx]]) {
+        // We have a direct match one node deeper
         return this.resolveHandler (obj['/'+urlsplit[idx]],urlsplit,idx+1,req);
     }
+    
+    // No exact match found. Is there a parameter match?
     for (var k in obj) {
         if (k.startsWith('/:')) {
             req.parameters[k.substr(2)] = urlsplit[idx];
@@ -137,9 +197,13 @@ URLMap::resolveHandler = function(obj,urlsplit,idx,req) {
         }
     }
     
+    // Out of luck, return a 404.
     return this.errorReturn (req, 404);
-}    
+}
 
+// ============================================================================
+// METHOD URLMap::resolve
+// ============================================================================
 URLMap::resolve = function(req) {
     req.parameters = {};
     var urlsplit = req.url.split ('/');
