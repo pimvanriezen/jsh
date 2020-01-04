@@ -11,18 +11,18 @@ OBJS_CLI = \
 	src/cli.o src/sugar.o src/textbuffer.o src/channel.o src/sys_init.o \
 	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
 	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o \
-	src/sys_global.o src/version.o
+	src/sys_global.o src/version.o src/dbsqlite.o
 
 OBJS_HTTPD = \
 	src/httpd.o src/sugar.o src/textbuffer.o src/channel.o src/sys_init.o \
 	src/sys_channel.o src/sys_fs.o src/sys_run.o src/sys_misc.o \
 	src/sys_module.o src/sys_io.o src/sys_sock.o src/fd.o \
-	src/sys_global.o src/version.o
+	src/sys_global.o src/version.o src/dbsqlite.o
 
 CC = gcc
 CCOPTS += -std=c99 -Wall -I./include
-CCOPTS += -D_GNU_SOURCE -I./duktape   # duktape.h and duk_config.h must be in include path
-CCLIBS = -lm
+CCOPTS += -DWITH_SQLITE3 -D_GNU_SOURCE -I./duktape
+CCLIBS = -lm -lsqlite3
 
 all: version bin/jsh bin/jshttpd
 

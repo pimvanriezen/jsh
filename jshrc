@@ -35,6 +35,7 @@ File            = require("file");
 Socket          = require("socket");
 UDPSocket       = require("udpsocket");
 ListenSocket    = require("listensocket");
+SQLite          = require("sqlite");
 
 // ============================================================================
 // Set up the result formatter for the interactive shell

@@ -27,6 +27,7 @@
 #include "sys_sock.h"
 #include "sys_global.h"
 #include "fd.h"
+#include "dbsqlite.h"
 
 // ============================================================================
 // FUNCTION mystrdup
@@ -64,6 +65,7 @@ void sys_init_heap (duk_context *ctx) {
     duk_idx_t ioobj_idx;
     duk_idx_t sockobj_idx;
     duk_idx_t globalobj_idx;
+    duk_idx_t sqlobj_idx;
     
     #define PROPFLAGS DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | \
             DUK_DEFPROP_SET_CONFIGURABLE
@@ -92,6 +94,11 @@ void sys_init_heap (duk_context *ctx) {
         duk_push_string (ctx, #xxx); \
         duk_push_c_function (ctx, sys_global_##xxx, type); \
         duk_def_prop (ctx, globalobj_idx, PROPFLAGS);
+        
+    #define sqlcall(xxx,type) \
+        duk_push_string (ctx, #xxx); \
+        duk_push_c_function (ctx, sys_sql_##xxx, type); \
+        duk_def_prop (ctx, sqlobj_idx, PROPFLAGS);
 
     duk_push_global_object (ctx);
     duk_push_string (ctx, "sys");
@@ -186,6 +193,17 @@ void sys_init_heap (duk_context *ctx) {
     globalcall (set, 3);
     
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+#ifdef WITH_SQLITE3
+    duk_push_string (ctx, "sql");
+    sqlobj_idx = duk_push_object (ctx);
+    sqlcall (open, 1);
+    sqlcall (close, 1);
+    sqlcall (query, DUK_VARARGS);
+    sqlcall (rowsaffected, 0);
+    
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+#endif
     
     duk_def_prop (ctx, -3, PROPFLAGS);
     duk_pop (ctx);
