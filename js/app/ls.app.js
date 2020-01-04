@@ -91,10 +91,13 @@ var ls = function (path) {
                 suffix = suffx.link + o.linkTarget;
             }
             
+            var sz = ""+o.size.toSize();
+            if (o.isDir) sz = "-";
+            
             var outstr = o.modeString + " " + dtformat(o.mtime).padStart(11)+
                          " : "+ o.user.padEnd(ulen) + "/" +
                          o.group.padEnd(glen+1) +
-                         (""+o.size.toSize()).padStart(szlen+1) + " " +
+                         sz.padStart(szlen+1) + " " +
                          fnstart + name + fnend + suffix + '\n';
             sys.print (outstr);
         }
@@ -114,5 +117,5 @@ ls.help = function() {
     });
 }
 
-module.version = "1.0.1";
+module.version = "1.0.2";
 module.exports = ls;
