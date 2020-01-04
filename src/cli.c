@@ -538,7 +538,7 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
     return retval;
 
  error:
-    fprintf(stderr, "error in executing file %s\n", filename);
+    fprintf(stderr, "%% Error in executing file %s\n", filename);
     fflush(stderr);
     goto cleanup;
 }
@@ -563,7 +563,7 @@ static int handle_file(duk_context *ctx, const char *filename,
 
     f = fopen(fnbuf, "rb");
     if (!f) {
-        fprintf(stderr, "failed to open source file: %s\n", filename);
+        fprintf(stderr, "%% Failed to open source file: %s\n", filename);
         fflush(stderr);
         goto error;
     }
@@ -688,14 +688,6 @@ static int handle_interactive(duk_context *ctx) {
     return retval;
 }
 
-// ============================================================================
-// FUNCTION string_frombufferraw
-// ============================================================================
-static duk_ret_t string_frombufferraw(duk_context *ctx) {
-    duk_buffer_to_string(ctx, 0);
-    return 1;
-}
-
 /*
  *  Duktape heap lifecycle
  */
@@ -723,22 +715,6 @@ static duk_context *create_duktape_heap(int alloc_provider,
         fflush(stderr);
         exit(1);
     }
-
-    /* Register String.fromBufferRaw() which does a 1:1 buffer-to-string
-     * coercion needed by testcases.  String.fromBufferRaw() is -not- a
-     * default built-in!  For stripped builds the 'String' built-in
-     * doesn't exist and we create it here; for ROM builds it may be
-     * present but unwritable (which is ignored).
-     */
-    duk_eval_string(ctx,
-        "(function(v){"
-            "if (typeof String === 'undefined') { String = {}; }"
-            "Object.defineProperty(String, 'fromBufferRaw', "
-            "{value:v, configurable:true});"
-        "})");
-    duk_push_c_function(ctx, string_frombufferraw, 1 /*nargs*/);
-    (void) duk_pcall(ctx, 1);
-    duk_pop(ctx);
 
     /* Register console object. */
     duk_console_init(ctx, DUK_CONSOLE_FLUSH /*flags*/);
@@ -797,7 +773,6 @@ int main(int argc, char *argv[]) {
     int alloc_provider = ALLOC_DEFAULT;
     int lowmem_log = 0;
     int debugger = 0;
-    int recreate_heap = 0;
     int no_heap_destroy = 0;
     int verbose = 0;
     int run_stdin = 0;
@@ -827,28 +802,12 @@ int main(int argc, char *argv[]) {
         if (!arg) {
             goto usage;
         }
-        if (strcmp(arg, "--restrict-memory") == 0) {
-            memlimit_high = 0;
-        } else if (strcmp(arg, "-i") == 0) {
-            interactive = 1;
-        } else if (strcmp(arg, "-b") == 0) {
-            allow_bytecode = 1;
-        } else if (strcmp(arg, "-c") == 0) {
-            if (i == argc - 1) {
-                goto usage;
-            }
-            i++;
-            compile_filename = argv[i];
-        } else if (strcmp(arg, "-e") == 0) {
+        else if (strcmp(arg, "-e") == 0) {
             have_eval = 1;
             if (i == argc - 1) {
                 goto usage;
             }
             i++;  /* skip code */
-        } else if (strcmp(arg, "--recreate-heap") == 0) {
-            recreate_heap = 1;
-        } else if (strcmp(arg, "--no-heap-destroy") == 0) {
-            no_heap_destroy = 1;
         } else if (strcmp(arg, "--no-auto-complete") == 0) {
             no_auto_complete = 1;
         } else if (strcmp(arg, "--verbose") == 0) {
@@ -914,16 +873,6 @@ int main(int argc, char *argv[]) {
         }
         
         goto cleanup;
-
-        if (recreate_heap) {
-            if (verbose) {
-                fprintf(stderr, "*** Recreating heap...\n");
-                fflush(stderr);
-            }
-
-            destroy_duktape_heap(ctx, alloc_provider);
-            ctx = create_duktape_heap(alloc_provider, debugger, lowmem_log);
-        }
     }
 
     if (run_stdin) {
@@ -934,16 +883,6 @@ int main(int argc, char *argv[]) {
         if (handle_fh(ctx, stdin, NULL, 0, "stdin", compile_filename) != 0) {
             retval = 1;
             goto cleanup;
-        }
-
-        if (recreate_heap) {
-            if (verbose) {
-                fprintf(stderr, "*** Recreating heap...\n");
-                fflush(stderr);
-            }
-
-            destroy_duktape_heap(ctx, alloc_provider);
-            ctx = create_duktape_heap(alloc_provider, debugger, lowmem_log);
         }
     }
 
