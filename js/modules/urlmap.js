@@ -3,17 +3,85 @@ var URLMap = function(data) {
     return this;
 }
 
-URLMap::perform = function(req,obj) {
+URLMap.mimedb = {
+    "js":"application/javascript",
+    "html":"text/html",
+    "png":"image/png",
+    "jpg":"image/jpeg",
+    "gif":"image/gif",
+    "c":"text/plain",
+    "h":"text/plain",
+    "md":"text/markdown",
+    "json":"application/json"
+}
+
+URLMap::call = function(req,path,obj) {
+    if (typeof (obj) == "function") return obj(req, path);
+    if (typeof (obj) == "string") {
+        var fn = obj + '/' + path;
+        var st = stat(fn);
+        if (st && (! st.isDir)) {
+            var mime = "application/octet-stream";
+            if (this.map.options && this.map.options.mimeMap) {
+                mime = this.map.options.mimeMap (fn);
+            }
+            else {
+                var ext = fn.split('.').slice(-1);
+                if (URLMap.mimedb[ext]) {
+                    mime = URLMap.mimedb[ext];
+                }
+            }
+            req.setHeader ("Content-type", mime);
+            req.sendFile (fn);
+            return 200;
+        }
+        else if (st && st.isDir) {
+            if (this.map.options && this.map.options.directoryIndex) {
+                if (typeof (this.map.options.directoryIndex) == "function") {
+                    return this.map.options.directoryIndex (req, fn);
+                }
+                var urldir = req.url;
+                if (! urldir.endsWith('/')) urldir = urldir+'/';
+
+                req.send (<<<`
+                    <html>
+                      <head><title>Index of ${urldir}</title>
+                      <body>
+                        <h1>Index of ${urldir}</h1>
+                `>>>);
+                var d = dir (fn);
+                for (var k in d) {
+                    if (k[0] == '.') continue;
+                    if (d[k].isDir) {
+                        req.send (<<<`
+                            <a href="${urldir}${k}/">${k}/</a><br/>
+                        `>>>);
+                    }
+                    else {
+                        req.send (<<<`
+                            <a href="${urldir}${k}">${k}</a><br/>
+                        `>>>);
+                    }
+                }
+                req.send ("</body></html>\n");
+                return 200;
+            }
+        }
+        return this.errorReturn (req, 404);
+    }
+}
+
+URLMap::perform = function(req,path,obj) {
     try {
         var res = 0;
         if (Array.isArray (obj)) {
             for (var i=0; i<obj.length; ++i) {
-                res = obj[i](req);
+                res = this.call (req, path, obj[i]);
                 if (res) return res;
             }
             return 0;
         }
-        res = obj(req);
+        res = this.call (req, path, obj);
         return res;
     }
     catch (e) {
@@ -43,14 +111,15 @@ URLMap::errorReturn = function(req, code) {
 }
 
 URLMap::resolveHandler = function(obj,urlsplit,idx,req) {
+    var pathleft = urlsplit.slice(idx).join('/');
     if (obj.access) {
-        var res = this.perform (req,obj.access);
+        var res = this.perform (req,pathleft,obj.access);
         if (res) return res;
     }
     if (idx == urlsplit.length) {
         var method = req.method.toLowerCase();
         if (obj[method]) {
-            return this.perform (req,obj[method]);
+            return this.perform (req,pathleft,obj[method]);
         }
         
         return this.errorReturn (req, 404);

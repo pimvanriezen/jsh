@@ -14,7 +14,7 @@ globalStorage.initialize ({
     }
 });
 
-console.log ("[INFO] Thread started");
+console.log ("[INFO] Thread allocated");
 
 var APIHandler = {};
 
@@ -118,6 +118,9 @@ APIHandler.internalError = function (req) {
 // Route Map
 // ============================================================================
 var Map = new URLMap({
+    options:{
+        directoryIndex:true
+    },
     404:APIHandler.notFound,
     500:APIHandler.internalError,
     access:APIHandler.logRequest,
@@ -129,6 +132,9 @@ var Map = new URLMap({
         "/:id":{
             get:APIHandler.userInfo
         }
+    },
+    "/modules":{
+        access:"js/modules"
     }
 });
 

@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <ctype.h>
 #include "duktape.h"
 #include "duk_console.h"
@@ -66,6 +68,7 @@ void heapstore_init (const char *fn) {
 heapstore_item *heapstore_acquire (void) {
     pthread_mutex_lock (&HS.mutex);
     heapstore_item *crsr = HS.first;
+    heapstore_item *pcrsr = NULL;
     if (! crsr) {
         crsr = HS.first = heapstore_item_create(HS.code);
         crsr->inuse = true;
@@ -161,6 +164,7 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
         "  _outhdr:{'Content-Type':'text/html'},\n"
         "  _inhdr:{},\n"
         "  _returndata:'',\n"
+        "  _returnfile:'',\n"
         "  peer:'::',\n"
         "  url:'',\n"
         "  postbody:'',\n"
@@ -194,6 +198,12 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
         "    else request._returndata += d;\n"
         "  },\n"
         "  clear:function() {request._returndata = ''},\n"
+        "  sendFile:function(f) {\n"
+        "    if (exists (f)) {\n"
+        "      request.clear();\n"
+        "      request._returnfile = f;\n"
+        "    }\n"
+        "  },\n"
         "  print:function() {request.send(arguments.join(' ')+'\\n');},\n"
         "  f:function(){\n"
         "    request.send ('Service not implemented\\n');\n"
@@ -276,6 +286,8 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
         duk_put_prop_string (ctx, -2, "_outhdr");
         duk_push_string (ctx, "");
         duk_put_prop_string (ctx, -2, "_returndata");
+        duk_push_string (ctx, "");
+        duk_put_prop_string (ctx, -2, "_returnfile");
         duk_pop(ctx);
         duk_pop(ctx);
         *con_cls = item;
@@ -329,20 +341,35 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
     size_t respsz;
     
     int status = duk_get_int (ctx, -1);
+    struct MHD_Response *response = NULL;
     
-    /* Get the body data from the function return */
-    duk_get_prop_string (ctx, -2, "_returndata"); // +4 [glo req <st> <ret>]
+    /* First check if there's no returnfile, because then we're totally
+       doing that. */
+    duk_get_prop_string (ctx, -2, "_returnfile");
+    const char *fn = duk_to_string (ctx, -1);
+    if (*fn) {
+        struct stat st;
+        int fd;
+        if (stat(fn, &st) == 0) {
+            fd = open (fn, O_RDONLY);
+            response = MHD_create_response_from_fd (st.st_size, fd);
+        }
+    }
+    duk_pop(ctx);
     
-    respbody = duk_to_string (ctx, -1);
-    respsz = strlen (respbody);
+    if (! response) {
+        /* Get the body data from the function return */
+        duk_get_prop_string (ctx, -2, "_returndata"); // +4 [glo req <st> <ret>]
     
-    /* Start building up the response from the returned body */
-    struct MHD_Response *response;
-    response = MHD_create_response_from_buffer
-        (respsz,(void*)respbody,MHD_RESPMEM_MUST_COPY);
+        respbody = duk_to_string (ctx, -1);
+        respsz = strlen (respbody);
+    
+        /* Start building up the response from the returned body */
+        response = MHD_create_response_from_buffer
+            (respsz,(void*)respbody,MHD_RESPMEM_MUST_COPY);
 
-    duk_pop(ctx); // +3 [glo req <st>]
-
+        duk_pop(ctx); // +3 [glo req <st>]
+    }
     /* Add in the headers from request._outhdr */
     duk_get_prop_string (ctx, -2, "_outhdr"); // +4 [glo req <return> hdr]
     duk_enum (ctx, -1, 0/*enum flags*/); // +5 [glo req <r> hdr enum]
