@@ -228,14 +228,15 @@ to store state information, with optional locked access. See the
 
 # Getting Started
 
-The only dependency for jsh is GNU libmicrohttpd, which is available on most
-sane platforms. To get it installed on macOS using homebrew, type:
+The full JSH environment depends on two libraries outside of the source
+tree: GNU libmicrohttpd, and sqlite3. On macOS, sqlite3 is available in
+the box, but you'll need to install libmicrohttpd through homebrew:
 
 > brew install libmicrohttpd
 
-On RedHat-derived distros, you can install through yum:
+On RedHat-derived distros, you can install both dependencies through yum:
 
-> yum install libmicrohttpd-devel
+> yum install libmicrohttpd-devel sqlite-devel
 
 I'm not sure about the proper package-name for debian/ubuntu, so good luck
 there!
