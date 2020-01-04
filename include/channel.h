@@ -7,12 +7,18 @@
 #include <unistd.h>
 #include <pthread.h>
 
+// ----------------------------------------------------------------------------
+// States of an individual pipe within a channel
+// ----------------------------------------------------------------------------
 enum pipestatus {
     PIPE_CLOSED = 0,
     PIPE_LISTENING,
     PIPE_BUSY
 };
 
+// ----------------------------------------------------------------------------
+// Channel communication constants
+// ----------------------------------------------------------------------------
 #define PIPEMSG_BUSY  "B"
 #define PIPEMSG_FREE  "F"
 #define PIPEMSG_DATA  "D"
@@ -25,16 +31,27 @@ enum pipestatus {
 #define MSGID_ERROR 'E'
 #define MSGID_EXIT  'X'
 
+// ----------------------------------------------------------------------------
+// Flags for channel pipes
+// ----------------------------------------------------------------------------
 #define PIPEFLAG_ISPARENT 0x01
 
 typedef unsigned int pipeflag_t;
 
+// ----------------------------------------------------------------------------
+// A structure representing a message, containing its data and a reference
+// to the pid that sent it.
+// ----------------------------------------------------------------------------
 struct channelmsg {
     struct channelmsg   *nextmsg;
     pid_t                from;
     char                *data;
 };
 
+// ----------------------------------------------------------------------------
+// Represents a communication pipe within the channel with one specific
+// coroutine/subprocess.
+// ----------------------------------------------------------------------------
 struct channelpipe {
     enum pipestatus      st;
     pid_t                pid;
@@ -45,6 +62,9 @@ struct channelpipe {
     unsigned int         msgrecv;
 };
 
+// ----------------------------------------------------------------------------
+// Represents an individual channel
+// ----------------------------------------------------------------------------
 struct channel {
     unsigned int         alloc;
     const char          *error;
@@ -52,11 +72,17 @@ struct channel {
     struct channelmsg   *firstmsg;
 };
 
+// ----------------------------------------------------------------------------
+// Maps channels to numeric channel-ids for convenience on the js-side
+// ----------------------------------------------------------------------------
 struct clist {
     int                  alloc;
     struct channel     **list;
 };
 
+// ============================================================================
+// PROTOTYPES
+// ============================================================================
 struct channelmsg   *msg_create (size_t);
 void                 msg_free (struct channelmsg *);
 void                 channel_init (void);

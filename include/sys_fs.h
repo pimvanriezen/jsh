@@ -1,6 +1,9 @@
 #ifndef _SYS_FS_H
 #define _SYS_FS_H 1
 
+// ============================================================================
+// PROTOTYPES
+// ============================================================================
 duk_ret_t sys_cd (duk_context *ctx);
 duk_ret_t sys_cwd (duk_context *ctx);
 duk_ret_t sys_dir (duk_context *ctx);

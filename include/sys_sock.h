@@ -3,14 +3,17 @@
 
 #include <stdbool.h>
 
+// ----------------------------------------------------------------------------
+// Representation fo a unisex IP address. With all the sockaddr_* layers
+// striped off, this is what addresses look like from a libc-perspective.
+// ----------------------------------------------------------------------------
 typedef struct {
     unsigned char d[16];
 } ipaddress;
 
-ipaddress *make_address (const char *);
-bool ipaddress_valid (ipaddress *);
-void ipaddress_tostring (ipaddress *, char *);
-
+// ----------------------------------------------------------------------------
+// Possible socket types
+// ----------------------------------------------------------------------------
 typedef enum {
     SOCK_FREE = 0,
     SOCK_TCP_OUT,
@@ -22,6 +25,9 @@ typedef enum {
     SOCK_UNIX_LISTEN
 } socktype;
 
+// ----------------------------------------------------------------------------
+// Entry for describing an open socket
+// ----------------------------------------------------------------------------
 typedef struct sockdata_s {
     socktype    type;
     ipaddress   remote;
@@ -29,6 +35,13 @@ typedef struct sockdata_s {
 } sockdata;
 
 extern sockdata SOCKINFO[1024];
+
+// ============================================================================
+// PROTOTYPES
+// ============================================================================
+ipaddress *make_address (const char *);
+bool ipaddress_valid (ipaddress *);
+void ipaddress_tostring (ipaddress *, char *);
 
 void register_socket (int, socktype, ipaddress *, int);
 void unregister_socket (int);

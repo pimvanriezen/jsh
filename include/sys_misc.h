@@ -1,6 +1,9 @@
 #ifndef _SYS_MISC_H
 #define _SYS_MISC_H 1
 
+// ============================================================================
+// PROTOTYPES
+// ============================================================================
 duk_ret_t sys_setenv (duk_context *ctx);
 duk_ret_t sys_getenv (duk_context *ctx);
 duk_ret_t sys_winsize (duk_context *ctx);

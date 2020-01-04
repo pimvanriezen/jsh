@@ -9,6 +9,12 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+// ============================================================================
+// Currently there's one big mutex around all channel stuff. This could use
+// some more thought, but there's currently already no scenario I can think
+// off where a short-lived interaction in the context of a thread in jshttpd
+// warrants spawning coroutines (fork()ing is going to suck anyway).
+// ============================================================================
 static pthread_mutex_t MUT;
 
 void channel_init (void) {

@@ -4,9 +4,14 @@
 #include <pthread.h>
 #include <stdint.h>
 
+// ----------------------------------------------------------------------------
+// Represents a global storage node, a value that can be safely stored
+// and retrieved by any thread. Note that the storage only deal in string
+// data, userland libraries will have to take care of serialization
+// ----------------------------------------------------------------------------
 typedef struct gs_node gs_node;
 struct gs_node {
-    gs_node             *next;
+    gs_node             *next; /* single-linked list, since no deletes */
     uint32_t             hash;
     char                 id[256];
     char                *value;
@@ -14,6 +19,11 @@ struct gs_node {
     pthread_mutex_t      vlck; /* value lock */
 };
 
+// ----------------------------------------------------------------------------
+// The global storage has one level of hierarchy, allowing for a set of
+// different 'roots' to be used. The userland implementation accesses the
+// root called 'default', unless if instructed otherwise.
+// ----------------------------------------------------------------------------
 typedef struct gs_rootnode gs_rootnode;
 struct gs_rootnode {
     gs_rootnode         *next;
@@ -23,12 +33,19 @@ struct gs_rootnode {
     pthread_mutex_t      lck;
 };
 
+// ----------------------------------------------------------------------------
+// The top level of the hierarchy, just a place holder for the list of
+// rootnode objects.
+// ----------------------------------------------------------------------------
 typedef struct gs_root gs_root;
 struct gs_root {
     gs_rootnode         *first;
     pthread_mutex_t      lck;
 };
 
+// ============================================================================
+// PROTOTYPES
+// ============================================================================
 gs_root         *gs_root_ceeate (void);
 gs_rootnode     *gs_root_find (gs_root *, const char *);
 
