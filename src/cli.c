@@ -30,6 +30,7 @@
 #include "duktape.h"
 #include "sugar.h"
 #include "textbuffer.h"
+#include "version.h"
 
 extern void sys_init (void);
 extern void sys_init_heap (duk_context *);
@@ -54,8 +55,10 @@ int duk_cmdline_stack_check(void);
 // FUNCTION print_greet_line
 // ============================================================================
 static void print_greet_line(void) {
-    printf ("Entering interactive shell.\n"
-            "Type \033[1mhelp()\033[0m for a list of commands.\n");
+    printf ("JSH version %s (%s)\n"
+            "Copyright (c) 2020 Midilab, available under the GNU GPL v2\n\n"
+            "Type \033[1mhelp()\033[0m for a list of commands.\n",
+            JSH_VERSION, JSH_PLATFORM);
 }
 
 // ============================================================================
