@@ -18,6 +18,9 @@ URLMap.mimedb = {
 URLMap::call = function(req,path,obj) {
     if (typeof (obj) == "function") return obj(req, path);
     if (typeof (obj) == "string") {
+        if (req.url.split('/').contains("..")) {
+            return this.errorReturn (req, 404);
+        }
         var fn = obj + '/' + path;
         var st = stat(fn);
         if (st && (! st.isDir)) {
