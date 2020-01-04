@@ -39,7 +39,6 @@ heapstore_item *heapstore_item_create (const char *);
 void fatal_handler (void *, const char *);
 duk_context *create_heap (heapstore_item *, const char *);
 
-
 // ============================================================================
 // FUNCTION heapstore_init
 // ============================================================================
@@ -55,6 +54,10 @@ void heapstore_init (const char *fn) {
     
     HS.code = handle_sugar (t->alloc);
     textbuffer_free (t);
+    heapstore_item *item1 = heapstore_acquire();
+    heapstore_item *item2 = heapstore_acquire();
+    heapstore_release (item1);
+    heapstore_release (item2);
 }
 
 // ============================================================================
@@ -376,8 +379,8 @@ int checkflag (const char *arg, const char *opt1, const char *opt2) {
 int main (int argc, char *argv[]) {
     main_argv = argv;
     int optPort = 0;
-    int optMaxConnections = 32;
-    int optMaxConnectionsPerIP = 4;
+    int optMaxConnections = 48;
+    int optMaxConnectionsPerIP = 8;
     bool optUseSSL = false;
     
     const char *sslServerKey = NULL;
@@ -463,7 +466,8 @@ int main (int argc, char *argv[]) {
     heapstore_init (optScript);
     
     struct MHD_Daemon *daemon;
-    unsigned int flags = MHD_USE_THREAD_PER_CONNECTION;
+    unsigned int flags = MHD_USE_THREAD_PER_CONNECTION |
+                         MHD_USE_DUAL_STACK;
 
     if (optUseSSL) {
         flags |= MHD_USE_SSL;
