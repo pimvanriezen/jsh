@@ -92,6 +92,7 @@ URLMap::call = function(req,path,obj) {
                       <head><title>Index of ${urldir}</title></head>
                       <body>
                         <h1>Index of ${urldir}</h1>
+                        <a href="../">../</a><br>
                         @{for k in d}
                           @{if k[0]!='.'}
                             @{if d[k].isDir}
