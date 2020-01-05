@@ -85,28 +85,25 @@ URLMap::call = function(req,path,obj) {
                 // Create a generic boring directory listing
                 var urldir = req.url;
                 if (! urldir.endsWith('/')) urldir = urldir+'/';
-
+                var d = dir(fn);
+                
                 req.send (<<<`
                     <html>
-                      <head><title>Index of ${urldir}</title>
+                      <head><title>Index of ${urldir}</title></head>
                       <body>
                         <h1>Index of ${urldir}</h1>
+                        @{for k in d}
+                          @{if k[0]!='.'}
+                            @{if d[k].isDir}
+                              <a href="${urldir}${k}/">${k}/</a><br/>
+                            @{else}
+                              <a href="${urldir}${k}">${k}</a><br/>
+                            @{endif}
+                          @{endif}
+                        @{next}
+                      </body>
+                    </html>
                 `>>>);
-                var d = dir (fn);
-                for (var k in d) {
-                    if (k[0] == '.') continue;
-                    if (d[k].isDir) {
-                        req.send (<<<`
-                            <a href="${urldir}${k}/">${k}/</a><br/>
-                        `>>>);
-                    }
-                    else {
-                        req.send (<<<`
-                            <a href="${urldir}${k}">${k}</a><br/>
-                        `>>>);
-                    }
-                }
-                req.send ("</body></html>\n");
                 return 200;
             }
         }
