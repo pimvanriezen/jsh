@@ -1124,3 +1124,41 @@ sys.sql.rowsaffected.help = function() {
 }
 
 setapi (sys.sql.rowsaffected, "sys.sql.rowsaffected");
+// ============================================================================
+// jshttpd request
+// ============================================================================
+if (! globalThis.request) {
+    request = function() {};
+
+    request.help = function() {
+        print (setapi.textformat(<<<`
+            The request object is passed around when running in jshttpd
+            context. Specifically, a jshttpd application will have somewhere
+            in its global scope a call to request.setHandler(), which will
+            point to either a function, or an object with a function called
+            resolve(), which will be called with the request object as
+            an argument, and return a HTTP status code.
+        
+            The following fields and functions are available on the object:
+        `>>>));
+    
+        print (TextTable.auto (<<<`
+            req.peer                A string containg the IP address of the
+                                    host doing the HTTP request
+            req.url                 The requested path
+            req.postbody            Any data posted
+            req.method              The request method
+            req.getHeader(name)     Returns the value of a header sent by the
+                                    client. The name is canonized to be
+                                    case-insensitive
+            req.setHeader(name)     Sets the value of a header to be sent back
+                                    to the client. Name is again case-sensitive
+                                    and will be canonized
+            req.send(data)          Adds data to the output buffer
+            req.clear()             Clears the output buffer
+            req.sendFile(path)      Will send out a file straight, the output
+                                    buffer will be ignored.
+        `>>>, 2).indent(4).boldColumn(0).format());
+    }
+    setapi (request, "request");
+}
