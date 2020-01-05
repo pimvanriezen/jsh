@@ -251,7 +251,7 @@ char *handle_sugar (const char *src) {
             else if (ciswhite(*c)) {
                 const char *crsr = c;
                 while (ciswhite(*crsr)) crsr++;
-                if ((crsr[0]=='@' || crsr[0]=='$') && crsr[1] == '{') {
+                if (crsr[0]=='@' && crsr[1] == '{') {
                     // syntax-indenting, don't copy
                     c = crsr;
                 }
