@@ -18,13 +18,24 @@ var URLMap = function(data) {
 URLMap.mimedb = {
     "js":"application/javascript",
     "html":"text/html",
+    "htm":"text/html",
     "png":"image/png",
     "jpg":"image/jpeg",
+    "jpeg":"image/jpeg",
     "gif":"image/gif",
     "c":"text/plain",
     "h":"text/plain",
     "md":"text/markdown",
-    "json":"application/json"
+    "json":"application/json",
+    "aif":"audio/aiff",
+    "aiff":"audio/aiff",
+    "bmp":"image/bmp",
+    "bz2":"application/x-bzip2",
+    "gz":"application/x-compressed",
+    "ico":"image/x-icon",
+    "mp3":"audio/mpeg3",
+    "zip":"application/zip",
+    "tar":"application/x-tar"
 }
 
 // ============================================================================

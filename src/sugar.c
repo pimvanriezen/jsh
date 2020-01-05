@@ -12,6 +12,59 @@
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
 
+int handle_template_command (const char *cptr, struct textbuffer *t) {
+    const char *c = cptr;
+    if (! strchr (c, '}')) return 0;
+    if (strncmp (c, "@{if ", 5) == 0) {
+        c+= 5;
+        textbuffer_add_str (t, "\"+((");
+        while (*c != '}') {
+            textbuffer_add_c (t, *c);
+            c++;
+        }
+        c++;
+        textbuffer_add_str (t, ")?\"");
+    }
+    else if (strncmp (c, "@{else}", 7) == 0) {
+        c+= 7;
+        textbuffer_add_str (t, "\":true?\"");
+    }
+    else if (strncmp (c, "@{endif}", 8) == 0) {
+        c+= 8;
+        textbuffer_add_str (t, "\":\"\")+\"");
+    }
+    else if (strncmp (c, "@{for ", 6) == 0) {
+        textbuffer_add_str (t, "\"+(function(){"
+                               "var _r=''; for (");
+        c+= 6;
+        while (*c != '}') {
+            textbuffer_add_c (t, *c);
+            c++;
+        }
+        c++;
+        textbuffer_add_str (t, "){_r+=\"");
+    }
+    else if (strncmp (c, "@{endfor}", 9) == 0 ||
+             strncmp (c, "@{next}", 7) == 0) {
+        textbuffer_add_str (t, "\";} return _r;})()+\"");
+        while (*c != '}') ++c;
+        ++c;
+    }
+    else {
+        textbuffer_add_str (t, "\"+(function(){"
+                               "throw new Error(\"Unrecognized "
+                               "template directive: ");
+        while (*c != '}') {
+            if (*c == '"') textbuffer_add_c (t, '\\');
+            textbuffer_add_c (t, *c);
+            c++;
+        }
+        c++;
+        textbuffer_add_str (t, "}\")})()+\"");
+    }
+    return (c - cptr);
+}
+
 // ============================================================================
 // FUNCITON handle_sugar
 // ---------------------
@@ -104,6 +157,15 @@ char *handle_sugar (const char *src) {
                 if (*c) c++;
                 hadcontent=1;
             }
+            else if (c[0] == '@' && c[1] == '{') {
+                c += handle_template_command (c, t);
+                if (*c == '\n') {
+                    c++;
+                    linestart = c;
+                    skippedspaces = 0;
+                    textbuffer_add_str (t, "\"+\n\"");
+                }
+            }
             else if (cisquote (*c)) {
                 textbuffer_add_c (t, '\\');
                 textbuffer_add (t, *c);
@@ -188,7 +250,7 @@ char *handle_sugar (const char *src) {
         }
     }
     
-    // fprintf (stderr, "---\n%s\n---\n", t->alloc);
+    fprintf (stderr, "---\n%s\n---\n", t->alloc);
     
     char *res = t->alloc;
     free (t);
