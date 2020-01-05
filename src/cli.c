@@ -128,9 +128,21 @@ static void cmdline_fatal_handler(void *udata, const char *msg) {
 // Print an error to the provided FILE, and pop it off the stack.
 // ============================================================================
 static void print_pop_error(duk_context *ctx, FILE *f) {
-    fprintf(f, "%s\n", duk_safe_to_stacktrace(ctx, -1));
+    const char *trace = duk_safe_to_stacktrace(ctx, -1);
+    struct textbuffer *tb = textbuffer_alloc();
+    const char *crsr = trace;
+    while (*crsr) {
+        if (memcmp (crsr, "preventsyield", 13) == 0) crsr += 13;
+        else {
+            textbuffer_add_c (tb, *crsr);
+            crsr++;
+        }
+    }
+    textbuffer_add_c (tb, '\0');
+    fprintf(f, "%% %s\n", tb->alloc);
     fflush(f);
     duk_pop(ctx);
+    textbuffer_free (tb);
 }
 
 // ============================================================================
