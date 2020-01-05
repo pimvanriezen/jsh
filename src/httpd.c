@@ -189,7 +189,6 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
         "    var key = this.canonizeHeaderName(nam);\n"
         "    request._outhdr[key] = val;\n"
         "  },\n"
-        "  getPeer:function() {return request._peer;},\n"
         "  send:function(d) {\n"
         "    if (typeof(d) == 'object') {\n"
         "      request._returndata = JSON.stringify(d);\n"
