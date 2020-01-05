@@ -246,6 +246,19 @@ char *handle_sugar (const char *src) {
                 textbuffer_add_c (t, 'x');
                 textbuffer_add_c (t, hexdigits[(*c & 0xf0) >> 4]);
                 textbuffer_add (t, hexdigits[(*c & 0x0f)]);
+                hadcontent = 1;
+            }
+            else if (ciswhite(*c)) {
+                const char *crsr = c;
+                while (ciswhite(*crsr)) crsr++;
+                if ((crsr[0]=='@' || crsr[0]=='$') && crsr[1] == '{') {
+                    // syntax-indenting, don't copy
+                    c = crsr;
+                }
+                else {
+                    textbuffer_add (t, *c);
+                    c++;
+                }
             }
             else {
                 // None of the above, add the literal character.
