@@ -14,6 +14,7 @@
 // FUNCTION textbuffer_free
 // ============================================================================
 void textbuffer_free (struct textbuffer *t) {
+    if (! t) return;
     if (t->alloc) free (t->alloc);
     free (t);
 }
