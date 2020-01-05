@@ -12,9 +12,20 @@
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
 
+// ============================================================================
+// FUNCTION handle_template_command
+// --------------------------------
+// Handles specific @{...} template commands within a <<<`quote`>>>.
+// Since the end result of a <<<`quote`>>> statement should be a valid
+// string definition, some convoluted magic goes on here.
+// ============================================================================
 int handle_template_command (const char *cptr, struct textbuffer *t) {
     const char *c = cptr;
     if (! strchr (c, '}')) return 0;
+    
+    // @{if stmt}foo@{endif}
+    // Should lead to:
+    // ""+((stmt)?"foo":"")+""
     if (strncmp (c, "@{if ", 5) == 0) {
         c+= 5;
         textbuffer_add_str (t, "\"+((");
@@ -25,6 +36,9 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
         c++;
         textbuffer_add_str (t, ")?\"");
     }
+    // @{if stmt}foo@{else}bar@{endif}
+    // Should lead to:
+    // ""+((stmt)?"foo":true?"bar":"")+""
     else if (strncmp (c, "@{else}", 7) == 0) {
         c+= 7;
         textbuffer_add_str (t, "\":true?\"");
@@ -33,6 +47,9 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
         c+= 8;
         textbuffer_add_str (t, "\":\"\")+\"");
     }
+    // @{for stmt}foo@{next}
+    // Should lead to:
+    // ""+(function(){var _r=''; for(stmt){_r+="foo";} return _r;})()+""
     else if (strncmp (c, "@{for ", 6) == 0) {
         textbuffer_add_str (t, "\"+(function(){"
                                "var _r=''; for (");
@@ -50,6 +67,8 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
         while (*c != '}') ++c;
         ++c;
     }
+    // Throws an error by making it
+    // ""+(function(){throw new Error("...")})()+""
     else {
         textbuffer_add_str (t, "\"+(function(){"
                                "throw new Error(\"Unrecognized "
@@ -83,26 +102,23 @@ char *handle_sugar (const char *src) {
     int spacestoskip = 0;
     int hadcontent = 0;
     const char *linestart;
-    char backtick=0;
     
     t = textbuffer_alloc();
     
     while ((*c)) {
+        // --------------------------------------------------------------------
+        // Are we currently in a <<<`quote block`>>>?
+        // --------------------------------------------------------------------
         if (currentquote == '<') {
-            if (backtick && c[0] == '`' && c[1] == '>' && c[2] == '>' &&
+            // Check for end of quote block
+            if (c[0] == '`' && c[1] == '>' && c[2] == '>' &&
                 c[3] == '>') {
                 textbuffer_add_c (t, '"');
                 textbuffer_add (t, ')');
                 currentquote = 0;
-                backtick = 0;
                 c += 4;
             }
-            else if ((!backtick) && c[0] == '>' && c[1] == '>' && c[2] == '>') {
-                textbuffer_add_c (t, '"');
-                textbuffer_add (t, ')');
-                currentquote = 0;
-                c += 3;
-            }
+            // If we're skipping over whitespace, do so now
             else if (ciswhite (*c) && !skippedspaces) {
                 // keep skipping until a trend is set
                 if (spacestoskip) {
@@ -115,8 +131,11 @@ char *handle_sugar (const char *src) {
                 }
                 c++;
             }
+            // Are we running into non-whitespace while still skipping?
             else if (! skippedspaces) {
-                // non-whitespace
+                // If we're the first line after the line starting the
+                // quote, take this as an indication of how much whitespace
+                // we should skip on subsequent lines.
                 if (quoteline == 1) {
                     spacestoskip = (c - linestart);
                 }
@@ -163,6 +182,7 @@ char *handle_sugar (const char *src) {
                 textbuffer_add_str (t, "\\\\");
             }
             else if (c[0] == '$' && c[1] == '{') {
+                // Inline variable
                 textbuffer_add_str (t, "\"+");
                 c += 2;
                 while ((*c) && (*c != '}')) {
@@ -174,6 +194,7 @@ char *handle_sugar (const char *src) {
                 hadcontent=1;
             }
             else if (c[0] == '@' && c[1] == '{') {
+                // Template command
                 c += handle_template_command (c, t);
                 
                 // if the command was on its own line,
@@ -196,31 +217,60 @@ char *handle_sugar (const char *src) {
                 }
             }
             else if (cisquote (*c)) {
+                // Since we're constructing our inline quote
+                // as double quoted, we ironically need to
+                // escape quotes.
                 textbuffer_add_c (t, '\\');
                 textbuffer_add (t, *c);
                 c++;
                 hadcontent=1;
             }
             else if (*c < 32) {
-                /* Signed char, so high ascii is negative */
+                // Escape non-printable characters.
                 textbuffer_add_c (t, '\\');
                 textbuffer_add_c (t, 'x');
                 textbuffer_add_c (t, hexdigits[(*c & 0xf0) >> 4]);
                 textbuffer_add (t, hexdigits[(*c & 0x0f)]);
             }
             else {
+                // None of the above, add the literal character.
                 textbuffer_add (t, *c);
                 c++;
                 hadcontent=1;
             }
         }
-        else if (currentquote && *c == currentquote) {
-            if (currentquote != '<') {
-                textbuffer_add (t, *c++);
-                currentquote = 0;
+        // --------------------------------------------------------------------
+        // Inside a regular javascript quote?
+        // --------------------------------------------------------------------
+        else if (currentquote) {
+            // End of quote.
+            if (*c == currentquote) {
+                if (currentquote != '<') {
+                    textbuffer_add (t, *c++);
+                    currentquote = 0;
+                }
+            }
+            // Backslash, add next character as literal, so we ignore
+            // quote characters.
+            else if (*c == '\\') {
+                textbuffer_add (t, *c);
+                c++;
+                if (*c) {
+                    textbuffer_add (t, *c);
+                    c++;
+                }
+            }
+            // Nope, just add the literal
+            else {
+                textbuffer_add (t, *c);
+                c++;
             }
         }
-        else if (!currentquote && c[0] == '/' && c[1] == '/') {
+        // --------------------------------------------------------------------
+        // From here on down, we're deffo not inside any kind of quote
+        // --------------------------------------------------------------------
+        // Line comment? Paste literally until end of line.
+        else if (c[0] == '/' && c[1] == '/') {
             while (*c && (*c != '\n')) {
                 textbuffer_add_c (t, *c);
                 c++;
@@ -230,7 +280,8 @@ char *handle_sugar (const char *src) {
                 c++;
             }
         }
-        else if (!currentquote && c[0] == '/' && c[1] == '*') {
+        // Start of a /*comment*/? Paste literally until end of comment.
+        else if (c[0] == '/' && c[1] == '*') {
             while (*c && (c[0] != '*' && c[1] != '/')) {
                 textbuffer_add_c (t, *c);
                 c++;
@@ -241,12 +292,10 @@ char *handle_sugar (const char *src) {
                 c+=2;
             }
         }
-        else if (!currentquote && c[0] == '<' && c[1] == '<' && c[2] == '<') {
-            c += 3;
-            if (*c == '`') {
-                backtick=1;
-                c++;
-            }
+        // Dtart of a <<<`blockquote`>>>?
+        else if (c[0] == '<' && c[1] == '<' &&
+                 c[2] == '<' && c[3] == '`') {
+            c += 4;
             currentquote = '<';
             quoteline = 0;
             skippedspaces = 0;
@@ -256,23 +305,18 @@ char *handle_sugar (const char *src) {
             textbuffer_add_c (t, '(');
             textbuffer_add (t, '"');
         }
-        else if (currentquote && *c == '\\') {
-            textbuffer_add (t, *c);
-            c++;
-            if (*c) {
-                textbuffer_add (t, *c);
-                c++;
-            }
-        }
-        else if (cisquote (*c) && (! currentquote)) {
+        // Start of a regular javascript quote.
+        else if (cisquote (*c)) {
             textbuffer_add (t, *c);
             currentquote = *c;
             c++;
         }
-        else if (!currentquote && c-src && (c[0] == ':') && (c[1] == ':')) {
+        // '::' literal? Replace with ".prototype."
+        else if (c-src && (c[0] == ':') && (c[1] == ':')) {
             textbuffer_add_str (t, ".prototype.");
             c+=2;
         }
+        // None of the above, add literal
         else {
             textbuffer_add (t, *c);
             c++;

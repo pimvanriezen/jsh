@@ -63,17 +63,17 @@ query.help = function() {
         args:[
             {name:"wildcard",text:"Filesystem wildcard match"}
         ],
-        text:<<<
+        text:<<<`
             Sets up a wildcard query against paths on the filesystem.
             The returned object has a couple of functions to deal with
             actually processing the query results, which are evaluated
             just before a function is called.
             
             The following functions are supported:
-        >>>
+        `>>>
     });
     echo ("");
-    echo (TextTable.auto (<<<
+    echo (TextTable.auto (<<<`
         write(data)     Overwrites matching objects with data
         run(...)        Executes the matching files, with arguments provided
                         in the argument list
@@ -85,7 +85,7 @@ query.help = function() {
         chmod(spec)     Changes permissions on all matching objects. See the
                         help page of the chmod() command for the valid 
                         specification
-    >>>,2).boldColumn(0).indent(4).format());
+    `>>>,2).boldColumn(0).indent(4).format());
 }
 
 module.exports = query;

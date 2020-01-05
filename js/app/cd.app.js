@@ -41,9 +41,9 @@ cd.history = function() {
 cd.history.help = function() {
     setapi.helptext ({
         name:"cd.history",
-        text:<<<
+        text:<<<`
             Displays the history of working directories.
-        >>>
+        `>>>
     });
 }
 

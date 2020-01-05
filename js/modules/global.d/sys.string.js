@@ -133,17 +133,17 @@ String::grep.help = function() {
     setapi.helptext ({
         name:"string.grep",
         args:[
-            {name:"pattern",text:<<<
+            {name:"pattern",text:<<<`
                 Regular expression pattern to match lines against.
-            >>>},
-            {name:"process",text:<<<
+            `>>>},
+            {name:"process",text:<<<`
                 [Optional] Regular expression pattern that will
                 be applied to a matchine line, and either deleted
                 or replaced with the third argument.
-            >>>},
-            {name:"replace",text:<<<
+            `>>>},
+            {name:"replace",text:<<<`
                 Replacement string for processing
-            >>>}
+            `>>>}
         ],
         text:<<<`
             Splits a string up by newlines, then pulls them through
