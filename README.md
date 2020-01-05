@@ -257,6 +257,7 @@ secondHandler = function (req) {
             </body>
         </html>
     `>>>);
+    return 200;
 }
 
 var Map = new URLMap({
