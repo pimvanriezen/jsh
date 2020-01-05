@@ -5,6 +5,7 @@
 //     $ jshttpd -p 8888 example.server.js
 // ============================================================================
 
+// Refuse to run in interactive/script modes
 if (sys.context != 'http') throw new Error ("need jshttpd");
 
 // Default globals on startup
@@ -58,6 +59,10 @@ APIHandler.root = function (req) {
                 Your advertisement could be here. Thank God it isn't.
                 <br>
                 Your browser is ${req.getHeader("user-agent")}
+                <br>
+                @{if req.getHeader("Host").substr(0,9) != "localhost"}
+                  You are a visitor from outside localhost, welcome!
+                @{endif}
             </body>
         </html>
     `>>>);
