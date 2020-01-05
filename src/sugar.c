@@ -43,6 +43,21 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
         c+= 7;
         textbuffer_add_str (t, "\":true?\"");
     }
+    // @{if stma}foo@{elseif stmb}bar@{endif}
+    // should lead to:
+    // ""+((stma)?"foo":(stmb)?"bar":"")+""
+    else if (strncmp (c, "@{else if ", 10) == 0 ||
+             strncmp (c, "@{elseif ", 9) == 0 ||
+             strncmp (c, "@{elsif ", 8) == 0) {
+        c = strchr (c, ' ');
+        c++;
+        textbuffer_add_str (t, "\":(");
+        while (*c != '}') {
+            textbuffer_add_c (t, *c);
+        }
+        c++;
+        textbuffer_add_str (t, ")?\"");
+    }
     else if (strncmp (c, "@{endif}", 8) == 0) {
         c+= 8;
         textbuffer_add_str (t, "\":\"\")+\"");
