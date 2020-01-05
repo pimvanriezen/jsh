@@ -248,6 +248,17 @@ pageHandler = function (req) {
     return 200;
 }
 
+secondHandler = function (req) {
+    req.send (<<<`
+        <html>
+            <head><title>Second page</title></head>
+            <body>
+                Hi
+            </body>
+        </html>
+    `>>>);
+}
+
 var Map = new URLMap({
     get:pageHandler,
     "/secondpage":{
