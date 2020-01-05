@@ -140,7 +140,7 @@ Accumulator::sum = function(i) {
     return this._sum;
 }
 
-var a = new Accumulator().add("15").add("27");
+var a = new Accumulator().add(15).add(27);
 echo (a.sum());
 ```
 
