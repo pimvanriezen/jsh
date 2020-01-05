@@ -52,7 +52,8 @@ int duk_cmdline_stack_check(void);
 // ============================================================================
 static void print_greet_line(void) {
     printf ("JSH version %s (%s)\n"
-            "Copyright (c) 2020 Midilab, available under the GNU GPL v2\n\n"
+            "Copyright (c) 2020 Midilab\n"
+            "Available under the GNU GPL v2\n\n"
             "Type \033[1mhelp()\033[0m for a list of commands.\n",
             JSH_VERSION, JSH_PLATFORM);
 }

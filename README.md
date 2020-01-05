@@ -225,13 +225,64 @@ program of your making. But instead of the asynchronous structure of Node,
 jshttpd runs the script in multiple threads that don't share a common heap.
 This allows the entire flow to be regular easy-to-follow synchronous code. To
 accommodate shared state, a globalStorage object allows multiple threads
-to store state information, with optional locked access. See the
-[example code](example/example.server.js) to see how that works out.
+to store state information, with optional locked access.
+
+Here's what a basic server script looks like:
+```javascript
+pageHandler = function (req) {
+    req.send (<<<`
+        <html>
+            <head><title>Welcome to my server</title></head>
+            <body>
+                <h1>Example page from jshttpd</h1>
+                Your advertisement could be here. Thank God it isn't.
+                <br>
+                Your browser is ${req.getHeader("user-agent")}
+                <br>
+                @{if req.getHeader("Host").substr(0,9) != "localhost"}
+                  You are a visitor from outside localhost, welcome!
+                @{endif}
+            </body>
+        </html>
+    `>>>);
+    return 200;
+}
+
+var Map = new URLMap({
+    get:pageHandler,
+    "/secondpage":{
+        get:secondHandler
+    }
+});
+
+request.setHandler (Map);
+```
+See the [example code](example/example.server.js) to see a more
+comprehensive demonstration.
 
 ## SQLite integration
 
 The runtime has bindings for SQLite, with a useful class for constructing
-queries and creating tables.
+queries and creating tables:
+
+```javascript
+var db = new SQLite("database.sqlite");
+db.defineTable("orders",{
+    id:"+",
+    customerName:"text",
+    orderData:"text",
+    totalPrice:"int"
+});
+
+db.insert({
+    customerName:"John Doe",
+    orderData:["chicken sandwich","french fries","beer"],
+    totalPrice:14.95
+});
+
+db.query("update orders set customerName=? where customerName=?",
+         "John Deau", "John Doe");
+```
 
 # Getting Started
 
@@ -245,8 +296,8 @@ On RedHat-derived distros, you can install both dependencies through yum:
 
 > yum install libmicrohttpd-devel sqlite-devel
 
-I'm not sure about the proper package-name for debian/ubuntu, so good luck
-there!
+I'm not sure about the proper package-name for Debian, Unbuntu, Arch or
+Hannah Montana Linux, so good luck there!
 
 After you took care of the dependency, building should be as simple as
 running a 'make', possibly followed by a 'make install'. The install
