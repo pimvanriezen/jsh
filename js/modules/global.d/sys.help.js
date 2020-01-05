@@ -975,7 +975,7 @@ sys.sock.stat.help = function() {
 setapi (sys.sock.stat, "sys.sock.stat");
 
 // ============================================================================
-// sys.sock.stat
+// sys.gethostbyname
 // ============================================================================
 sys.gethostbyname.help = function() {
     setapi.helptext ({
@@ -993,3 +993,134 @@ sys.gethostbyname.help = function() {
 }
 
 setapi (sys.gethostbyname, "sys.gethostbyname");
+
+// ============================================================================
+// sys.global.get
+// ============================================================================
+sys.global.get.help = function() {
+    setapi.helptext ({
+        name:"sys.global.get",
+        args:[
+            {name:"rootid",text:<<<`
+                The top level root key for the storage object.
+            `>>>},
+            {name:"id",text:<<<`
+                The key of the storage object.
+            `>>>},
+            {name:"locked",text:<<<`
+                If provided, and true, other threads will be blocked
+                from accessing the object until this thread has
+                relinquished it by writing a value to it.
+            `>>>}
+        ],
+        text:<<<`
+            The global storage is a tool for multiple threads within
+            a jshttpd application to share data between eachother.
+            Rather than messing through this API, user code is encouraged
+            to use the globalstorage.js module provided.
+        `>>>
+    })
+}
+
+setapi (sys.global.get, "sys.global.get");
+
+// ============================================================================
+// sys.global.set
+// ============================================================================
+sys.global.set.help = function() {
+    setapi.helptext ({
+        name:"sys.global.set",
+        args:[
+            {name:"rootid",text:<<<`
+                The top level root key for the storage object.
+            `>>>},
+            {name:"id",text:<<<`
+                The key of the storage object.
+            `>>>},
+            {name:"value",text:<<<`
+                The value to store. Only accepts strings. Needs
+                prior serialization if you want to store objects.
+            `>>>}
+        ],
+        text:<<<`
+           Writes a value to the global storage, and unlocks it if it was
+           locked.
+        `>>>
+    })
+}
+
+setapi (sys.global.set, "sys.global.set");
+
+// ============================================================================
+// sys.sql.open
+// ============================================================================
+sys.sql.open.help = function() {
+    setapi.helptext ({
+        name:"sys.sql.open",
+        args:[
+            {name:"path",text:"Database path"}
+        ],
+        text:<<<`
+            Opens a connection to an SQLite database. Returns a database
+            handle needed for other sys.sql.* calls.
+        `>>>
+    })
+}
+
+setapi (sys.sql.open, "sys.sql.open");
+
+// ============================================================================
+// sys.sql.close
+// ============================================================================
+sys.sql.close.help = function() {
+    setapi.helptext ({
+        name:"sys.sql.close",
+        args:[
+            {name:"handle",text:"Database handle"}
+        ],
+        text:<<<`
+            Closes a database connection.
+        `>>>
+    });
+}
+
+setapi (sys.sql.close, "sys.sql.close");
+
+// ============================================================================
+// sys.sql.query
+// ============================================================================
+sys.sql.query.help = function() {
+    setapi.helptext ({
+        name:"sys.sql.query",
+        args:[
+            {name:"handle",text:"Database handle"},
+            {name:"query",text:<<<`
+                The query text. Argument can be followed by parameters
+                for a prepared statement. Acceptable value types for
+                extra parameters are number, string, and null.
+            `>>>}
+        ],
+        text:<<<`
+            Performs an SQL query.
+        `>>>
+    });
+}
+
+setapi (sys.sql.query, "sys.sql.query");
+
+// ============================================================================
+// sys.sql.rowsaffected
+// ============================================================================
+sys.sql.rowsaffected.help = function() {
+    setapi.helptext ({
+        name:"sys.sql.rowsaffected",
+        args:[
+            {name:"handle",text:"Database handle"}
+        ],
+        text:<<<`
+            Returns the number of rows affected by the last query.
+        `>>>
+    });
+}
+
+setapi (sys.sql.rowsaffected, "sys.sql.rowsaffected");
