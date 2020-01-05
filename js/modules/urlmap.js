@@ -52,6 +52,10 @@ URLMap::call = function(req,path,obj) {
             return this.errorReturn (req, 404);
         }
         
+        if (req.method != "GET") {
+            return this.errorReturn (req, 405);
+        }
+        
         // See if there's anything at the provided path
         var fn = obj + '/' + path;
         var st = stat(fn);
