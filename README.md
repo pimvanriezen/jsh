@@ -100,7 +100,7 @@ configuration files, and there's no way in any current language to not
 make code for that look awkward. The JSH parser adds an extra style
 of text quotes to javascript, specifically to solve this problem. It
 allows for inlining variable templates, as well as simple iteration
-and if-statements, but, most importantly, it deals
+and if-then-else-statements, but, most importantly, it deals
 with the text being indented, by looking at the first line of text, and
 cutting that indentation out of each subsequent line. As long as you're
 not being weirdly esoteric in mixing tabs and spaces, this works out
@@ -227,6 +227,11 @@ This allows the entire flow to be regular easy-to-follow synchronous code. To
 accommodate shared state, a globalStorage object allows multiple threads
 to store state information, with optional locked access. See the
 [example code](example/example.server.js) to see how that works out.
+
+## SQLite integration
+
+The runtime has bindings for SQLite, with a useful class for constructing
+queries and creating tables.
 
 # Getting Started
 
