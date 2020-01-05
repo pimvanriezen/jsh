@@ -169,7 +169,6 @@ duk_ret_t sys_parse (duk_context *ctx) {
     struct textbuffer *t = textbuffer_load (fnam);
     if (! t) {
         duk_push_boolean (ctx, 0);
-        textbuffer_free (t);
     }
     else {
         if (duk_get_top(ctx) > 1) {
