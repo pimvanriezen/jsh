@@ -99,23 +99,25 @@ A lot of jobs in the shell-script domain end up needing to rewrite
 configuration files, and there's no way in any current language to not
 make code for that look awkward. The JSH parser adds an extra style
 of text quotes to javascript, specifically to solve this problem. It
-allows for inlining variable templates, but, most importantly, it deals
+allows for inlining variable templates, as well as simple iteration
+and if-statements, but, most importantly, it deals
 with the text being indented, by looking at the first line of text, and
 cutting that indentation out of each subsequent line. As long as you're
 not being weirdly esoteric in mixing tabs and spaces, this works out
 quite well:
 
 ```javascript
-var setSystemResolverOptions = function(domain,pri,sec) {
+var setSystemResolverOptions = function(domain,servers) {
     if (! domain) domain = "local";
-    if (! pri) pri = "4.4.4.4";
-    if (! sec) sec = "8.8.8.8";
+    if (! servers) servers = ["4.4.4.4","8.8.8.8"];
+    if (! Array.isArray(servers)) servers = [servers];
     
     var rconf = <<<`
         ; System resolver configuration, do not edit manually.
         domain ${domain}
-        nameserver ${pri}
-        nameserver ${sec}
+        @{for var i in servers}
+        nameserver ${servers[i]}
+        @{next}
     `>>>;
     
     save (rconf, "/etc/resolv.conf");
