@@ -286,7 +286,7 @@ db.defineTable("orders",{
     totalPrice:"int"
 });
 
-db.insert({
+db.insert("orders",{
     customerName:"John Doe",
     orderData:["chicken sandwich","french fries","beer"],
     totalPrice:14.95
