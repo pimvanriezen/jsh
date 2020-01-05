@@ -110,6 +110,7 @@ char *handle_sugar (const char *src) {
                     // where new lines start, so we can go on.
                     if ((c - linestart + 1) >= spacestoskip) {
                         skippedspaces = 1;
+                        hadcontent = 0;
                     }
                 }
                 c++;
@@ -128,7 +129,21 @@ char *handle_sugar (const char *src) {
                 // to keep line numbering consistent with the
                 // original source.
                 if (quoteline || hadcontent) {
-                    textbuffer_add_str (t, "\\n\"+\n\"");
+                    // Ok this is tricky. We want a truly empty
+                    // line that had no content yet to count
+                    // as empty. But if it only appears empty
+                    // because we parsed a template directive into
+                    // it, and there was no other content,
+                    // we'd like to ignore the line.
+                    if (! hadcontent) {
+                        if ((c-linestart) <= spacestoskip) {
+                            textbuffer_add_str (t, "\\n\"+\n\"");
+                        }
+                        else {
+                            textbuffer_add_str (t, "\"+\n\"");
+                        }
+                    }
+                    else textbuffer_add_str (t, "\\n\"+\n\"");
                 }
                 else {
                     textbuffer_add_str (t, "\"+\n\"");
@@ -137,6 +152,7 @@ char *handle_sugar (const char *src) {
                 c++;
                 linestart = c;
                 skippedspaces = 0;
+                hadcontent = 0;
             }
             else if (*c == '\r') {
                 // Skip windows EOL noise
@@ -159,11 +175,24 @@ char *handle_sugar (const char *src) {
             }
             else if (c[0] == '@' && c[1] == '{') {
                 c += handle_template_command (c, t);
-                if (*c == '\n') {
-                    c++;
-                    linestart = c;
-                    skippedspaces = 0;
-                    textbuffer_add_str (t, "\"+\n\"");
+                
+                // if the command was on its own line,
+                // ignore following whitespace and newline
+                // (in the latter case, only in terms of line
+                // numbering).
+                if (! hadcontent) {
+                    // if anything other than newline follows
+                    // whitespace, we roll back and accept that
+                    // the whitespace was intentional.
+                    const char *backoff = c;
+                    while (ciswhite (*c)) c++;
+                    if (*c == '\n') {
+                        c++;
+                        linestart = c;
+                        skippedspaces = 0;
+                        textbuffer_add_str (t, "\"+\n\"");
+                    }
+                    else c = backoff;
                 }
             }
             else if (cisquote (*c)) {
