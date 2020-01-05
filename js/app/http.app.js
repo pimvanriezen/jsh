@@ -10,9 +10,9 @@ var http = setapi ([
     {arg:"method",helptext:"Request method (e.g., POST)"},
     {literal:function(args) {
         var ret = [];
-        if (args.headers) for (var i in args.outheaders) {
+        if (args.outheaders) for (var i in args.outheaders) {
             ret.push ("-H");
-            ret.push (i + ": "+args.headers[i]);
+            ret.push (i + ": "+args.outheaders[i]);
         }
         return ret;
     }},
@@ -248,5 +248,5 @@ http.put.help = function() {
     });
 }
 
-module.version = "1.0.4";
+module.version = "1.0.5";
 module.exports = http;
