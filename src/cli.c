@@ -33,7 +33,7 @@
 #include "version.h"
 
 extern void sys_init (void);
-extern void sys_init_heap (duk_context *);
+extern void sys_init_heap (duk_context *, const char *);
 
 #define  MEM_LIMIT_NORMAL   (128*1024*1024)   /* 128 MB */
 #define  MEM_LIMIT_HIGH     (2047*1024*1024)  /* ~2 GB */
@@ -701,7 +701,8 @@ static int handle_interactive(duk_context *ctx) {
 // FUNCTION create_duktape_heap
 // ============================================================================
 static duk_context *create_duktape_heap(int alloc_provider,
-                                        int debugger, int lowmem_log) {
+                                        int debugger, int lowmem_log,
+                                        int interactive) {
     duk_context *ctx;
 
     (void) lowmem_log;  /* suppress warning */
@@ -737,7 +738,7 @@ static duk_context *create_duktape_heap(int alloc_provider,
     duk_pop(ctx);
 
     sys_init ();
-    sys_init_heap (ctx);
+    sys_init_heap (ctx, interactive ? "interactive":"script");
 
     if (debugger) {
         fprintf(stderr, "Warning: option --debugger ignored, "
@@ -833,7 +834,8 @@ int main(int argc, char *argv[]) {
      *  Create heap
      */
 
-    ctx = create_duktape_heap(alloc_provider, debugger, lowmem_log);
+    ctx = create_duktape_heap(alloc_provider, debugger,
+                              lowmem_log, interactive);
 
     /*
      *  Execute any argument file(s)

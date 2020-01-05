@@ -57,7 +57,7 @@ void sys_init (void) {
 //
 // Finally, the path to global.js is resolved to bootstrap the system.
 // ============================================================================
-void sys_init_heap (duk_context *ctx) {
+void sys_init_heap (duk_context *ctx, const char *context) {
     const char *osglobal;
 
     duk_idx_t obj_idx;
@@ -106,6 +106,10 @@ void sys_init_heap (duk_context *ctx) {
     
     duk_push_string (ctx, "_modules");
     duk_push_object (ctx);
+    duk_def_prop (ctx, obj_idx, PROPFLAGS);
+    
+    duk_push_string (ctx, "context");
+    duk_push_string (ctx, context);
     duk_def_prop (ctx, obj_idx, PROPFLAGS);
 
     defcall (cd, 1);

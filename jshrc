@@ -19,23 +19,28 @@ defaults({
 // ============================================================================
 // Load all core modules
 // ============================================================================
-$               = require("fquery");
-userdb          = require("userdb");
-groupdb         = require("groupdb");
-proc            = require("proc");
-run             = require("run");
-setapi          = require("setapi");
-dump            = require("dump");
-which           = require("which");
-len             = require("len");
+$                   = require("fquery");
+userdb              = require("userdb");
+groupdb             = require("groupdb");
+proc                = require("proc");
+run                 = require("run");
+setapi              = require("setapi");
+dump                = require("dump");
+which               = require("which");
+len                 = require("len");
 
-TextTable       = require("texttable");
-TextGrid        = require("textgrid");
-File            = require("file");
-Socket          = require("socket");
-UDPSocket       = require("udpsocket");
-ListenSocket    = require("listensocket");
-SQLite          = require("sqlite");
+TextTable           = require("texttable");
+TextGrid            = require("textgrid");
+File                = require("file");
+Socket              = require("socket");
+UDPSocket           = require("udpsocket");
+ListenSocket        = require("listensocket");
+SQLite              = require("sqlite");
+
+if (sys.context == 'http') {
+    URLMap          = require("urlmap");
+    globalStorage   = require("globalstorage");
+}
 
 // ============================================================================
 // Set up the result formatter for the interactive shell

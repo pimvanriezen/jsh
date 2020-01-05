@@ -16,7 +16,7 @@
 #include "version.h"
 
 extern void sys_init (void);
-extern void sys_init_heap (duk_context *);
+extern void sys_init_heap (duk_context *, const char *);
 
 typedef struct heapstore_item {
     struct heapstore_item   *next;
@@ -157,7 +157,7 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
         "}}\n");
         
     duk_module_duktape_init (ctx);
-    sys_init_heap (ctx);
+    sys_init_heap (ctx, "http");
     
     duk_eval_string(ctx,
         "request={\n"

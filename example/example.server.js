@@ -4,8 +4,8 @@
 // Spawn this program with jshttpd, i.e.:
 //     $ jshttpd -p 8888 example.server.js
 // ============================================================================
-var globalStorage = require("globalstorage");
-var URLMap = require("urlmap");
+
+if (sys.context != 'http') throw new Error ("need jshttpd");
 
 // Default globals on startup
 globalStorage.initialize ({
