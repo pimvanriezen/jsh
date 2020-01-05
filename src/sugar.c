@@ -195,6 +195,7 @@ char *handle_sugar (const char *src) {
             else if (*c == '\\') {
                 // Escape backslash
                 textbuffer_add_str (t, "\\\\");
+                c++;
             }
             else if (c[0] == '$' && c[1] == '{') {
                 // Inline variable
