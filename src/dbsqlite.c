@@ -165,7 +165,6 @@ duk_ret_t sys_sql_query (duk_context *ctx) {
     }
     
     for (int ai=0; ai<nparam; ++ai) {
-        printf ("param %i ", ai);
         if (duk_is_number (ctx, ai+2)) {
             sqlite3_bind_double (stmt, ai+1, duk_get_number (ctx, ai+2));
         }

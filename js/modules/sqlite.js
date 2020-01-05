@@ -123,4 +123,124 @@ SQLite::describe.help = function() {
     });
 }
 
+// ============================================================================
+// METHOD SQLite::defineTable
+// ============================================================================
+SQLite::defineTable = function(name,def) {
+    if (this.listTables().contains(name)) return false;
+    var query = "CREATE TABLE `"+name+"` (";
+    var comma = "";
+    for (var k in def) {
+        query += comma + "`" + k + "`";
+        comma = ", ";
+        if (def[k] == '+') {
+            query += " integer primary key autoincrement";
+        }
+        else if (def[k][0] == '*') {
+            query += def[k].substr(1)+" primary key";
+        }
+        else query += " "+def[k];
+    }
+    query += ")";
+    return this.query (query);
+}
+
+SQLite::defineTable.help = function() {
+    setapi.helptext({
+        name:"db.defineTable",
+        args:[
+            {name:"table",text:"The table name"},
+            {name:"def",text:<<<`
+                The table definition, a dictionary of fields to add
+                to the table, with their type as value (nominally
+                either 'text' or 'integer'). A field marked with the
+                type '+' will be set as an auto-incrementing integer
+                key. A field type prepended with '*' will act as a regular
+                primary key.
+            `>>>}
+        ],
+        text:<<<`
+            Creates a table from a definition. Will return false if
+            the table already exists.
+        `>>>
+    })
+}
+
+// ============================================================================
+// METHOD SQLite::insert
+// ============================================================================
+SQLite::insert = function(name,def) {
+    var values=[];
+    if (! this.listTables().contains(name)) return false;
+    var query = "INSERT INTO `"+name+"`(";
+    var comma = "";
+    for (var k in def) {
+        query += comma + k;
+        comma = ",";
+        values.push (def[k]);
+    }
+    query += ") VALUES (";
+    comma = "";
+    for (var k in def) {
+        query += comma + '?';
+        comma=",";
+    }
+    query += ")";
+    
+    var args = [query].intern (values);
+    return this.query.apply (this, args);
+}
+
+SQLite::insert.help = function() {
+    setapi.helptext({
+        name:"db.insert",
+        args:[
+            {name:"table",text:"The table name"},
+            {name:"def",text:<<<`
+                A dictionary of fields to insert, with the field name
+                as key and the desired value as value.
+            `>>>}
+        ],
+        text:<<<`
+            Adds a row to a database table.
+        `>>>
+    })
+}
+
+// ============================================================================
+// METHOD SQLite::display
+// ============================================================================
+SQLite::display = function(table) {
+    var def = this.describe (table);
+    var tt = new TextTable (def.length);
+    var rowdef = [];
+    for (var k in def) {
+        if (def[k].type == "integer") tt.rightAlignColumn(k);
+        rowdef.push (def[k].name.toUpperCase());
+        if (def[k].pk == 1) tt.boldColumn(k);
+    }
+    tt.addRow (rowdef);
+    var data = this.query ("select * from `"+table+"`");
+    for (var i in data) {
+        var row = [];
+        for (var k in def) {
+            row.push (data[i][def[k].name]);
+        }
+        tt.addRow (row);
+    }
+    print (tt.format());
+}
+
+SQLite::display.help = function() {
+    setapi.helptext({
+        name:"db.display",
+        args:[
+            {name:"table",text:"The table name"},
+        ],
+        text:<<<`
+            Displays the contents of a table (if it fits your terminal width).
+        `>>>
+    })
+}
+
 module.exports = SQLite;
