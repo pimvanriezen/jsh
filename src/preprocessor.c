@@ -514,7 +514,7 @@ char *preprocess (const char *src) {
     }
     
     // fprintf (stderr, "---\n%s\n---\n", t->alloc);
-    
+    textbuffer_add_c (t, 0);
     char *res = t->alloc;
     free (t);
     return res;

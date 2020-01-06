@@ -111,6 +111,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
 
     // Translate syntax sugar, and push the result to the stack.
     char *translated = preprocess (t->alloc);
+    size_t rssz = strlen (translated);
     duk_push_string (ctx, translated);
     free (translated);
     
@@ -120,7 +121,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
     duk_push_string (ctx, full);
     duk_put_prop_string (ctx, obj_idx, "fileName");
-    duk_push_number (ctx, strlen(translated));
+    duk_push_number (ctx, rssz);
     duk_put_prop_string (ctx, obj_idx, "size");
     duk_push_string (ctx, "require");
     duk_put_prop_string (ctx, obj_idx, "type");
