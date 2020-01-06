@@ -236,7 +236,7 @@ File::readLine = function() {
     var nl = this.rdbuf.indexOf (this.eol);
     while (nl<0) {
         var inbuf = sys.io.read (this.fd, 256);
-        if (! inbuf.length) {
+        if (! inbuf || ! inbuf.length) {
             sys.io.close (this.fd);
             this.fd = null;
             if (this.rdbuf.length) {

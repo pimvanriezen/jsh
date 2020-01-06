@@ -16,6 +16,7 @@
 #include <strings.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
+#include <signal.h>
 #include "duktape.h"
 #include "sys_run.h"
 #include "textbuffer.h"
@@ -218,5 +219,102 @@ duk_ret_t sys_runconsole (duk_context *ctx) {
     else {
         duk_push_boolean (ctx, 1);
     }
+    return 1;
+}
+
+duk_ret_t sys_runpipe (duk_context *ctx) {
+    if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
+    int tocmdpipe[2];
+    int fromcmdpipe[2];
+    int i;
+    pid_t pid;
+    int fdin;
+    int fdout;
+    int numarg = 0;
+    char **args = NULL;
+    const char *command = duk_to_string (ctx, 0);
+    const char *senddata = NULL;
+    
+    // Get the array length of arguments[0]
+    duk_get_prop_string(ctx,1,"length");
+    numarg = duk_get_int(ctx,-1);
+    duk_pop(ctx);
+    
+    // We need two extra arguments, one for the command name,
+    // and one for the terminating NULL that execvp wants.
+    args = (char **) calloc (sizeof(char*),numarg+2);
+    
+    // Copy the arguments from the array
+    args[0] = mystrdup (command);
+    for (i=0; i<numarg; ++i) {
+        duk_get_prop_index(ctx,1,i);
+        args[i+1] = mystrdup(duk_to_string(ctx,-1));
+        duk_pop(ctx);
+    }
+    args[i+1] = NULL;
+    
+    // If we have a second argument, it means there's data to be sent
+    // into the child process stdin.
+    if (duk_get_top (ctx) > 2) senddata = duk_to_string (ctx, 2);
+    
+    // Set up unix pipes
+    fd_pipe (tocmdpipe);
+    fd_pipe (fromcmdpipe);
+    fd_retain (tocmdpipe[0]);
+    fd_retain (fromcmdpipe[1]);
+    
+    // Spawn
+    switch (pid = fd_fork()) {
+        case -1:
+            fd_close (tocmdpipe[0]);
+            fd_close (tocmdpipe[1]);
+            fd_close (fromcmdpipe[0]);
+            fd_close (fromcmdpipe[1]);
+            for (i=0; i<(numarg+1);++i) free (args[i]);
+            free (args);
+            return 0;
+            
+        case 0:
+            // We're the new process here.
+            fd_close (0);
+            fd_close (1);
+            fd_close (2);
+            fd_dup2 (tocmdpipe[0], 0);
+            fd_dup2 (fromcmdpipe[1], 1);
+            fd_dup2 (fromcmdpipe[1], 2);
+            execvp (command, args);
+            printf ("Exec failed: %s", strerror (errno));
+            exit (1);
+    }
+    
+    // Close the ends of the pipe that aren't ours.
+    fd_close (fromcmdpipe[1]);
+    fd_close (tocmdpipe[0]);
+    
+    // For clarity
+    fdout = tocmdpipe[1];
+    fdin = fromcmdpipe[0];
+    
+    duk_push_array (ctx);
+    duk_push_int (ctx, fdin);
+    duk_put_prop_index (ctx, -2, 0);
+    duk_push_int (ctx, fdout);
+    duk_put_prop_index (ctx, -2, 1);
+    duk_push_int (ctx, pid);
+    duk_put_prop_index (ctx, -2, 2);
+    return 1;
+}
+
+duk_ret_t sys_closepipe (duk_context *ctx) {
+    if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
+    pid_t pid = duk_get_int (ctx, 0);
+    if (! pid) {
+        duk_push_boolean (ctx, 0);
+        return 1;
+    }
+    kill (pid, SIGTERM);
+    int ret;
+    waitpid (pid, &ret, 0);
+    duk_push_int (ctx, WEXITSTATUS(ret));
     return 1;
 }

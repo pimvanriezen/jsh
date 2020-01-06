@@ -128,6 +128,8 @@ void sys_init_heap (duk_context *ctx, const char *context) {
     defcall (write, 2);
     defcall (run, DUK_VARARGS);
     defcall (runconsole, 2);
+    defcall (runpipe, 2);
+    defcall (closepipe, 1);
     defcall (mkdir, DUK_VARARGS);
     defcall (chmod, 2);
     defcall (chown, 3);

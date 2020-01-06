@@ -137,4 +137,48 @@ run.js.help = function() {
 }
 #endif
 
+// ============================================================================
+// FUNCTION run.pipe
+// ============================================================================
+run.pipe = function() {
+    var args = [];
+    var res;
+    if (arguments.length == 1) {
+        var arg = ""+arguments[0];
+        if (arg.indexOf (' ') < 0) res = sys.runpipe (arg, []);
+        else {
+            args = arg.split(' ');
+            var cmd = which (args.splice(0,1)[0]);
+            if (cmd) res = sys.runpipe (cmd, args);
+        }
+    }
+    else {
+        var cmd = arguments[0];
+        for (var i=1;i<arguments.length; ++i) args.push (arguments[i]);
+        res = sys.runpipe (cmd, args);
+    }
+    if (! res) {
+        return false;
+    }
+    var p = new Pipe();
+    p.setData (res[0],res[1],res[2]);
+    return p;
+}
+
+#ifdef IS_INTERACTIVE
+run.js.help = function() {
+    setapi.helptext({
+        name:"run.pipe",
+        args:[
+            {name:"cmd",text:"Command to run"},
+            {name:"args",text:"Argument list"}
+        ],
+        text:<<<`
+            Spawns the command and returns a Pipe object connected to
+            the process' in- and output.
+        `>>>
+    });
+}
+#endif
+
 module.exports = run;

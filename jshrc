@@ -35,6 +35,7 @@ File                = require("file");
 Socket              = require("socket");
 UDPSocket           = require("udpsocket");
 ListenSocket        = require("listensocket");
+Pipe                = require("pipe");
 SQLite              = require("sqlite");
 
 if (sys.context == 'http') {
