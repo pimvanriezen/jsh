@@ -11,6 +11,7 @@ Channel = function() {
     });
 }
 
+#ifdef IS_INTERACTIVE
 Channel.help = function() {
     setapi.helptext({
         name:"c = new Channel",
@@ -31,6 +32,7 @@ Channel.help = function() {
 }
 
 setapi (Channel, "Channel");
+#endif
 
 // ============================================================================
 // METHOD Channel::send
@@ -43,6 +45,7 @@ Channel::send = function (data) {
     return sys.channel.send (this.ch, JSON.stringify (data));
 }
 
+#ifdef IS_INTERACTIVE
 Channel::send.help = function() {
     setapi.helptext({
         name:"c.send",
@@ -57,6 +60,7 @@ Channel::send.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD Channel::senderror
@@ -66,6 +70,7 @@ Channel::senderror = function (data) {
     sys.channel.senderror (this.ch, ""+data);
 }
 
+#ifdef IS_INTERACTIVE
 Channel::senderror.help = function() {
     setapi.helptext({
         name:"c.senderror",
@@ -77,6 +82,7 @@ Channel::senderror.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD Channel::isempty
@@ -86,6 +92,7 @@ Channel::isempty = function() {
     return sys.channel.isempty (this.ch);
 }
 
+#ifdef IS_INTERACTIVE
 Channel::isempty.help = function() {
     setapi.helptext({
         name:"c.isempty",
@@ -94,6 +101,7 @@ Channel::isempty.help = function() {
         `>>>
     })
 }
+#endif
 
 Channel::available = function() {
     return sys.channel.available (this.ch);
@@ -112,6 +120,7 @@ Channel::recv = function() {
     else return JSON.parse (res);
 }
 
+#ifdef IS_INTERACTIVE
 Channel::recv.help = function() {
     setapi.helptext({
         name:"c.recv",
@@ -120,6 +129,7 @@ Channel::recv.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD Channel::exit
@@ -129,6 +139,7 @@ Channel::exit = function() {
     sys.channel.exit (this.ch);
 }
 
+#ifdef IS_INTERACTIVE
 Channel::exit.help = function() {
     setapi.helptext({
         name:"c.exit",
@@ -139,6 +150,7 @@ Channel::exit.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD Channel::close
@@ -148,6 +160,7 @@ Channel::close = function() {
     sys.channel.close (this.ch);
 }
 
+#ifdef IS_INTERACTIVE
 Channel::close.help = function() {
     setapi.helptext({
         name:"c.close",
@@ -157,6 +170,7 @@ Channel::close.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // FUNCTION go
@@ -182,6 +196,7 @@ go = function(chan, func) {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 go.help = function() {
     setapi.helptext({
         name:"go",
@@ -211,3 +226,4 @@ go.help = function() {
 }
 
 setapi (go, "go");
+#endif

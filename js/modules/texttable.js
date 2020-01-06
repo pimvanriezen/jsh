@@ -290,6 +290,7 @@ TextTable::format = function() {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 TextTable.help = function() {
     setapi.helptext({
         name:"t = new TextTable",
@@ -336,5 +337,6 @@ TextTable.help = function() {
 }
 
 setapi (TextTable,"TextTable");
+#endif
 
 module.exports = TextTable;

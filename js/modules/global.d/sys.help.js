@@ -1,4 +1,4 @@
-if (sys.context != 'http') {
+#ifdef IS_INTERACTIVE
 
 // ============================================================================
 // sys.cd
@@ -1187,4 +1187,4 @@ sys.dancingbears = function() {
   `>>>);
 }
 
-} // sys.context
+#endif

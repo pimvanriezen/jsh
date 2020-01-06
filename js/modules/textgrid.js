@@ -75,6 +75,7 @@ TextGrid::format = function() {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 TextGrid.help = function() {
     setapi.helptext({
         name:"c = new TextGrid",
@@ -100,5 +101,6 @@ TextGrid.help = function() {
 }
 
 setapi (TextGrid,"TextGrid");
+#endif
 
 module.exports = TextGrid;

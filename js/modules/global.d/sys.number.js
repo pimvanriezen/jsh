@@ -1,6 +1,7 @@
 // ============================================================================
 // Extensions to the Number class
 // ============================================================================
+#ifdef IS_INTERACTIVE
 Number.help = function() {
     print (setapi.textformat (<<<`
         The following extra functions have been added to the Number
@@ -19,6 +20,7 @@ Number.help = function() {
 }
 
 setapi (Number, "Number");
+#endif
 
 Number::toSize = function () {
     var res = this;
@@ -34,6 +36,7 @@ Number::toSize = function () {
     return "" + res.toFixed(0) + factor;
 }
 
+#ifdef IS_INTERACTIVE
 Number::toSize.help = function() {
     setapi.helptext ({
         name:"num.toSize",
@@ -45,12 +48,14 @@ Number::toSize.help = function() {
         `>>>
     });
 }
+#endif
 
 Number::toHex = function(wid) {
     if (! wid) return this.toString(16);
     return this.toString(16).padStart(wid,'0');
 }
 
+#ifdef IS_INTERACTIVE
 Number::toHex.help = function() {
     setapi.helptext ({
         name:"num.toHex",
@@ -63,3 +68,4 @@ Number::toHex.help = function() {
         `>>>
     })
 }
+#endif

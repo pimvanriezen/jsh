@@ -28,6 +28,7 @@ include = function(name) {
     }
 }
 
+#ifdef IS_INTERACTIVE
 include.help = function() {
     setapi.helptext ({
         name:"include",
@@ -46,6 +47,7 @@ include.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Override for Duktape require, picks up exceptions so we can report
@@ -69,6 +71,7 @@ printerr = function(e) {
     console.log ("% " + e);
 }
 
+#ifdef IS_INTERACTIVE
 printerr.help = function() {
     setapi.helptext ({
         name:"printerr",
@@ -78,6 +81,7 @@ printerr.help = function() {
         text:"Outputs error to the console"
     });
 }
+#endif
 
 // ============================================================================
 // regular print
@@ -88,6 +92,7 @@ print = function(x) {
     sys.print ("" + x);
 }
 
+#ifdef IS_INTERACTIVE
 print.help = function() {
     setapi.helptext ({
         name:"print",
@@ -97,12 +102,14 @@ print.help = function() {
         text:"Prints out the data, raw without a newline"
     });
 }
+#endif
 
 // ============================================================================
 // Print with newline
 // ============================================================================
 echo = console.log;
 
+#ifdef IS_INTERACTIVE
 echo.help = function() {
     setapi.helptext ({
         name:"echo",
@@ -112,6 +119,7 @@ echo.help = function() {
         text:"Prints data to the console, adding a newline"
     });
 }
+#endif
 
 // ============================================================================
 // Environment
@@ -163,6 +171,7 @@ setenv = function(def) {
     }
 }
 
+#ifdef IS_INTERACTIVE
 setenv.help = function() {
     setapi.helptext ({
         name:"setenv",
@@ -173,6 +182,7 @@ setenv.help = function() {
         text:"Sets multiple environment variables"
     });
 }
+#endif
 
 // ============================================================================
 // Environment defaults
@@ -186,6 +196,7 @@ defaults = function(def) {
     }
 }
 
+#ifdef IS_INTERACTIVE
 defaults.help = function() {
     setapi.helptext ({
         name:"defaults",
@@ -200,6 +211,7 @@ defaults.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Load in modules and globals

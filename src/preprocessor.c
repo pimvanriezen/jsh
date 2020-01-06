@@ -4,10 +4,70 @@
 #include <signal.h>
 #include <sys/resource.h>
 #include "linenoise.h"
-#include <stdint.h>  /* Assume C99/C++11 with linenoise. */
 #include <fcntl.h>
 #include <unistd.h>
-#include "sugar.h"
+#include "preprocessor.h"
+#include "hash.h"
+
+typedef struct define define;
+struct define {
+    define          *next;
+    char            *key;
+    char            *value;
+    uint32_t         hash;
+};
+
+typedef struct defines defines;
+struct defines {
+    define          *first;
+};
+
+static defines DEFINES;
+
+void preprocessor_init (void) {
+    DEFINES.first = NULL;
+}
+
+define *define_create (const char *key, const char *value, uint32_t hash) {
+    define *res = malloc (sizeof (define));
+    res->next = NULL;
+    res->key = strdup (key);
+    res->value = strdup (value);
+    res->hash = hash;
+    return res;
+}
+
+void preprocessor_define (const char *key, const char *value) {
+    uint32_t hash = hash_token (key);
+    define *crsr = DEFINES.first;
+    if (! crsr) {
+        DEFINES.first = define_create (key, value, hash);
+        return;
+    }
+    while (crsr->next) {
+        if (crsr->hash == hash) {
+            if (strcasecmp (crsr->key, key) == 0) {
+                free (crsr->value);
+                crsr->value = strdup (value);
+                return;
+            }
+        }
+        crsr = crsr->next;
+    }
+    crsr->next = define_create (key, value, hash);
+}
+
+bool preprocessor_isdefined (const char *key) {
+    uint32_t hash = hash_token (key);
+    define *crsr = DEFINES.first;
+    while (crsr) {
+        if (crsr->hash == hash) {
+            if (strcasecmp (crsr->key, key) == 0) return true;
+        }
+        crsr = crsr->next;
+    }
+    return false;
+}
 
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
@@ -19,7 +79,8 @@
 // Since the end result of a <<<`quote`>>> statement should be a valid
 // string definition, some convoluted magic goes on here.
 // ============================================================================
-int handle_template_command (const char *cptr, struct textbuffer *t) {
+int handle_template_command (const char *cptr, struct textbuffer *t,
+                             bool output) {
     const char *c = cptr;
     if (! strchr (c, '}')) return 0;
     
@@ -28,20 +89,20 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
     // ""+((stmt)?"foo":"")+""
     if (strncmp (c, "@{if ", 5) == 0) {
         c+= 5;
-        textbuffer_add_str (t, "\"+((");
+        if (output) textbuffer_add_str (t, "\"+((");
         while (*c != '}') {
-            textbuffer_add_c (t, *c);
+            if (output) textbuffer_add_c (t, *c);
             c++;
         }
         c++;
-        textbuffer_add_str (t, ")?\"");
+        if (output) textbuffer_add_str (t, ")?\"");
     }
     // @{if stmt}foo@{else}bar@{endif}
     // Should lead to:
     // ""+((stmt)?"foo":true?"bar":"")+""
     else if (strncmp (c, "@{else}", 7) == 0) {
         c+= 7;
-        textbuffer_add_str (t, "\":true?\"");
+        if (output) textbuffer_add_str (t, "\":true?\"");
     }
     // @{if stma}foo@{elseif stmb}bar@{endif}
     // should lead to:
@@ -51,26 +112,26 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
              strncmp (c, "@{elsif ", 8) == 0) {
         c = strchr (c, ' ');
         c++;
-        textbuffer_add_str (t, "\":(");
+        if (output) textbuffer_add_str (t, "\":(");
         while (*c != '}') {
-            textbuffer_add_c (t, *c);
+            if (output) textbuffer_add_c (t, *c);
         }
         c++;
-        textbuffer_add_str (t, ")?\"");
+        if (output) textbuffer_add_str (t, ")?\"");
     }
     else if (strncmp (c, "@{endif}", 8) == 0) {
         c+= 8;
-        textbuffer_add_str (t, "\":\"\")+\"");
+        if (output) textbuffer_add_str (t, "\":\"\")+\"");
     }
     // @{for stmt}foo@{next}
     // Should lead to:
     // ""+(function(){var _r=''; for(stmt){_r+="foo";} return _r;})()+""
     else if (strncmp (c, "@{for ", 6) == 0) {
-        textbuffer_add_str (t, "\"+(function(){"
-                               "var _r=''; for (");
+        if (output) textbuffer_add_str (t, "\"+(function(){"
+                                           "var _r=''; for (");
         c+= 6;
         while (*c != '}') {
-            textbuffer_add_c (t, *c);
+            if (output) textbuffer_add_c (t, *c);
             c++;
         }
         c++;
@@ -99,6 +160,54 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
     return (c - cptr);
 }
 
+static char *readkey (const char *c) {
+    char *res;
+    const char *k = c;
+    while (*k && (!ciswhite(*k)) && (*k != '\n')) k++;
+    res = malloc ((size_t) (k-c +1));
+    memcpy (res, c, k-c);
+    res[k-c] = 0;
+    return res;
+}
+
+int handle_directive (const char *cp, struct textbuffer *t, bool *out) {
+    const char *c = cp;
+    char *key = NULL;
+    
+    if (strncmp (c, "#ifdef ", 7) == 0) {
+        c+= 7;
+        key = readkey (c);
+        if (! preprocessor_isdefined (key)) *out = false;
+        else *out = true;
+        const char *nc = strchr (c, '\n');
+        if (nc) c = nc;
+        else (c += strlen(c));
+    }
+    else if (strncmp (c, "#ifndef ", 8) == 0) {
+        c+= 8;
+        key = readkey (c);
+        if (preprocessor_isdefined (key)) *out = false;
+        else *out = true;
+        free (key);
+        const char *nc = strchr (c, '\n');
+        if (nc) c = nc;
+        else (c += strlen(c));
+    }
+    else if (strncmp (c, "#endif", 6) == 0) {
+        *out = true;
+        const char *nc = strchr (c, '\n');
+        if (nc) c = nc;
+        else (c += strlen(c));
+    }
+    else {
+        if (out) {
+            textbuffer_add (t, *c);
+            c++;
+        }
+    }
+    return c - cp;
+}
+
 // ============================================================================
 // FUNCITON handle_sugar
 // ---------------------
@@ -107,7 +216,7 @@ int handle_template_command (const char *cptr, struct textbuffer *t) {
 // equal to the original. Returns a newly allocated string that needs
 // to be freed by the caller when they're done with it.
 // ============================================================================
-char *handle_sugar (const char *src) {
+char *preprocess (const char *src) {
     const char *hexdigits = "0123456789abcdef";
     char currentquote = 0;
     const char *c = src;
@@ -117,6 +226,7 @@ char *handle_sugar (const char *src) {
     int spacestoskip = 0;
     int hadcontent = 0;
     const char *linestart;
+    bool output = true;
     
     t = textbuffer_alloc();
     
@@ -128,8 +238,10 @@ char *handle_sugar (const char *src) {
             // Check for end of quote block
             if (c[0] == '`' && c[1] == '>' && c[2] == '>' &&
                 c[3] == '>') {
-                textbuffer_add_c (t, '"');
-                textbuffer_add (t, ')');
+                if (output) {
+                    textbuffer_add_c (t, '"');
+                    textbuffer_add (t, ')');
+                }
                 currentquote = 0;
                 c += 4;
             }
@@ -162,26 +274,29 @@ char *handle_sugar (const char *src) {
                 // incorporate the newline. We add '\n"+"',
                 // to keep line numbering consistent with the
                 // original source.
-                if (quoteline || hadcontent) {
-                    // Ok this is tricky. We want a truly empty
-                    // line that had no content yet to count
-                    // as empty. But if it only appears empty
-                    // because we parsed a template directive into
-                    // it, and there was no other content,
-                    // we'd like to ignore the line.
-                    if (! hadcontent) {
-                        if ((c-linestart) <= spacestoskip) {
-                            textbuffer_add_str (t, "\\n\"+\n\"");
+                if (output) {
+                    if (quoteline || hadcontent) {
+                        // Ok this is tricky. We want a truly empty
+                        // line that had no content yet to count
+                        // as empty. But if it only appears empty
+                        // because we parsed a template directive into
+                        // it, and there was no other content,
+                        // we'd like to ignore the line.
+                        if (! hadcontent) {
+                            if ((c-linestart) <= spacestoskip) {
+                                textbuffer_add_str (t, "\\n\"+\n\"");
+                            }
+                            else {
+                                textbuffer_add_str (t, "\"+\n\"");
+                            }
                         }
-                        else {
-                            textbuffer_add_str (t, "\"+\n\"");
-                        }
+                        else textbuffer_add_str (t, "\\n\"+\n\"");
                     }
-                    else textbuffer_add_str (t, "\\n\"+\n\"");
+                    else {
+                        textbuffer_add_str (t, "\"+\n\"");
+                    }
                 }
-                else {
-                    textbuffer_add_str (t, "\"+\n\"");
-                }
+                else textbuffer_add_str (t, "\n");
                 quoteline++;
                 c++;
                 linestart = c;
@@ -194,24 +309,24 @@ char *handle_sugar (const char *src) {
             }
             else if (*c == '\\') {
                 // Escape backslash
-                textbuffer_add_str (t, "\\\\");
+                if (output) textbuffer_add_str (t, "\\\\");
                 c++;
             }
             else if (c[0] == '$' && c[1] == '{') {
                 // Inline variable
-                textbuffer_add_str (t, "\"+");
+                if (output) textbuffer_add_str (t, "\"+");
                 c += 2;
                 while ((*c) && (*c != '}')) {
-                    textbuffer_add_c (t, *c);
+                    if (output) textbuffer_add_c (t, *c);
                     c++;
                 }
-                textbuffer_add_str (t, "+\"");
+                if (output) textbuffer_add_str (t, "+\"");
                 if (*c) c++;
                 hadcontent=1;
             }
             else if (c[0] == '@' && c[1] == '{') {
                 // Template command
-                c += handle_template_command (c, t);
+                c += handle_template_command (c, t, output);
                 
                 // if the command was on its own line,
                 // ignore following whitespace and newline
@@ -227,7 +342,8 @@ char *handle_sugar (const char *src) {
                         c++;
                         linestart = c;
                         skippedspaces = 0;
-                        textbuffer_add_str (t, "\"+\n\"");
+                        if (output) textbuffer_add_str (t, "\"+\n\"");
+                        else textbuffer_add_str (t, "\n");
                     }
                     else c = backoff;
                 }
@@ -236,18 +352,23 @@ char *handle_sugar (const char *src) {
                 // Since we're constructing our inline quote
                 // as double quoted, we ironically need to
                 // escape quotes.
-                textbuffer_add_c (t, '\\');
-                textbuffer_add (t, *c);
+                if (output) {
+                    textbuffer_add_c (t, '\\');
+                    textbuffer_add (t, *c);
+                }
                 c++;
                 hadcontent=1;
             }
             else if (*c < 32) {
                 // Escape non-printable characters.
-                textbuffer_add_c (t, '\\');
-                textbuffer_add_c (t, 'x');
-                textbuffer_add_c (t, hexdigits[(*c & 0xf0) >> 4]);
-                textbuffer_add (t, hexdigits[(*c & 0x0f)]);
+                if (output) {
+                    textbuffer_add_c (t, '\\');
+                    textbuffer_add_c (t, 'x');
+                    textbuffer_add_c (t, hexdigits[(*c & 0xf0) >> 4]);
+                    textbuffer_add (t, hexdigits[(*c & 0x0f)]);
+                }
                 hadcontent = 1;
+                c++;
             }
             else if (ciswhite(*c)) {
                 const char *crsr = c;
@@ -257,13 +378,13 @@ char *handle_sugar (const char *src) {
                     c = crsr;
                 }
                 else {
-                    textbuffer_add (t, *c);
+                    if (output) textbuffer_add (t, *c);
                     c++;
                 }
             }
             else {
                 // None of the above, add the literal character.
-                textbuffer_add (t, *c);
+                if (output) textbuffer_add (t, *c);
                 c++;
                 hadcontent=1;
             }
@@ -275,23 +396,24 @@ char *handle_sugar (const char *src) {
             // End of quote.
             if (*c == currentquote) {
                 if (currentquote != '<') {
-                    textbuffer_add (t, *c++);
+                    if (output) textbuffer_add (t, *c);
+                    c++;
                     currentquote = 0;
                 }
             }
             // Backslash, add next character as literal, so we ignore
             // quote characters.
             else if (*c == '\\') {
-                textbuffer_add (t, *c);
+                if (output) textbuffer_add (t, *c);
                 c++;
                 if (*c) {
-                    textbuffer_add (t, *c);
+                    if (output) textbuffer_add (t, *c);
                     c++;
                 }
             }
             // Nope, just add the literal
             else {
-                textbuffer_add (t, *c);
+                if (output) textbuffer_add (t, *c);
                 c++;
             }
         }
@@ -301,10 +423,11 @@ char *handle_sugar (const char *src) {
         // Line comment? Paste literally until end of line.
         else if (c[0] == '/' && c[1] == '/') {
             while (*c && (*c != '\n')) {
-                textbuffer_add_c (t, *c);
+                if (output) textbuffer_add_c (t, *c);
                 c++;
             }
             if (*c) {
+                // even when not outputting, emit end of lines
                 textbuffer_add (t, *c);
                 c++;
             }
@@ -312,12 +435,14 @@ char *handle_sugar (const char *src) {
         // Start of a /*comment*/? Paste literally until end of comment.
         else if (c[0] == '/' && c[1] == '*') {
             while (*c && (c[0] != '*' && c[1] != '/')) {
-                textbuffer_add_c (t, *c);
+                if (output) textbuffer_add_c (t, *c);
                 c++;
             }
             if (*c) {
-                textbuffer_add_c (t, c[0]);
-                textbuffer_add_c (t, c[1]);
+                if (output) {
+                    textbuffer_add_c (t, c[0]);
+                    textbuffer_add_c (t, c[1]);
+                }
                 c+=2;
             }
         }
@@ -331,23 +456,28 @@ char *handle_sugar (const char *src) {
             spacestoskip = 0;
             hadcontent = 0;
             linestart = c;
-            textbuffer_add_c (t, '(');
-            textbuffer_add (t, '"');
+            if (output) {
+                textbuffer_add_c (t, '(');
+                textbuffer_add (t, '"');
+            }
         }
         // Start of a regular javascript quote.
         else if (cisquote (*c)) {
-            textbuffer_add (t, *c);
+            if (output) textbuffer_add (t, *c);
             currentquote = *c;
             c++;
         }
         // '::' literal? Replace with ".prototype."
         else if (c-src && (c[0] == ':') && (c[1] == ':')) {
-            textbuffer_add_str (t, ".prototype.");
+            if (output) textbuffer_add_str (t, ".prototype.");
             c+=2;
         }
         // None of the above, add literal
+        else if ((*c) == '#') {
+            c += handle_directive (c, t, &output);
+        }
         else {
-            textbuffer_add (t, *c);
+            if (output) textbuffer_add (t, *c);
             c++;
         }
     }

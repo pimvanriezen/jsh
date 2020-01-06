@@ -17,7 +17,7 @@
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include "duktape.h"
-#include "sugar.h"
+#include "preprocessor.h"
 #include "sys_channel.h"
 #include "sys_fs.h"
 #include "sys_run.h"
@@ -231,13 +231,13 @@ void sys_init_heap (duk_context *ctx, const char *context) {
     }
 
     if (t) {
-        char *tbuffer = handle_sugar (t->alloc);
+        char *tbuffer = preprocess (t->alloc);
         duk_get_global_string (ctx, "sys");
         duk_get_prop_string (ctx, -1, "_modules");
         duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
         duk_push_string (ctx, osglobal);
         duk_put_prop_string (ctx, obj_idx, "fileName");
-        duk_push_number (ctx, t->wpos);
+        duk_push_number (ctx, strlen (tbuffer));
         duk_put_prop_string (ctx, obj_idx, "size");
         duk_push_string (ctx, "bootstrap");
         duk_put_prop_string (ctx, obj_idx, "type");

@@ -9,6 +9,7 @@ var UDPSocket = function() {
     this.dec =  new TextDecoder();
 }
 
+#ifdef IS_INTERACTIVE
 UDPSocket.help = function() {
     setapi.helptext({
         name:"us = new UDPSocket",
@@ -32,6 +33,7 @@ UDPSocket.help = function() {
 }
 
 setapi (UDPSocket,"UDPSocket");
+#endif
 
 // ============================================================================
 // METHOD UDPSocket::bind
@@ -41,6 +43,7 @@ UDPSocket::bind = function (arg1, arg2) {
     return sys.sock.udpbind (this.fd, arg1, arg2);
 }
 
+#ifdef IS_INTERACTIVE
 UDPSocket::bind.help = function() {
     setapi.helptext ({
         name:"us.bind",
@@ -54,6 +57,7 @@ UDPSocket::bind.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD UDPSocket::send
@@ -65,6 +69,7 @@ UDPSocket::send = function (addr, port, msg) {
     return sys.sock.send (this.fd, addr, port, encmsg);
 }
 
+#ifdef IS_INTERACTIVE
 UDPSocket::send.help = function() {
     setapi.helptext ({
         name:"us.send",
@@ -78,6 +83,7 @@ UDPSocket::send.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD UDPSocket::receiveMessage
@@ -94,6 +100,7 @@ UDPSocket::receiveMessage = function(timeout_ms) {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 UDPSocket::receiveMessage.help = function() {
     setapi.helptext ({
         name:"us.receiveMessage",
@@ -105,6 +112,7 @@ UDPSocket::receiveMessage.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD UDPSocket::receive
@@ -115,6 +123,7 @@ UDPSocket::receive = function(timeout_ms) {
     return res.data;
 }
 
+#ifdef IS_INTERACTIVE
 UDPSocket::receive.help = function() {
     setapi.helptext ({
         name:"us.receive",
@@ -124,5 +133,6 @@ UDPSocket::receive.help = function() {
         `>>>
     })
 }
+#endif
 
 module.exports = UDPSocket;

@@ -26,6 +26,7 @@ var run = function() {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 run.help = function() {
     setapi.helptext({
         name:"run",
@@ -40,6 +41,7 @@ run.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // FUNCTION run.console
@@ -63,6 +65,7 @@ run.console = function() {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 run.console.help = function() {
     setapi.helptext({
         name:"run.console",
@@ -77,6 +80,7 @@ run.console.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // FUNCTION run.js
@@ -109,6 +113,7 @@ run.js = function(file) {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 run.js.help = function() {
     setapi.helptext({
         name:"run.js",
@@ -130,5 +135,6 @@ run.js.help = function() {
         `>>>
     });
 }
+#endif
 
 module.exports = run;

@@ -18,7 +18,7 @@
 #include <sys/utsname.h>
 #include "duktape.h"
 #include "textbuffer.h"
-#include "sugar.h"
+#include "preprocessor.h"
 #include "sys_module.h"
 
 // ============================================================================
@@ -110,7 +110,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     if (! t) return 0;
 
     // Translate syntax sugar, and push the result to the stack.
-    char *translated = handle_sugar (t->alloc);
+    char *translated = preprocess (t->alloc);
     duk_push_string (ctx, translated);
     free (translated);
     
@@ -120,7 +120,7 @@ duk_ret_t sys_modsearch (duk_context *ctx) {
     duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
     duk_push_string (ctx, full);
     duk_put_prop_string (ctx, obj_idx, "fileName");
-    duk_push_number (ctx, t->wpos);
+    duk_push_number (ctx, strlen(translated));
     duk_put_prop_string (ctx, obj_idx, "size");
     duk_push_string (ctx, "require");
     duk_put_prop_string (ctx, obj_idx, "type");
@@ -146,7 +146,7 @@ duk_ret_t sys_eval (duk_context *ctx) {
     char *translated;
     src = duk_to_string (ctx, 0);
     if (duk_get_top (ctx) > 1) fname = duk_to_string (ctx, 1);
-    translated = handle_sugar (src);
+    translated = preprocess (src);
     duk_push_string (ctx, fname);
     if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
         duk_push_error_object (ctx, DUK_ERR_TYPE_ERROR, "%s",
@@ -177,7 +177,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
                 modnam = duk_to_string (ctx, 2);
             }
         }
-        char *translated = handle_sugar (t->alloc);
+        char *translated = preprocess (t->alloc);
         duk_push_string (ctx, fnam);
         if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
             fprintf (stderr, "%% %s: %s\n",
@@ -191,7 +191,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
             duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
             duk_push_string (ctx, fnam);
             duk_put_prop_string (ctx, obj_idx, "fileName");
-            duk_push_number (ctx, t->wpos);
+            duk_push_number (ctx, strlen(translated));
             duk_put_prop_string (ctx, obj_idx, "size");
             duk_push_string (ctx, ctxnam);
             duk_put_prop_string (ctx, obj_idx, "type");

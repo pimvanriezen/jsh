@@ -293,6 +293,7 @@ var setapi = function(arg1,arg2) {
         return null;
     }
     
+#ifdef IS_INTERACTIVE
     // Hidden sub-function, prints out the help page for the function.
     obj.help = function() {
         var t = new TextTable(4);
@@ -386,6 +387,7 @@ var setapi = function(arg1,arg2) {
             }
         }
     }
+#endif
     return obj;
 }
 

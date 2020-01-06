@@ -28,7 +28,7 @@
 #include "duk_console.h"
 #include "duk_module_duktape.h"
 #include "duktape.h"
-#include "sugar.h"
+#include "preprocessor.h"
 #include "textbuffer.h"
 #include "version.h"
 
@@ -523,7 +523,7 @@ static int handle_fh(duk_context *ctx, FILE *f, char *argv[],
         bufptr = strchr (bufptr, '\n');
     }
     
-    char *translated = handle_sugar (t->alloc);
+    char *translated = preprocess (t->alloc);
     textbuffer_free (t);
 
     duk_push_string(ctx, bytecode_filename);
@@ -667,7 +667,7 @@ static int handle_interactive(duk_context *ctx) {
             linenoiseHistoryAdd(buffer);
         }
         
-        char *translated = handle_sugar (buffer);
+        char *translated = preprocess (buffer);
 
         duk_push_pointer(ctx, (void *) translated);
         duk_push_uint(ctx, (duk_uint_t) strlen(translated));
@@ -750,9 +750,13 @@ static duk_context *create_duktape_heap(int alloc_provider,
     duk_put_prop_string(ctx, -2, "jshFormat");
     duk_pop(ctx);
 
+    preprocessor_init ();
+    if (interactive) {
+        preprocessor_define ("IS_INTERACTIVE","true");
+    }
+
     sys_init ();
     sys_init_heap (ctx, interactive ? "interactive":"script");
-
     if (debugger) {
         fprintf(stderr, "Warning: option --debugger ignored, "
                         "no debugger support\n");

@@ -44,6 +44,7 @@ sys.module.list = function(asJSON) {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 sys.module.list.help = function() {
     setapi.helptext ({
         name:"sys.module.list",
@@ -55,3 +56,4 @@ sys.module.list.help = function() {
 }
 
 setapi (sys.module.list, "sys.module.list");
+#endif

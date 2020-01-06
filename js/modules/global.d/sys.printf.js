@@ -8,6 +8,7 @@ var printf = function() {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 printf.help = function() {
     setapi.helptext ({
         name:"printf",
@@ -46,6 +47,7 @@ printf.help = function() {
 }
 
 setapi (printf, "printf");
+#endif
 
 // ============================================================================
 // FUNCTION sprintf

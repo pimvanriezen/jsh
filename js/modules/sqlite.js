@@ -6,6 +6,7 @@ var SQLite = function(dbname) {
     if (! this.sqlid) throw new Error ("Could not open database");
 }
 
+#ifdef IS_INTERACTIVE
 SQLite.help = function() {
     setapi.helptext({
         name:"db = new SQLite",
@@ -29,6 +30,7 @@ SQLite.help = function() {
 }
 
 setapi (SQLite,"SQLite");
+#endif
 
 // ============================================================================
 // METHOD SQLite::query
@@ -44,6 +46,7 @@ SQLite::query = function() {
     return sys.sql.query.apply (null, args);
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::query.help = function() {
     setapi.helptext({
         name:"db.query",
@@ -67,6 +70,7 @@ SQLite::query.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD SQLite::close
@@ -76,6 +80,7 @@ SQLite::close = function() {
     this.sqlid = 0;
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::close.help = function() {
     setapi.helptext({
         name:"db.close",
@@ -85,6 +90,7 @@ SQLite::close.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD SQLite::listTables
@@ -98,6 +104,7 @@ SQLite::listTables = function() {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::listTables.help = function() {
     setapi.helptext({
         name:"db.listTables",
@@ -106,6 +113,7 @@ SQLite::listTables.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD SQLite::describe
@@ -114,6 +122,7 @@ SQLite::describe = function(table) {
     return this.query ("PRAGMA table_info("+table+")");
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::describe.help = function() {
     setapi.helptext({
         name:"db.describe",
@@ -122,6 +131,7 @@ SQLite::describe.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD SQLite::defineTable
@@ -145,6 +155,7 @@ SQLite::defineTable = function(name,def) {
     return this.query (query);
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::defineTable.help = function() {
     setapi.helptext({
         name:"db.defineTable",
@@ -165,6 +176,7 @@ SQLite::defineTable.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD SQLite::insert
@@ -191,6 +203,7 @@ SQLite::insert = function(name,def) {
     return this.query.apply (this, args);
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::insert.help = function() {
     setapi.helptext({
         name:"db.insert",
@@ -206,6 +219,7 @@ SQLite::insert.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD SQLite::display
@@ -231,6 +245,7 @@ SQLite::display = function(table) {
     print (tt.format());
 }
 
+#ifdef IS_INTERACTIVE
 SQLite::display.help = function() {
     setapi.helptext({
         name:"db.display",
@@ -242,5 +257,6 @@ SQLite::display.help = function() {
         `>>>
     })
 }
+#endif
 
 module.exports = SQLite;

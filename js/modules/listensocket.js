@@ -8,6 +8,7 @@ var ListenSocket = function() {
     this.unix = false;
 }
 
+#ifdef IS_INTERACTIVE
 ListenSocket.help = function() {
     setapi.helptext({
         name:"ls = new ListenSocket",
@@ -31,6 +32,7 @@ ListenSocket.help = function() {
 }
 
 setapi (ListenSocket,"ListenSocket");
+#endif
 
 // ============================================================================
 // METHOD ListenSocket::listenTo
@@ -57,6 +59,7 @@ ListenSocket::listenTo = function (arg1, arg2) {
     return (this.fd ? true : false);
 }
 
+#ifdef IS_INTERACTIVE
 ListenSocket::listenTo.help = function() {
     setapi.helptext ({
         name:"ls.listenTo",
@@ -78,6 +81,7 @@ ListenSocket::listenTo.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // METHOD ListenSocket::accept
@@ -92,6 +96,7 @@ ListenSocket::accept = function() {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 ListenSocket::accept.help = function() {
     setapi.helptext ({
         name:"ls.accept",
@@ -101,6 +106,7 @@ ListenSocket::accept.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD ListenSocket::close
@@ -111,6 +117,7 @@ ListenSocket::close = function() {
     this.fd = null;
 }
 
+#ifdef IS_INTERACTIVE
 ListenSocket::close.help = function() {
     setapi.helptext ({
         name:"ls.close",
@@ -119,5 +126,6 @@ ListenSocket::close.help = function() {
         `>>>
     });
 }
+#endif
 
 module.exports = ListenSocket;

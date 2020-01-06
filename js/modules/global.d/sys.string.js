@@ -1,6 +1,7 @@
 // ============================================================================
 // Augmentations for the string class
 // ============================================================================
+#ifdef IS_INTERACTIVE
 String.help = function() {
     print (setapi.textformat (<<<`
         The following extra functions have been added to the String
@@ -19,6 +20,7 @@ String.help = function() {
 }
 
 setapi (String, "String");
+#endif
 
 // ============================================================================
 // String::padStart
@@ -31,6 +33,7 @@ String::padStart = function(len,c) {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 String::padStart.help = function() {
     setapi.helptext ({
         name:"string.padStart",
@@ -46,6 +49,7 @@ String::padStart.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // String::padEnd
@@ -58,6 +62,7 @@ String::padEnd = function(len,c) {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 String::padEnd.help = function() {
     setapi.helptext ({
         name:"string.padEnd",
@@ -73,6 +78,7 @@ String::padEnd.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // String::save
@@ -81,6 +87,7 @@ String::save = function(path) {
     sys.write (""+this, ""+path);
 }
 
+#ifdef IS_INTERACTIVE
 String::save.help = function() {
     setapi.helptext ({
         name:"string.save",
@@ -92,6 +99,7 @@ String::save.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // String::summarize
@@ -108,6 +116,7 @@ String::summarize = function(sz) {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 String::summarize.help = function() {
     setapi.helptext ({
         name:"string.summarize",
@@ -121,6 +130,7 @@ String::summarize.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // String::grep
@@ -129,6 +139,7 @@ String::grep = function(re,srch,repl) {
     return this.split('\n').grep (re,srch,repl);
 }
 
+#ifdef IS_INTERACTIVE
 String::grep.help = function() {
     setapi.helptext ({
         name:"string.grep",
@@ -152,6 +163,7 @@ String::grep.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // String::wrap
@@ -174,6 +186,7 @@ String::wrap = function (cols) {
     return res.join('\n');
 }
 
+#ifdef IS_INTERACTIVE
 String::wrap.help = function() {
     setapi.helptext ({
         name:"string.wrap",
@@ -186,6 +199,7 @@ String::wrap.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // String::cut
@@ -199,6 +213,7 @@ String::cut = function (field, sep) {
     return splt[field];
 }
 
+#ifdef IS_INTERACTIVE
 String::cut.help = function() {
     setapi.helptext ({
         name:"string.cut",
@@ -221,6 +236,7 @@ String::cut.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // String::rewrap
@@ -241,6 +257,7 @@ String::rewrap = function (cols) {
     return res;   
 }
 
+#ifdef IS_INTERACTIVE
 String::rewrap.help = function() {
     setapi.helptext ({
         name:"string.rewrap",
@@ -255,6 +272,7 @@ String::rewrap.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // String::colorMatch

@@ -11,6 +11,7 @@ var Socket = function() {
     this.eol = '\r\n';
 }
 
+#ifdef IS_INTERACTIVE
 Socket.help = function() {
     setapi.helptext({
         name:"f = new Socket",
@@ -35,6 +36,7 @@ Socket.help = function() {
 }
 
 setapi (Socket,"Socket");
+#endif
 
 // ============================================================================
 // FUNCTION Socket.resolve
@@ -48,6 +50,7 @@ Socket.resolve = function(name) {
     return res[0];
 }
 
+#ifdef IS_INTERACTIVE
 Socket.resolve.help = function() {
     setapi.helptext ({
         name:"Socket.resolve",
@@ -60,6 +63,7 @@ Socket.resolve.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD Socket::connect
@@ -75,6 +79,7 @@ Socket::connect = function(addr,port) {
     }
 }
 
+#ifdef IS_INTERACTIVE
 Socket::connect.help = function() {
     setapi.helptext ({
         name:"f.connect",
@@ -94,6 +99,7 @@ Socket::connect.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Inherit functions from File

@@ -12,7 +12,7 @@
 #include "duk_console.h"
 #include "duk_module_duktape.h"
 #include "textbuffer.h"
-#include "sugar.h"
+#include "preprocessor.h"
 #include "version.h"
 
 extern void sys_init (void);
@@ -54,7 +54,7 @@ void heapstore_init (const char *fn) {
         exit (1);
     }
     
-    HS.code = handle_sugar (t->alloc);
+    HS.code = preprocess (t->alloc);
     textbuffer_free (t);
     heapstore_item *item1 = heapstore_acquire();
     heapstore_item *item2 = heapstore_acquire();
@@ -488,6 +488,8 @@ int main (int argc, char *argv[]) {
         return 0;
     }
     
+    preprocessor_init();
+    preprocessor_define ("IS_HTTP","true");
     sys_init();
     heapstore_init (optScript);
     

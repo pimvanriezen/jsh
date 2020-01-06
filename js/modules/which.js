@@ -23,6 +23,7 @@ var which = function(cmd) {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 which.help = function() {
     setapi.helptext ({
         name:"which",
@@ -40,6 +41,7 @@ which.help = function() {
         `>>>
     });
 }
+#endif
 
 module.version = "1.0.0";
 module.exports = which;
