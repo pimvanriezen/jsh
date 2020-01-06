@@ -210,6 +210,7 @@ int handle_directive (const char *cp, struct textbuffer *t, bool *out) {
         key = readkey (c);
         if (! preprocessor_isdefined (key)) *out = false;
         else *out = true;
+        free (key);
         const char *nc = strchr (c, '\n');
         if (nc) c = nc;
         else (c += strlen(c));
