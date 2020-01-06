@@ -4,6 +4,35 @@ var Pipe = function() {
     this.pid = 0;
 }
 
+#ifdef IS_INTERACTIVE
+Pipe.help = function() {
+    setapi.helptext({
+        name:"p = run.pipe",
+        args:[
+            {name:"cmd",text:"Command"},
+            {name:"args",text:"Arguments"}
+        ],
+        text:<<<`
+            Special class for keeping open a pipe to a spawned process
+            through run.pipe(). Contains two File objects, p.in and
+            p.out, and a bunch of methods to make the object act like
+            a File object itself.
+            
+            Available functions on constructed objects:
+        `>>>
+    });
+
+    var list = [];
+    for (var i in Pipe.prototype) {
+        if (Pipe.prototype[i].help) list.push("Pipe::"+i);
+    }
+
+    print (new TextGrid().setData(list).indent(4).format());
+}
+
+setapi (Pipe, "Pipe");
+#endif
+
 Pipe::setData = function(infd,outfd,pid) {
     this.in.fd = infd;
     this.out.fd = outfd;
@@ -19,6 +48,18 @@ Pipe::close = function() {
         this.pid = 0;
     }
 }
+
+#ifdef IS_INTERACTIVE
+Pipe::close.help = function() {
+    setapi.helptext({
+        name:"p.close",
+        text:<<<`
+            Closes the pipe. If the background process is still
+            running, it will be sent a SIGTERM.
+        `>>>
+    })
+}
+#endif
 
 Pipe::write = function() {
     return this.out.write.apply (this.out, arguments);
@@ -43,5 +84,14 @@ Pipe::canRead = function() {
 Pipe::canWrite = function() {
     return this.out.canWrite();
 }
+
+#ifdef IS_INTERACTIVE
+Pipe::write.help = File::write.help;
+Pipe::writeLine.help = File::writeLine.help;
+Pipe::read.help = File::read.help;
+Pipe::readLine.help = File::readLine.help;
+Pipe::canRead.help = File::canRead.help;
+Pipe::canWrite.help = File::canWrite.help;
+#endif
 
 module.exports = Pipe;
