@@ -178,6 +178,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
             }
         }
         char *translated = preprocess (t->alloc);
+        size_t rssz = strlen (translated);
         duk_push_string (ctx, fnam);
         if (duk_pcompile_string_filename (ctx, 0, translated) != 0) {
             fprintf (stderr, "%% %s: %s\n",
@@ -191,7 +192,7 @@ duk_ret_t sys_parse (duk_context *ctx) {
             duk_idx_t obj_idx = duk_push_object (ctx); // [ .. gl sys mo obj ]
             duk_push_string (ctx, fnam);
             duk_put_prop_string (ctx, obj_idx, "fileName");
-            duk_push_number (ctx, strlen(translated));
+            duk_push_int (ctx, rssz);
             duk_put_prop_string (ctx, obj_idx, "size");
             duk_push_string (ctx, ctxnam);
             duk_put_prop_string (ctx, obj_idx, "type");
