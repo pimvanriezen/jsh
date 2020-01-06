@@ -8,6 +8,8 @@ static uint32_t IHASH = 0;
 
 // ============================================================================
 // FUNCTION hash_token
+// -------------------
+// Case-insensitive hash routine.
 // ============================================================================
 uint32_t hash_token (const char *str) {
     uint32_t hash = 0;

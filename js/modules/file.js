@@ -9,6 +9,7 @@ var File = function() {
     this.eol = '\n';
 }
 
+#ifdef IS_INTERACTIVE
 File.help = function() {
     setapi.helptext({
         name:"f = new File",
@@ -32,6 +33,7 @@ File.help = function() {
 }
 
 setapi (File, "File");
+#endif
 
 // ============================================================================
 // METHOD File::openRead
@@ -43,6 +45,7 @@ File::openRead = function(fnam) {
     return true;
 }
 
+#ifdef IS_INTERACTIVE
 File::openRead.help = function() {
     setapi.helptext ({
         name:"f.openRead",
@@ -55,6 +58,7 @@ File::openRead.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::openWrite
@@ -68,6 +72,7 @@ File::openWrite = function(fnam,perm) {
     return true;
 }
 
+#ifdef IS_INTERACTIVE
 File::openWrite.help = function() {
     setapi.helptext ({
         name:"f.openWrite",
@@ -80,6 +85,7 @@ File::openWrite.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::openAppend
@@ -94,6 +100,7 @@ File::openAppend = function(fnam,perm) {
     return true;
 }
 
+#ifdef IS_INTERACTIVE
 File::openAppend.help = function() {
     setapi.helptext ({
         name:"f.openAppend",
@@ -107,6 +114,7 @@ File::openAppend.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::close
@@ -116,6 +124,7 @@ File::close = function() {
     sys.io.close (this.fd);
 }
 
+#ifdef IS_INTERACTIVE
 File::close.help = function() {
     setapi.helptext ({
         name:"f.close",
@@ -124,6 +133,7 @@ File::close.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::canRead
@@ -133,6 +143,7 @@ File::canRead = function(timeout) {
     return (sys.io.select (this.fd,null,null,timeout)[0].length != 0);
 }
 
+#ifdef IS_INTERACTIVE
 File::canRead.help = function() {
     setapi.helptext ({
         name:"f.canRead",
@@ -147,6 +158,7 @@ File::canRead.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::canWrite
@@ -156,6 +168,7 @@ File::canWrite = function(timeout) {
     return (sys.io.select (null,this.fd,null,timeout)[1].length != 0);
 }
 
+#ifdef IS_INTERACTIVE
 File::canWrite.help = function() {
     setapi.helptext ({
         name:"f.canWrite",
@@ -170,6 +183,7 @@ File::canWrite.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::read
@@ -198,6 +212,7 @@ File::read = function(sz) {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 File::read.help = function() {
     setapi.helptext ({
         name:"f.read",
@@ -211,6 +226,7 @@ File::read.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::readLine
@@ -238,6 +254,7 @@ File::readLine = function() {
     return res;
 }
 
+#ifdef IS_INTERACTIVE
 File::readLine.help = function() {
     setapi.helptext ({
         name:"f.readLine",
@@ -250,6 +267,7 @@ File::readLine.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::write
@@ -264,6 +282,7 @@ File::write = function(str) {
     return true;
 }
 
+#ifdef IS_INTERACTIVE
 File::write.help = function() {
     setapi.helptext ({
         name:"f.write",
@@ -276,6 +295,7 @@ File::write.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::writeLine
@@ -284,6 +304,7 @@ File::writeLine = function(str) {
     return this.write (str + this.eol);
 }
 
+#ifdef IS_INTERACTIVE
 File::writeLine.help = function() {
     setapi.helptext ({
         name:"f.writeLine",
@@ -296,6 +317,7 @@ File::writeLine.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::printf
@@ -304,6 +326,7 @@ File::printf = function() {
     return this.write (sprintf.apply (null, arguments));
 }
 
+#ifdef IS_INTERACTIVE
 File::printf.help = function() {
     setapi.helptext ({
         name:"f.printf",
@@ -317,6 +340,7 @@ File::printf.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // METHOD File::printf
@@ -327,6 +351,7 @@ File::eof = function() {
     return false;
 }
 
+#ifdef IS_INTERACTIVE
 File::eof.help = function() {
     setapi.helptext ({
         name:"f.eof",
@@ -336,5 +361,6 @@ File::eof.help = function() {
         `>>>
     });
 }
+#endif
 
 module.exports = File;

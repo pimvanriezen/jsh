@@ -27,7 +27,8 @@ sys.help = function() {
 // If no argument is provided, a help index is generated for the user level
 // functions that were documented.
 // ============================================================================
-if (sys.context != 'http') help = function(helpfor) {
+#ifdef IS_INTERACTIVE
+help = function(helpfor) {
     var helplevel = 0;
     if (typeof (helpfor) != "number") {
         if (helpfor && helpfor.help) return helpfor.help();
@@ -78,6 +79,7 @@ if (sys.context != 'http') help = function(helpfor) {
                                 indent(4).minWidth(16).format());
     }
 }
+#endif
 
 // ============================================================================
 // FUNCTION setapi

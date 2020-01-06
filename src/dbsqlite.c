@@ -7,6 +7,10 @@
 #include <stdbool.h>
 #include "duktape.h"
 
+// ----------------------------------------------------------------------------
+// Data types for keeping a list of sqlite3 handles, indexed by an integer
+// descriptor.
+// ----------------------------------------------------------------------------
 typedef struct sql_descriptor sql_descriptor;
 
 struct sql_descriptor {
@@ -25,12 +29,18 @@ struct sql_list {
 
 sql_list SQL;
 
+// ============================================================================
+// FUNCTION sql_init
+// ============================================================================
 void sql_init (void) {
     SQL.lastid = 0;
     SQL.first = SQL.last = NULL;
     pthread_mutex_init (&SQL.mutex, NULL);
 }
 
+// ============================================================================
+// FUNCTION sql_descriptor_create
+// ============================================================================
 sql_descriptor *sql_descriptor_create (void) {
     sql_descriptor *res = malloc (sizeof (sql_descriptor));
     res->id = 0;
@@ -40,6 +50,9 @@ sql_descriptor *sql_descriptor_create (void) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION sql_list_find
+// ============================================================================
 sql_descriptor *sql_list_find (int id) {
     pthread_mutex_lock (&SQL.mutex);
     sql_descriptor *crsr = SQL.first;
@@ -51,6 +64,9 @@ sql_descriptor *sql_list_find (int id) {
     return crsr;
 }
 
+// ============================================================================
+// FUNCTION sql_list_open
+// ============================================================================
 int sql_list_open (const char *path) {
     int res = 0;
     sql_descriptor *nsql = sql_descriptor_create();
@@ -74,6 +90,9 @@ int sql_list_open (const char *path) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION sql_list_close
+// ============================================================================
 void sql_list_close (int id) {
     sql_descriptor *node = sql_list_find (id);
     if (! node) return;
@@ -95,6 +114,9 @@ void sql_list_close (int id) {
     free (node);
 }
 
+// ============================================================================
+// FUNCTION sys_sql_open
+// ============================================================================
 duk_ret_t sys_sql_open (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     const char *path = duk_to_string (ctx, 0);
@@ -103,6 +125,9 @@ duk_ret_t sys_sql_open (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_sql_close
+// ============================================================================
 duk_ret_t sys_sql_close (duk_context *ctx) {
     if (duk_get_top (ctx) < 1) return DUK_RET_TYPE_ERROR;
     int hdl = duk_get_int (ctx, 0);
@@ -110,11 +135,19 @@ duk_ret_t sys_sql_close (duk_context *ctx) {
     return 0;
 }
 
+// ============================================================================
+// FUNCTION freearr
+// ============================================================================
 static void freearr (char **a, int count) {
     for (int i=0; i<count; ++i) free (a[i]);
     free (a);
 }
 
+// ============================================================================
+// FUNCTION pushrow
+// ----------------
+// Pushes a row received from sqlite to the duktape stack.
+// ============================================================================
 static void pushrow (duk_context *ctx, sqlite3_stmt *stmt,
                      char **colnames, int colcount) {
     duk_idx_t obj_idx = duk_push_object (ctx);
@@ -143,7 +176,9 @@ static void pushrow (duk_context *ctx, sqlite3_stmt *stmt,
     }
 }
 
-// sys.sql.query (id, query, param, param, param...)
+// ============================================================================
+// FUNCTION sys_sql_query
+// ============================================================================
 duk_ret_t sys_sql_query (duk_context *ctx) {
     int nparam = duk_get_top (ctx) - 2;
     if (nparam<0) return DUK_RET_TYPE_ERROR;
@@ -234,6 +269,9 @@ duk_ret_t sys_sql_query (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_sql_rowsaffecte
+// ============================================================================
 duk_ret_t sys_sql_rowsaffected (duk_context *ctx) {
     if (duk_get_top (ctx) != 1) return DUK_RET_TYPE_ERROR;
     int hdl = duk_get_int (ctx, 0);

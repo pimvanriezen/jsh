@@ -1,6 +1,7 @@
 // ============================================================================
 // Extensions to the Array class
 // ============================================================================
+#ifdef IS_INTERACTIVE
 Array.help = function() {
     print (setapi.textformat (<<<`
         The following extra functions have been added to the Array
@@ -17,6 +18,7 @@ Array.help = function() {
 }
 
 setapi (Array, "Array");
+#endif
 
 // ============================================================================
 // Array::contains
@@ -25,6 +27,7 @@ Object.defineProperty (Array.prototype, 'contains', {
     value: function(id) { return this.indexOf(id)>=0; }
 });
 
+#ifdef IS_INTERACTIVE
 Array::contains.help = function() {
     setapi.helptext ({
         name:"array.contains",
@@ -37,6 +40,7 @@ Array::contains.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Array::remove
@@ -57,6 +61,7 @@ Object.defineProperty (Array.prototype, 'remove', {
     }
 });
 
+#ifdef IS_INTERACTIVE
 Array::remove.help = function() {
     setapi.helptext ({
         name:"array.remove",
@@ -71,6 +76,7 @@ Array::remove.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Array::sum
@@ -83,6 +89,7 @@ Object.defineProperty (Array.prototype, 'sum', {
     }
 });
 
+#ifdef IS_INTERACTIVE
 Array::sum.help = function() {
     setapi.helptext ({
         name:"array.sum",
@@ -92,6 +99,7 @@ Array::sum.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Array::cut
@@ -108,6 +116,7 @@ Object.defineProperty (Array.prototype, 'cut', {
     }
 });
 
+#ifdef IS_INTERACTIVE
 Array::cut.help = function() {
     setapi.helptext ({
         name:"array.cut",
@@ -130,6 +139,7 @@ Array::cut.help = function() {
         `>>>
     });
 }
+#endif
 
 // ============================================================================
 // Array::grep
@@ -151,6 +161,7 @@ Object.defineProperty (Array.prototype, 'grep', {
     }
 });
 
+#ifdef IS_INTERACTIVE
 Array::grep.help = function() {
     setapi.helptext ({
         name:"array.grep",
@@ -174,6 +185,7 @@ Array::grep.help = function() {
         `>>>
     })
 }
+#endif
 
 // ============================================================================
 // Array::intern
@@ -213,6 +225,7 @@ Object.defineProperty (Array.prototype, 'intern', {
     }
 });
 
+#ifdef IS_INTERACTIVE
 Array::intern.help = function() {
     setapi.helptext ({
         name:"array.intern",
@@ -234,3 +247,4 @@ Array::intern.help = function() {
         `>>>
     })
 }
+#endif

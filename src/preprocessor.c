@@ -9,11 +9,14 @@
 #include "preprocessor.h"
 #include "hash.h"
 
+// ----------------------------------------------------------------------------
+// Structures for keeping track of preprocessor defines
+// ----------------------------------------------------------------------------
 typedef struct define define;
 struct define {
     define          *next;
     char            *key;
-    char            *value;
+    char            *value; // We don't currently use the value for anything.
     uint32_t         hash;
 };
 
@@ -24,10 +27,16 @@ struct defines {
 
 static defines DEFINES;
 
+// ============================================================================
+// FUNCTION preprocessor_init
+// ============================================================================
 void preprocessor_init (void) {
     DEFINES.first = NULL;
 }
 
+// ============================================================================
+// FUNCTION define_create
+// ============================================================================
 define *define_create (const char *key, const char *value, uint32_t hash) {
     define *res = malloc (sizeof (define));
     res->next = NULL;
@@ -37,6 +46,9 @@ define *define_create (const char *key, const char *value, uint32_t hash) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION preprocessor_define
+// ============================================================================
 void preprocessor_define (const char *key, const char *value) {
     uint32_t hash = hash_token (key);
     define *crsr = DEFINES.first;
@@ -57,6 +69,9 @@ void preprocessor_define (const char *key, const char *value) {
     crsr->next = define_create (key, value, hash);
 }
 
+// ============================================================================
+// FUNCTION preprocessor_isdefined
+// ============================================================================
 bool preprocessor_isdefined (const char *key) {
     uint32_t hash = hash_token (key);
     define *crsr = DEFINES.first;
@@ -69,6 +84,9 @@ bool preprocessor_isdefined (const char *key) {
     return false;
 }
 
+// ----------------------------------------------------------------------------
+// Stupid macros
+// ----------------------------------------------------------------------------
 #define ciswhite(c) (c==' ' || c=='\t')
 #define cisquote(c) (c=='"' || c=='\'')
 
@@ -160,6 +178,11 @@ int handle_template_command (const char *cptr, struct textbuffer *t,
     return (c - cptr);
 }
 
+// ============================================================================
+// FUNCTION readkey
+// ----------------
+// Used by handle_directive to read an argument
+// ============================================================================
 static char *readkey (const char *c) {
     char *res;
     const char *k = c;
@@ -170,6 +193,14 @@ static char *readkey (const char *c) {
     return res;
 }
 
+// ============================================================================
+// FUNCTION handle_directive
+// -------------------------
+// Handles preprocessor '#foo' directives. Gets called by the preprocessor
+// when it runs into an unquoted '#'. If an exact match with one of the
+// defined directives is not found, everything is passed unaltered. On a
+// match, the rest of the line is eaten.
+// ============================================================================
 int handle_directive (const char *cp, struct textbuffer *t, bool *out) {
     const char *c = cp;
     char *key = NULL;
@@ -209,8 +240,8 @@ int handle_directive (const char *cp, struct textbuffer *t, bool *out) {
 }
 
 // ============================================================================
-// FUNCITON handle_sugar
-// ---------------------
+// FUNCITON preprocess
+// -------------------
 // Transforms input text with jsh syntactic sugar (indented quoting, and
 // the Class::protoFunction operator), trying to keep line numbering
 // equal to the original. Returns a newly allocated string that needs

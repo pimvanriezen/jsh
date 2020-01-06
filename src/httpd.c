@@ -15,9 +15,16 @@
 #include "preprocessor.h"
 #include "version.h"
 
+// ----------------------------------------------------------------------------
+// External prototypes
+// ----------------------------------------------------------------------------
 extern void sys_init (void);
 extern void sys_init_heap (duk_context *, const char *);
 
+// ----------------------------------------------------------------------------
+// Data definitions for the heapstore, a collection of pre-allocated and
+// pre-booted Duktape heaps that can be called on by a http-handling thread.
+// ----------------------------------------------------------------------------
 typedef struct heapstore_item {
     struct heapstore_item   *next;
     duk_context             *ctx;
@@ -34,6 +41,9 @@ typedef struct heapstore {
 
 static heapstore HS;
 
+// ----------------------------------------------------------------------------
+// Internal prototypes
+// ----------------------------------------------------------------------------
 void heapstore_init (const char *);
 heapstore_item *heapstore_acquire (void);
 void heapstore_release (heapstore_item *);
@@ -222,6 +232,16 @@ duk_context *create_heap (heapstore_item *owner, const char *code) {
 
 // ============================================================================
 // FUNCTION enumerate_header
+// -------------------------
+// The way to get headers in microhttpd is kind of esoteric. This function
+// is used as a callback to load the request headers into the Duktape
+// heap.
+//
+// Header names are always canonized with an initial upper case character
+// on each word, e.g. "Content-Type", "Content-Transfer-Encoding". This same
+// canonization is enforced on the javascript side through the
+// request.setHeader() and request.getHeader() calls, guaranteeing that
+// headers are being held case-insensitively.
 // ============================================================================
 int enumerate_header (void *cls, enum MHD_ValueKind kind, const char *key,
                       const char *value) {
@@ -253,6 +273,8 @@ int enumerate_header (void *cls, enum MHD_ValueKind kind, const char *key,
 
 // ============================================================================
 // FUNCTION answer_to_connection
+// -----------------------------
+// Callback function for microhttpd, handles a single HTTP request.
 // ============================================================================
 int answer_to_connection (void *cls, struct MHD_Connection *connection,
                           const char *url,
@@ -290,7 +312,7 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
         duk_pop(ctx);
         duk_pop(ctx);
         *con_cls = item;
-        return MHD_YES;
+        return MHD_YES; // Yeah, microhttpd is weird.
     }
     
     ctx = item->ctx;
@@ -304,7 +326,7 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
         duk_pop(ctx);
         duk_pop(ctx);
         *upload_data_size = 0;
-        return MHD_YES;
+        return MHD_YES; // Yeah, microhttpd is weird.
     }
     
     /* Handle input headers */
@@ -396,12 +418,20 @@ int answer_to_connection (void *cls, struct MHD_Connection *connection,
 
 char **main_argv;
 
+// ============================================================================
+// FUNCTION checkflag
+// ------------------
+// Utility function for checking a command line flag
+// ============================================================================
 int checkflag (const char *arg, const char *opt1, const char *opt2) {
     if (strcmp (arg, opt1) == 0) return 1;
     if (strcmp (arg, opt2) == 0) return 1;
     return 0;
 }
 
+// ============================================================================
+// FUNCTION main
+// ============================================================================
 int main (int argc, char *argv[]) {
     main_argv = argv;
     int optPort = 0;

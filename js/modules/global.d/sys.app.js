@@ -71,6 +71,7 @@ sys.app.load = function(appname, apppath) {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 sys.app.load.help = function() {
     setapi.helptext ({
         name:"sys.app.load",
@@ -86,7 +87,7 @@ sys.app.load.help = function() {
         `>>>
     });
 }
-
+#endif
 // ============================================================================
 // FUNCTION sys.app.scan
 // ============================================================================
@@ -104,6 +105,7 @@ sys.app.scan = function() {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 sys.app.scan.help = function() {
     setapi.helptext ({
         name:"sys.app.scan",
@@ -113,7 +115,7 @@ sys.app.scan.help = function() {
         `>>>
     })
 }
-
+#endif
 // ============================================================================
 // FUNCTION sys.app.list
 // ============================================================================
@@ -136,7 +138,9 @@ sys.app.list = function(asJSON) {
         for (var k in mods) {
             var mod = mods[k];
             if (mod.type == "app") {
-                if (globalThis[mod.id].app) vers = globalThis[mod.id].app.version;
+                if (globalThis[mod.id].app) {
+                    vers = globalThis[mod.id].app.version;
+                }
                 if (! vers) vers = "n/a";
                 mod.version = vers;                
                 res.push (mod);
@@ -161,6 +165,7 @@ sys.app.list = function(asJSON) {
 // ============================================================================
 // DOCUMENTATION
 // ============================================================================
+#ifdef IS_INTERACTIVE
 sys.app.list.help = function() {
     setapi.helptext ({
         name:"sys.app.list",
@@ -173,3 +178,4 @@ sys.app.list.help = function() {
 setapi (sys.app.load, "sys.app.load");
 setapi (sys.app.scan, "sys.app.scan");
 setapi (sys.app.list, "sys.app.list");
+#endif
