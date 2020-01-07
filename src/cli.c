@@ -690,6 +690,7 @@ static int handle_interactive(duk_context *ctx) {
         } else {
             duk_pop(ctx);
         }
+        duk_gc(ctx,0);
     }
 
     if (buffer) {
