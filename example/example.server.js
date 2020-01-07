@@ -160,7 +160,9 @@ var Map = new URLMap({
         // If set to a string instead of a function, it is assumed to be
         // set to the path that should act as the root for the fileserver
         // while serving files from this point down.
-        access:"js/modules"
+        access:{
+            get:"js/modules"
+        }
     }
 });
 

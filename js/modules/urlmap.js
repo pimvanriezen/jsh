@@ -180,17 +180,23 @@ URLMap::errorReturn = function(req, code) {
 // ============================================================================
 URLMap::resolveHandler = function(obj,urlsplit,idx,req) {
     var pathleft = urlsplit.slice(idx).join('/');
-    
+    var method = req.method.toLowerCase();
     // Access handlers are performed regardless of whether we're at the
     // leaf end of a tree path.
     if (obj.access) {
-        var res = this.perform (req,pathleft,obj.access);
-        if (res) return res;
+        if (typeof (obj.access) == "object") {
+            if (obj.access[method]) {
+                var res = this.perform (req,pathleft,obj.access[method]);
+                if (res) return res;
+            }
+        }
+        else {
+            var res = this.perform (req,pathleft,obj.access);
+            if (res) return res;
     }
     
     // Are we at a leaf node?
     if (idx == urlsplit.length) {
-        var method = req.method.toLowerCase();
         if (obj[method]) {
             return this.perform (req,pathleft,obj[method]);
         }
