@@ -1,3 +1,6 @@
+// ============================================================================
+// CONSTRUCTOR
+// ============================================================================
 var Pipe = function() {
     this.in = new File();
     this.out = new File();
@@ -33,12 +36,20 @@ Pipe.help = function() {
 setapi (Pipe, "Pipe");
 #endif
 
+// ============================================================================
+// METHOD Pipe::setData
+// --------------------
+// Imports two filedescriptors and child pid, as it came out of sys.runpipe().
+// ============================================================================
 Pipe::setData = function(infd,outfd,pid) {
     this.in.fd = infd;
     this.out.fd = outfd;
     this.pid = pid;
 }
 
+// ============================================================================
+// METHOD Pipe::close
+// ============================================================================
 Pipe::close = function() {
     this.in.close();
     this.out.close();
@@ -61,6 +72,9 @@ Pipe::close.help = function() {
 }
 #endif
 
+// ============================================================================
+// I/O methods redirect to the relevant in/out descriptors.
+// ============================================================================
 Pipe::write = function() {
     return this.out.write.apply (this.out, arguments);
 }
