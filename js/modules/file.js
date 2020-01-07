@@ -7,6 +7,11 @@ var File = function() {
     this.enc = new TextEncoder();
     this.dec = new TextDecoder();
     this.eol = '\n';
+    Duktape.fin (this, function (x) {
+        if (this.fd) {
+            sys.io.close (this.fd);
+        }
+    });
 }
 
 #ifdef IS_INTERACTIVE
@@ -122,6 +127,7 @@ File::openAppend.help = function() {
 File::close = function() {
     if (! this.fd) return;
     sys.io.close (this.fd);
+    this.fd = 0;
 }
 
 #ifdef IS_INTERACTIVE
@@ -197,7 +203,7 @@ File::read = function(sz) {
         return res;
     }
     var inbuf = sys.io.read (this.fd, sz - (this.rdbuf.length));
-    if (! inbuf.length) {
+    if (!inbuf || !inbuf.length) {
         sys.io.close (this.fd);
         this.fd = null;
         if (! this.rdbuf.length) return null;

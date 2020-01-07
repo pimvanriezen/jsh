@@ -5,6 +5,14 @@ var Pipe = function() {
     this.in = new File();
     this.out = new File();
     this.pid = 0;
+    Duktape.fin (this, function (x) {
+        if (this.pid != 0) {
+            this.in.close();
+            this.out.close();
+            sys.closepipe (this.pid);
+            this.pid = 0;
+        }
+    });
 }
 
 #ifdef IS_INTERACTIVE
@@ -53,11 +61,13 @@ Pipe::setData = function(infd,outfd,pid) {
 Pipe::close = function() {
     this.in.close();
     this.out.close();
+    var res = -1;
     
     if (this.pid) {
-        sys.closepipe (this.pid);
+        res = sys.closepipe (this.pid);
         this.pid = 0;
     }
+    return (res == 0);
 }
 
 #ifdef IS_INTERACTIVE
@@ -71,6 +81,54 @@ Pipe::close.help = function() {
     })
 }
 #endif
+
+// ============================================================================
+// METHOD Pipe::grep
+// ============================================================================
+Pipe::grep = function(ex) {
+    var res = [];
+    if (typeof (ex) == "string") {
+        ex = new RegExp (ex);
+    }
+    
+    var ln;
+    while ((ln=this.readLine()) !== null) {
+        if (ex.test (ln)) res.push(ln);
+    }
+    this.close();
+    return res;
+}
+
+#ifdef IS_INTERACTIVE
+Pipe::grep.help = function() {
+    setapi.helptext({
+        name:"p.grep",
+        args:[
+            {name:"expr",text:<<<`
+                A regular expression, either as a RegExp object, or as
+                a string.
+            `>>>}
+        ],
+        text:<<<`
+            Drains and closes the pipe, returning all lines in its output
+            that match the regular expression as an array.
+        `>>>
+    })
+}
+#endif
+
+// ============================================================================
+// METHOD Pipe::readLines
+// ============================================================================
+Pipe::readLines = function() {
+    var res = [];
+    var ln;
+    while ((ln=this.readLine()) !== null) {
+        res.push(ln);
+    }
+    this.close();
+    return res;
+}
 
 // ============================================================================
 // I/O methods redirect to the relevant in/out descriptors.

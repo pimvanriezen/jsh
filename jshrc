@@ -46,7 +46,9 @@ if (sys.context == 'http') {
 // ============================================================================
 // Set up the result formatter for the interactive shell
 // ============================================================================
-jshFormat = function(x) { return dump.dumper(x,false,0,2); }
+jshFormat = function(x) {
+    return dump.dumper(x,false,0,2);
+}
 
 // ============================================================================
 // Set up help texts for the built-ins we loaded above
