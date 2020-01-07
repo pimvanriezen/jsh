@@ -184,7 +184,6 @@ TextTable.auto = function (inputstr, cols) {
     if (! cols) {
         cols = col;
     }
-    
     var t = new TextTable(cols);
     var outlines = [];
     var emptycount = 0;
@@ -208,6 +207,7 @@ TextTable.auto = function (inputstr, cols) {
                     if (emptycount == (cols-1)) {
                         var l = outlines.length;
                         outlines[l-1][nonemptyidx] += " "+output[nonemptyidx];
+                        t.stretchColumn(nonemptyidx);
                     }
                     else outlines.push (output);
                     emptycount = 0;
