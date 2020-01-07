@@ -142,45 +142,88 @@ TextTable.colorize = function(str) {
 // FUNCTION TextTable.auto
 // ============================================================================
 TextTable.auto = function (inputstr, cols) {
-    var t = new TextTable(cols);
     var cutw = [];
     var cutp = [0];
     var pos = 0;
     var col = 1;
     var output = [];
+    var lines = inputstr.split('\n');
+    var nlines = lines.length;
     
-    while (col<cols) {
-        while (inputstr[pos] != ' ' && inputstr[pos] != '\t') pos++;
-        while (inputstr[pos] == ' ' || inputstr[pos] == '\t') pos++;
+    while ((!cols) || (col<cols)) {
+        var isColumnStart = false;
+        while (! isColumnStart) {
+            while (inputstr[pos] != ' ' &&
+                   inputstr[pos] != '\t' &&
+                   inputstr[pos] != '\n') pos++;
+
+            // Assume a single space means it's two words
+            if (inputstr[pos]!='\n' && inputstr[pos+1]!=' ' &&
+                inputstr[pos+1]!='\t') {
+                pos++;
+                continue;
+            }
+            while (inputstr[pos] == ' ' || inputstr[pos] == '\t') pos++;
+            if (inputstr[pos] == '\n') break;
+            
+            isColumnStart = true;
+            for (var i=1;i<nlines;i++) {
+                if (lines[i].length < pos) continue;
+                if (lines[i][pos-1]!=' ' && lines[i][pos-1]!='\t') {
+                    isColumnStart = false;
+                    break;
+                }
+            }
+        }
+        if (! isColumnStart) break;
         cutw[col-1] = pos - cutp[col-1];
         cutp[col] = pos;
         col++;
     }
     cutw[cols-1] = 0;
+    if (! cols) {
+        cols = col;
+    }
     
-    var lines = inputstr.split('\n');
-    var output=[];
+    var t = new TextTable(cols);
+    var outlines = [];
+    var emptycount = 0;
+    var nonemptyidx = -1;
     
     for (var li in lines) {
         if (lines[li] == "") break;
         for (var i=0; i<cols; ++i) {
             var cdata="";
-            if (cutw[i]) {
+            if (lines[li].length < cutp[i]) {
+                cdata = " ";
+            }
+            else if (cutw[i]) {
                 cdata = lines[li].substr(cutp[i], cutw[i]);
             }
             else cdata = lines[li].substr(cutp[i]);
             cdata = cdata.replace (/[ \t]*$/, "");
-            if (cdata) {
-                if (i==0) {
-                    if (output.length) t.addRow (output);
-                    output = [];
+            
+            if (i==0) {
+                if (output.length) {
+                    if (emptycount == (cols-1)) {
+                        var l = outlines.length;
+                        outlines[l-1][nonemptyidx] += " "+output[nonemptyidx];
+                    }
+                    else outlines.push (output);
+                    emptycount = 0;
+                    nonemptyidx = -1;
                 }
-                if (output[i]) output[i] += " " + cdata;
-                else output[i] = cdata;
+                output = [];
             }
+
+            if (cdata) nonemptyidx = i;
+            else emptycount++;
+            
+            output[i] = cdata;
         }
     }
-    if (output.length) t.addRow (output);
+    if (output.length) outlines.push (output);
+    for (var ol in outlines) t.addRow (outlines[ol]);
     return t;
 }
 
@@ -261,6 +304,7 @@ TextTable::format = function() {
                 }
                 var w = widths[i];
                 var addcol;
+                
                 if ((i+1)<this.columns) w += this._padding;
                 if (out[i].length > line) {
                     if ((i+1)<this.columns) {
@@ -270,7 +314,7 @@ TextTable::format = function() {
                     else addcol = out[i][line];
                 }
                 else {
-                    if ((i+1)<this.columns) addcol = ("").padEnd (w);
+                    addcol = ("").padEnd (w);
                 }
                 ln += addcol;
                 ww += addcol.length;
