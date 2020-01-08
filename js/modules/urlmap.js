@@ -193,6 +193,7 @@ URLMap::resolveHandler = function(obj,urlsplit,idx,req) {
         else {
             var res = this.perform (req,pathleft,obj.access);
             if (res) return res;
+        }
     }
     
     // Are we at a leaf node?
