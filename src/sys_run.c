@@ -117,6 +117,8 @@ duk_ret_t sys_run (duk_context *ctx) {
             return 1;
         }
     }
+
+    fd_close (fdout);
     
     // Free stuff we no longer need
     for (i=0; i<(numarg+1);++i) free (args[i]);
@@ -147,8 +149,6 @@ duk_ret_t sys_run (duk_context *ctx) {
         buf[bufpos] = 0;
     }
     
-    waitpid (pid, &retstatus, 0);
-    fd_close (fdout);
     fd_close (fdin);
     
     // Clean up the process.
