@@ -222,6 +222,12 @@ duk_ret_t sys_runconsole (duk_context *ctx) {
     return 1;
 }
 
+// ============================================================================
+// FUNCTION sys_runpipe
+// --------------------
+// Like sys_run, this spawns a child process, but the raw pipe connected to
+// the child process is returned instead.
+// ============================================================================
 duk_ret_t sys_runpipe (duk_context *ctx) {
     if (duk_get_top (ctx) < 2) return DUK_RET_TYPE_ERROR;
     int tocmdpipe[2];
