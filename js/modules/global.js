@@ -23,7 +23,7 @@ include = function(name) {
             sys.parse (script, "include", scriptid);
         }
         catch (e) {
-            sys.print ("["+scriptid+"]: "+e+'\n');
+            sys.print ("["+scriptid+"]: "+(e.stack?e.stack:e)+'\n');
         }
     }
 }
@@ -59,7 +59,7 @@ require = function(modname) {
         return sys.require (modname);
     }
     catch (e) {
-        printerr ("Error loading module '"+modname+"': "+e);
+        printerr ("Module '"+modname+"': "+(e.stack?e.stack:e));
         throw (new Error ("Module load error"));
     }
 }
